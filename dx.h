@@ -428,7 +428,7 @@ namespace KennyKerr
 
         struct Device : Details::Object
         {
-            KENNYKERR_DEFINE_CLASS(Device, Details::Object, IDXGIDevice)
+            KENNYKERR_DEFINE_CLASS(Device, Details::Object, IDXGIDevice1)
 
             auto GetAdapter() const -> Adapter
             {
@@ -897,6 +897,7 @@ namespace KennyKerr
             None     = D2D1_WINDOW_STATE_NONE,
             Occluded = D2D1_WINDOW_STATE_OCCLUDED,
         };
+        DEFINE_ENUM_FLAG_OPERATORS(WindowState)
 
         enum class RenderTargetType
         {
@@ -1018,6 +1019,12 @@ namespace KennyKerr
         {
             SourceOver = D2D1_PRIMITIVE_BLEND_SOURCE_OVER,
             Copy       = D2D1_PRIMITIVE_BLEND_COPY,
+        };
+
+        enum class FactoryType
+        {
+            SingleThreaded = D2D1_FACTORY_TYPE_SINGLE_THREADED,
+            MultiThreaded  = D2D1_FACTORY_TYPE_MULTI_THREADED,
         };
 
         enum class ThreadingMode
@@ -3169,8 +3176,8 @@ namespace KennyKerr
                                                     mode);
             }
 
-            auto CreateLinearGradientBrush(LinearGradientBrushProperties const & linearGradientBrushProperties,
-                                           GradientStopCollection const & stops) const -> LinearGradientBrush
+            auto CreateLinearGradientBrush(GradientStopCollection const & stops,
+                                           LinearGradientBrushProperties const & linearGradientBrushProperties = LinearGradientBrushProperties()) const -> LinearGradientBrush
             {
                 LinearGradientBrush result;
 
@@ -3181,9 +3188,9 @@ namespace KennyKerr
                 return result;
             }
 
-            auto CreateLinearGradientBrush(LinearGradientBrushProperties const & linearGradientBrushProperties,
-                                           BrushProperties const &  brushProperties,
-                                           GradientStopCollection const & stops) const -> LinearGradientBrush
+            auto CreateLinearGradientBrush(GradientStopCollection const & stops,
+                                           LinearGradientBrushProperties const & linearGradientBrushProperties,
+                                           BrushProperties const &  brushProperties) const -> LinearGradientBrush
             {
                 LinearGradientBrush result;
 
@@ -4649,7 +4656,7 @@ namespace KennyKerr
 
         #pragma region Functions
 
-        inline auto CreateFactory(ThreadingMode mode = ThreadingMode::SingleThreaded) -> Factory1
+        inline auto CreateFactory(FactoryType mode = FactoryType::SingleThreaded) -> Factory1
         {
             Factory1 result;
 
