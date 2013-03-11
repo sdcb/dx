@@ -16,15 +16,17 @@
 #pragma warning(disable: 4706)
 #pragma warning(disable: 4127)
 
+#ifndef ASSERT
 #define ASSERT(cond) _ASSERTE(cond)
-
 #if WINAPI_FAMILY_PHONE_APP == WINAPI_FAMILY
 #ifdef _DEBUG
 #undef ASSERT
 #define ASSERT(expression) { if (!(expression)) throw Platform::Exception::CreateException(E_FAIL); }
 #endif
 #endif
+#endif
 
+#ifndef TRACE
 #ifdef _DEBUG
 #include <stdio.h>
 inline void TRACE(WCHAR const * const format, ...)
@@ -38,6 +40,7 @@ inline void TRACE(WCHAR const * const format, ...)
 }
 #else
 #define TRACE __noop
+#endif
 #endif
 
 namespace KennyKerr
@@ -128,8 +131,8 @@ namespace KennyKerr
         {
         }
 
-        explicit SizeU(unsigned width  = 0,
-                        unsigned height = 0) :
+        explicit SizeU(unsigned const width  = 0,
+                       unsigned const height = 0) :
             Width(width),
             Height(height)
         {}
@@ -148,8 +151,8 @@ namespace KennyKerr
         {
         }
 
-        explicit SizeF(float width = 0.0f,
-                        float height = 0.0f) :
+        explicit SizeF(float const width = 0.0f,
+                       float const height = 0.0f) :
             Width(width),
             Height(height)
         {}
@@ -168,8 +171,8 @@ namespace KennyKerr
         {
         }
 
-        explicit Point2F(float x = 0.0f,
-                            float y = 0.0f) :
+        explicit Point2F(float const x = 0.0f,
+                         float const y = 0.0f) :
             X(x),
             Y(y)
         {}
@@ -188,8 +191,8 @@ namespace KennyKerr
         {
         }
 
-        explicit Point2U(unsigned x = 0,
-                            unsigned y = 0) :
+        explicit Point2U(unsigned const x = 0,
+                         unsigned const y = 0) :
             X(x),
             Y(y)
         {}
@@ -202,10 +205,10 @@ namespace KennyKerr
     {
         KENNYKERR_DEFINE_STRUCT(D2D1_RECT_F)
 
-        explicit RectF(float left   = 0.0f,
-                        float top    = 0.0f,
-                        float right  = 0.0f,
-                        float bottom = 0.0f) :
+        explicit RectF(float const left   = 0.0f,
+                       float const top    = 0.0f,
+                       float const right  = 0.0f,
+                       float const bottom = 0.0f) :
             Left(left),
             Top(top),
             Right(right),
@@ -222,10 +225,10 @@ namespace KennyKerr
     {
         KENNYKERR_DEFINE_STRUCT(D2D1_RECT_U)
 
-        explicit RectU(unsigned left   = 0,
-                        unsigned top    = 0,
-                        unsigned right  = 0,
-                        unsigned bottom = 0) :
+        explicit RectU(unsigned const left   = 0,
+                       unsigned const top    = 0,
+                       unsigned const right  = 0,
+                       unsigned const bottom = 0) :
             Left(left),
             Top(top),
             Right(right),
@@ -335,8 +338,8 @@ namespace KennyKerr
                                               0); // flags
             }
 
-            auto SwapChain::Present(unsigned sync = 1,
-                                    unsigned flags = 0) const -> HRESULT
+            auto SwapChain::Present(unsigned const sync = 1,
+                                    unsigned const flags = 0) const -> HRESULT
             {
                 return (*this)->Present(sync, flags);
             }
@@ -368,8 +371,6 @@ namespace KennyKerr
                                               IUnknown * window,
                                               SwapChainProperties const & properties) const -> SwapChain
             {
-                ASSERT(window);
-
                 SwapChain result;
 
                 HR((*this)->CreateSwapChainForCoreWindow(device.Get(),
@@ -393,8 +394,8 @@ namespace KennyKerr
             }
             #endif
 
-            DWORD RegisterOcclusionStatusWindow(HWND window,
-                                                unsigned message = WM_USER) const
+            auto RegisterOcclusionStatusWindow(HWND window,
+                                               unsigned const message = WM_USER) const -> DWORD
             {
                 DWORD cookie;
 
@@ -438,7 +439,7 @@ namespace KennyKerr
             }
         };
 
-        auto CreateFactory() -> Factory
+        inline auto CreateFactory() -> Factory
         {
             Factory result;
 
@@ -453,12 +454,12 @@ namespace KennyKerr
     {
         enum class DriverType
         {
-            Unknown,
-            Hardware,
-            Reference,
-            Null,
-            Software,
-            Warp,
+            Unknown   = D3D_DRIVER_TYPE_UNKNOWN,
+            Hardware  = D3D_DRIVER_TYPE_HARDWARE,
+            Reference = D3D_DRIVER_TYPE_REFERENCE,
+            Null      = D3D_DRIVER_TYPE_NULL,
+            Software  = D3D_DRIVER_TYPE_SOFTWARE,
+            Warp      = D3D_DRIVER_TYPE_WARP,
          };
 
         enum class CreateDeviceFlag
@@ -490,7 +491,7 @@ namespace KennyKerr
 
         inline auto CreateDevice(Device & result,
                                  DriverType const type,
-                                 CreateDeviceFlag flags) -> HRESULT
+                                 CreateDeviceFlag flags = CreateDeviceFlag::SingleThreaded | CreateDeviceFlag::BgraSupport) -> HRESULT
         {
             #ifdef _DEBUG
             flags |= CreateDeviceFlag::Debug;
@@ -507,19 +508,19 @@ namespace KennyKerr
                                      nullptr); // device context
         }
 
-        inline auto CreateDevice() -> Device
+        inline auto CreateDevice(CreateDeviceFlag flags = CreateDeviceFlag::SingleThreaded | CreateDeviceFlag::BgraSupport) -> Device
         {
             Device result;
 
             auto hr = CreateDevice(result,
                                    DriverType::Hardware,
-                                   CreateDeviceFlag::SingleThreaded | CreateDeviceFlag::BgraSupport);
+                                   flags);
 
             if (DXGI_ERROR_UNSUPPORTED == hr)
             {
                 hr = CreateDevice(result,
                                   DriverType::Warp,
-                                  CreateDeviceFlag::SingleThreaded | CreateDeviceFlag::BgraSupport);
+                                  flags);
             }
 
             HR(hr);
@@ -635,13 +636,13 @@ namespace KennyKerr
 
         enum class RenderingMode
         {
-            Default = DWRITE_RENDERING_MODE_DEFAULT,
-            Aliased = DWRITE_RENDERING_MODE_ALIASED,
-            GdiClassic = DWRITE_RENDERING_MODE_GDI_CLASSIC,
-            GdiNatural = DWRITE_RENDERING_MODE_GDI_NATURAL,
-            Natural = DWRITE_RENDERING_MODE_NATURAL,
+            Default          = DWRITE_RENDERING_MODE_DEFAULT,
+            Aliased          = DWRITE_RENDERING_MODE_ALIASED,
+            GdiClassic       = DWRITE_RENDERING_MODE_GDI_CLASSIC,
+            GdiNatural       = DWRITE_RENDERING_MODE_GDI_NATURAL,
+            Natural          = DWRITE_RENDERING_MODE_NATURAL,
             NaturalSymmetric = DWRITE_RENDERING_MODE_NATURAL_SYMMETRIC,
-            Outline = DWRITE_RENDERING_MODE_OUTLINE,
+            Outline          = DWRITE_RENDERING_MODE_OUTLINE,
         };
 
         enum class MeasuringMode
@@ -692,21 +693,24 @@ namespace KennyKerr
         };
     }
 
-
     namespace Direct2D
     {
         #pragma region Enumerations
 
+        enum class BitmapInterpolationMode
+        {
+            NearestNeighbor   = D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,
+            Linear            = D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+        };
+
         enum class InterpolationMode
         {
-            NearestNeighbor   = D2D1_INTERPOLATION_MODE_DEFINITION_NEAREST_NEIGHBOR,
-            Linear            = D2D1_INTERPOLATION_MODE_DEFINITION_LINEAR,
-            Cubic             = D2D1_INTERPOLATION_MODE_DEFINITION_CUBIC,
-            MultiSampleLinear = D2D1_INTERPOLATION_MODE_DEFINITION_MULTI_SAMPLE_LINEAR,
-            Anisotropic       = D2D1_INTERPOLATION_MODE_DEFINITION_ANISOTROPIC,
-            HighQualityCubic  = D2D1_INTERPOLATION_MODE_DEFINITION_HIGH_QUALITY_CUBIC,
-            Fant              = D2D1_INTERPOLATION_MODE_DEFINITION_FANT,
-            MipmapLinear      = D2D1_INTERPOLATION_MODE_DEFINITION_MIPMAP_LINEAR,
+            NearestNeighbor   = D2D1_INTERPOLATION_MODE_NEAREST_NEIGHBOR,
+            Linear            = D2D1_INTERPOLATION_MODE_LINEAR,
+            Cubic             = D2D1_INTERPOLATION_MODE_CUBIC,
+            MultiSampleLinear = D2D1_INTERPOLATION_MODE_MULTI_SAMPLE_LINEAR,
+            Anisotropic       = D2D1_INTERPOLATION_MODE_ANISOTROPIC,
+            HighQualityCubic  = D2D1_INTERPOLATION_MODE_HIGH_QUALITY_CUBIC,
         };
 
         enum class Gamma
@@ -1404,7 +1408,7 @@ namespace KennyKerr
 
             explicit BitmapBrushProperties(ExtendMode extendModeX = ExtendMode::Clamp,
                                            ExtendMode extendModeY = ExtendMode::Clamp,
-                                           InterpolationMode interpolationMode = InterpolationMode::Linear) :
+                                           BitmapInterpolationMode interpolationMode = BitmapInterpolationMode::Linear) :
                 ExtendModeX(extendModeX),
                 ExtendModeY(extendModeY),
                 InterpolationMode(interpolationMode)
@@ -1413,7 +1417,7 @@ namespace KennyKerr
 
             ExtendMode ExtendModeX;
             ExtendMode ExtendModeY;
-            InterpolationMode InterpolationMode;
+            BitmapInterpolationMode InterpolationMode;
         };
 
         struct BitmapBrushProperties1
@@ -1983,7 +1987,7 @@ namespace KennyKerr
                 (*this)->SetExtendModeY(static_cast<D2D1_EXTEND_MODE>(mode));
             }
 
-            void SetInterpolationMode(InterpolationMode mode) const
+            void SetInterpolationMode(BitmapInterpolationMode mode) const
             {
                 (*this)->SetInterpolationMode(static_cast<D2D1_BITMAP_INTERPOLATION_MODE>(mode));
             }
@@ -2003,9 +2007,9 @@ namespace KennyKerr
                 return static_cast<ExtendMode>((*this)->GetExtendModeY());
             }
 
-            auto GetInterpolationMode() const -> InterpolationMode
+            auto GetInterpolationMode() const -> BitmapInterpolationMode
             {
-                return static_cast<InterpolationMode>((*this)->GetInterpolationMode());
+                return static_cast<BitmapInterpolationMode>((*this)->GetInterpolationMode());
             }
 
             auto GetBitmap() const -> Bitmap
