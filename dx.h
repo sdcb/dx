@@ -121,6 +121,23 @@ namespace KennyKerr
         Ignore       = D2D1_ALPHA_MODE_IGNORE,        // DXGI_ALPHA_MODE_IGNORE
     };
 
+    enum class ExecutionContext
+    {
+        InprocServer   = CLSCTX_INPROC_SERVER,
+        InprocHandler  = CLSCTX_INPROC_HANDLER,
+        LocalServer    = CLSCTX_LOCAL_SERVER,
+        RemoteServer   = CLSCTX_REMOTE_SERVER,
+        EnableCloaking = CLSCTX_ENABLE_CLOAKING,
+        AppContainer   = CLSCTX_APPCONTAINER,
+    };
+    DEFINE_ENUM_FLAG_OPERATORS(ExecutionContext)
+
+    enum class Apartment
+    {
+        SingleThreaded = COINIT_APARTMENTTHREADED,
+        MultiThreaded  = COINIT_MULTITHREADED,
+    };
+
     struct SizeU
     {
         KENNYKERR_DEFINE_STRUCT(D2D1_SIZE_U)
@@ -240,6 +257,37 @@ namespace KennyKerr
         unsigned Right;
         unsigned Bottom;
     };
+
+    struct Stream : Details::Object
+    {
+        KENNYKERR_DEFINE_CLASS(Stream, Details::Object, IStream)
+    };
+
+    struct ComInitialize
+    { 
+        explicit ComInitialize(Apartment apartment = Apartment::MultiThreaded)
+        {
+            HR(CoInitializeEx(nullptr,
+                              static_cast<DWORD>(apartment)));
+        }
+
+        ~ComInitialize()
+        {
+            CoUninitialize();
+        }
+    };
+
+    template <typename T>
+    auto CoCreateInstance(REFCLSID clsid,
+                          T ** result,
+                          ExecutionContext context = ExecutionContext::InprocServer) -> HRESULT
+    {
+        return ::CoCreateInstance(clsid,
+                                  nullptr, // outer
+                                  static_cast<DWORD>(context),
+                                  __uuidof(T),
+                                  reinterpret_cast<void **>(result));
+    }
 
     namespace Dxgi
     {
@@ -464,6 +512,7 @@ namespace KennyKerr
 
         enum class CreateDeviceFlag
         {
+            None             = 0,
             SingleThreaded   = D3D11_CREATE_DEVICE_SINGLETHREADED,
             Debug            = D3D11_CREATE_DEVICE_DEBUG,
             BgraSupport      = D3D11_CREATE_DEVICE_BGRA_SUPPORT,
@@ -471,6 +520,31 @@ namespace KennyKerr
             PreventDebugging = D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY
         };
         DEFINE_ENUM_FLAG_OPERATORS(CreateDeviceFlag);
+
+        struct MultiThread : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(MultiThread, Details::Object, ID3D10Multithread)
+
+            void Enter() const
+            {
+                (*this)->Enter();
+            }
+
+            void Leave() const
+            {
+                (*this)->Leave();
+            }
+
+            auto SetProtected(bool protect) const -> bool
+            {
+                return 0 != (*this)->SetMultithreadProtected(protect);
+            }
+
+            auto GetProtected() const -> bool
+            {
+                return 0 != (*this)->GetMultithreadProtected();
+            }
+        };
 
         struct Device : Details::Object
         {
@@ -483,6 +557,13 @@ namespace KennyKerr
                 return result;
             }
 
+            auto AsMultiThread() const -> MultiThread
+            {
+                MultiThread result;
+                HR(m_ptr.CopyTo(result.GetAddressOf()));
+                return result;
+            }
+
             auto GetDxgiFactory() const -> Dxgi::Factory
             {
                 return AsDxgi().GetAdapter().GetParent();
@@ -491,7 +572,7 @@ namespace KennyKerr
 
         inline auto CreateDevice(Device & result,
                                  DriverType const type,
-                                 CreateDeviceFlag flags = CreateDeviceFlag::SingleThreaded | CreateDeviceFlag::BgraSupport) -> HRESULT
+                                 CreateDeviceFlag flags = CreateDeviceFlag::BgraSupport) -> HRESULT
         {
             #ifdef _DEBUG
             flags |= CreateDeviceFlag::Debug;
@@ -508,7 +589,7 @@ namespace KennyKerr
                                      nullptr); // device context
         }
 
-        inline auto CreateDevice(CreateDeviceFlag flags = CreateDeviceFlag::SingleThreaded | CreateDeviceFlag::BgraSupport) -> Device
+        inline auto CreateDevice(CreateDeviceFlag flags = CreateDeviceFlag::BgraSupport) -> Device
         {
             Device result;
 
@@ -560,6 +641,20 @@ namespace KennyKerr
             FixedGray4       = WICBitmapPaletteTypeFixedGray4,
             FixedGray16      = WICBitmapPaletteTypeFixedGray16,
             FixedGray256     = WICBitmapPaletteTypeFixedGray256,
+        };
+
+        enum class BitmapCreateCacheOption
+        {
+            None     = WICBitmapNoCache,
+            OnDemand = WICBitmapCacheOnDemand,
+            OnLoad   = WICBitmapCacheOnLoad,
+        };
+
+        enum class BitmapEncoderCacheOption
+        {
+            None     = WICBitmapEncoderNoCache,
+            InMemory = WICBitmapEncoderCacheInMemory,
+            TempFile = WICBitmapEncoderCacheTempFile,
         };
 
         struct Palette : Details::Object
@@ -619,6 +714,54 @@ namespace KennyKerr
                                        static_cast<WICBitmapPaletteType>(paletteTranslate)));
             }
         };
+
+        struct BitmapEncoder : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(BitmapEncoder, Details::Object, IWICBitmapEncoder)
+
+            //void Initialize(Stream const & stream, WICBitmapEncoderNoCache
+        };
+
+        struct Factory : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Factory, Details::Object, IWICImagingFactory)
+
+            auto CreateBitmap(SizeU const & size,
+                              REFGUID format = GUID_WICPixelFormat32bppPBGRA,
+                              BitmapCreateCacheOption cache = BitmapCreateCacheOption::OnLoad) -> Bitmap
+            {
+                Bitmap result;
+
+                HR((*this)->CreateBitmap(size.Width,
+                                         size.Height,
+                                         format,
+                                         static_cast<WICBitmapCreateCacheOption>(cache),
+                                         result.GetAddressOf()));
+
+                return result;
+            }
+
+            auto CreateEncoder(REFGUID format) -> BitmapEncoder
+            {
+                BitmapEncoder result;
+
+                HR((*this)->CreateEncoder(format,
+                                          nullptr,
+                                          result.GetAddressOf()));
+
+                return result;
+            }
+        };
+
+        inline auto CreateFactory() -> Factory
+        {
+            Factory result;
+
+            HR(CoCreateInstance(CLSID_WICImagingFactory,
+                                result.GetAddressOf()));
+
+            return result;
+        }
     }
 
     namespace Wam
@@ -4313,9 +4456,36 @@ namespace KennyKerr
             }
         };
 
+        struct MultiThread : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(MultiThread, Details::Object, ID2D1Multithread)
+
+            auto GetProtected() const -> bool
+            {
+                return 0 != (*this)->GetMultithreadProtected();
+            }
+
+            void Enter() const
+            {
+                (*this)->Enter();
+            }
+
+            void Leave() const
+            {
+                (*this)->Leave();
+            }
+        };
+
         struct Factory : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Factory, Details::Object, ID2D1Factory)
+
+            auto AsMultiThread() const -> MultiThread
+            {
+                MultiThread result;
+                HR(m_ptr.CopyTo(result.GetAddressOf()));
+                return result;
+            }
 
             auto GetDesktopDpi() const -> float
             {
@@ -4531,73 +4701,53 @@ namespace KennyKerr
             // TODO: remaining methods
         };
 
-        struct MultiThread : Details::Object
-        {
-            KENNYKERR_DEFINE_CLASS(MultiThread, Details::Object, ID2D1Multithread)
-
-            auto GetMultithreadProtected() const -> bool
-            {
-                return 0 != (*this)->GetMultithreadProtected();
-            }
-
-            void Enter() const
-            {
-                (*this)->Enter();
-            }
-
-            void Leave() const
-            {
-                (*this)->Leave();
-            }
-        };
-
-        auto Resource::GetFactory() const -> Factory
+        inline auto Resource::GetFactory() const -> Factory
         {
             Factory result;
             (*this)->GetFactory(result.GetAddressOf());
             return result;
         }
 
-        void Bitmap::CopyFromRenderTarget(RenderTarget const & other) const
+        inline void Bitmap::CopyFromRenderTarget(RenderTarget const & other) const
         {
             HR((*this)->CopyFromRenderTarget(nullptr,
                                              other.Get(),
                                              nullptr));
         }
 
-        void Bitmap::CopyFromRenderTarget(RenderTarget const & other,
-                                          Point2U const & destination) const
+        inline void Bitmap::CopyFromRenderTarget(RenderTarget const & other,
+                                                 Point2U const & destination) const
         {
             HR((*this)->CopyFromRenderTarget(destination.Get(),
                                              other.Get(),
                                              nullptr));
         }
 
-        void Bitmap::CopyFromRenderTarget(RenderTarget const & other,
-                                          RectU const & source) const
+        inline void Bitmap::CopyFromRenderTarget(RenderTarget const & other,
+                                                 RectU const & source) const
         {
             HR((*this)->CopyFromRenderTarget(nullptr,
                                              other.Get(),
                                              source.Get()));
         }
 
-        void Bitmap::CopyFromRenderTarget(RenderTarget const & other,
-                                          Point2U const & destination,
-                                          RectU const & source) const
+        inline void Bitmap::CopyFromRenderTarget(RenderTarget const & other,
+                                                 Point2U const & destination,
+                                                 RectU const & source) const
         {
             HR((*this)->CopyFromRenderTarget(destination.Get(),
                                              other.Get(),
                                              source.Get()));
         }
 
-        auto RenderTarget::CreateCompatibleRenderTarget() const -> BitmapRenderTarget
+        inline auto RenderTarget::CreateCompatibleRenderTarget() const -> BitmapRenderTarget
         {
             BitmapRenderTarget result;
             HR((*this)->CreateCompatibleRenderTarget(result.GetAddressOf()));
             return result;
         }
 
-        auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & size) const -> BitmapRenderTarget
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & size) const -> BitmapRenderTarget
         {
             BitmapRenderTarget result;
 
@@ -4607,8 +4757,8 @@ namespace KennyKerr
             return result;
         }
 
-        auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & size,
-                                                        SizeU const & pixelSize) const -> BitmapRenderTarget
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & size,
+                                                               SizeU const & pixelSize) const -> BitmapRenderTarget
         {
             BitmapRenderTarget result;
 
@@ -4619,9 +4769,9 @@ namespace KennyKerr
             return result;
         }
 
-        auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & size,
-                                                        SizeU const & pixelSize,
-                                                        PixelFormat const & format) const -> BitmapRenderTarget
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & size,
+                                                               SizeU const & pixelSize,
+                                                               PixelFormat const & format) const -> BitmapRenderTarget
         {
             BitmapRenderTarget result;
 
@@ -4633,10 +4783,10 @@ namespace KennyKerr
             return result;
         }
 
-        auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & size,
-                                                        SizeU const & pixelSize,
-                                                        PixelFormat const & format,
-                                                        CompatibleRenderTargetOptions options) const -> BitmapRenderTarget
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & size,
+                                                               SizeU const & pixelSize,
+                                                               PixelFormat const & format,
+                                                               CompatibleRenderTargetOptions options) const -> BitmapRenderTarget
         {
             BitmapRenderTarget result;
 
@@ -4649,7 +4799,7 @@ namespace KennyKerr
             return result;
         }
 
-        auto DeviceContext::GetDevice() const -> Device
+        inline auto DeviceContext::GetDevice() const -> Device
         {
             Device result;
             (*this)->GetDevice(result.GetAddressOf());
