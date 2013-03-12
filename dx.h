@@ -252,6 +252,16 @@ namespace KennyKerr
             Bottom(bottom)
         {}
 
+        auto Width() const -> unsigned
+        {
+            return Right - Left;
+        }
+
+        auto Height() const -> unsigned
+        {
+            return Bottom - Top;
+        }
+
         unsigned Left;
         unsigned Top;
         unsigned Right;
@@ -261,6 +271,11 @@ namespace KennyKerr
     struct Stream : Details::Object
     {
         KENNYKERR_DEFINE_CLASS(Stream, Details::Object, IStream)
+    };
+
+    struct PropertyBag2 : Details::Object
+    {
+        KENNYKERR_DEFINE_CLASS(PropertyBag2, Details::Object, IPropertyBag2)
     };
 
     struct ComInitialize
@@ -712,7 +727,7 @@ namespace KennyKerr
             KENNYKERR_DEFINE_CLASS(FormatConverter, BitmapSource, IWICFormatConverter);
 
             void Initialize(BitmapSource const & source,
-                            REFGUID format = GUID_WICPixelFormat32bppPBGRA,
+                            GUID const & format = GUID_WICPixelFormat32bppPBGRA,
                             BitmapDitherType dither = BitmapDitherType::None,
                             double alphaThresholdPercent = 0.0,
                             BitmapPaletteType paletteTranslate = BitmapPaletteType::MedianCut) const
@@ -726,11 +741,81 @@ namespace KennyKerr
             }
         };
 
+        struct BitmapFrameEncode : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(BitmapFrameEncode, Details::Object, IWICBitmapFrameEncode)
+
+            void Initialize(PropertyBag2 const & properties) const
+            {
+                HR((*this)->Initialize(properties.Get()));
+            }
+
+            void SetSize(SizeU const & size) const
+            {
+                HR((*this)->SetSize(size.Width,
+                                    size.Height));
+            }
+
+            void SetPixelFormat(GUID & format) const
+            {
+                HR((*this)->SetPixelFormat(&format));
+            }
+
+            void WriteSource(BitmapSource const & source) const
+            {
+                HR((*this)->WriteSource(source.Get(),
+                                        nullptr));
+            }
+
+            void WriteSource(BitmapSource const & source,
+                             RectU const & rect) const
+            {
+                WICRect wrect = { rect.Left, rect.Top, rect.Width(), rect.Height() };
+
+                HR((*this)->WriteSource(source.Get(),
+                                        &wrect));
+            }
+
+            void Commit() const
+            {
+                HR((*this)->Commit());
+            }
+        };
+
         struct BitmapEncoder : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(BitmapEncoder, Details::Object, IWICBitmapEncoder)
 
-            //void Initialize(Stream const & stream, WICBitmapEncoderNoCache
+            void Initialize(Stream const & stream,
+                            BitmapEncoderCacheOption cache = BitmapEncoderCacheOption::None) const
+            {
+                HR((*this)->Initialize(stream.Get(),
+                                       static_cast<WICBitmapEncoderCacheOption>(cache)));
+            }
+
+            void CreateNewFrame(BitmapFrameEncode & frame,
+                                PropertyBag2 & properties) const
+            {
+                HR((*this)->CreateNewFrame(frame.GetAddressOf(),
+                                           properties.GetAddressOf()));
+            }
+
+            auto CreateNewFrame() const -> BitmapFrameEncode
+            {
+                BitmapFrameEncode frame;
+                PropertyBag2 properties;
+
+                CreateNewFrame(frame,
+                               properties);
+
+                frame.Initialize(properties);
+                return frame;
+            }
+
+            void Commit() const
+            {
+                HR((*this)->Commit());
+            }
         };
 
         struct BitmapDecoder : Details::Object
@@ -765,6 +850,13 @@ namespace KennyKerr
                 HR((*this)->InitializeFromMemory(buffer,
                                                  size));
             }
+
+            auto InitializeFromFilename(PCWSTR filename,
+                                        DWORD desiredAccess = GENERIC_READ | GENERIC_WRITE) -> HRESULT
+            {
+                return (*this)->InitializeFromFilename(filename,
+                                                       desiredAccess);
+            }
         };
 
         struct Factory : Details::Object
@@ -772,7 +864,7 @@ namespace KennyKerr
             KENNYKERR_DEFINE_CLASS(Factory, Details::Object, IWICImagingFactory)
 
             auto CreateBitmap(SizeU const & size,
-                              REFGUID format = GUID_WICPixelFormat32bppPBGRA,
+                              GUID const & format = GUID_WICPixelFormat32bppPBGRA,
                               BitmapCreateCacheOption cache = BitmapCreateCacheOption::OnLoad) const -> Bitmap
             {
                 Bitmap result;
@@ -786,7 +878,7 @@ namespace KennyKerr
                 return result;
             }
 
-            auto CreateEncoder(REFGUID format) const -> BitmapEncoder
+            auto CreateEncoder(GUID const & format) const -> BitmapEncoder
             {
                 BitmapEncoder result;
 
@@ -1494,8 +1586,8 @@ namespace KennyKerr
             {
             }
 
-            explicit PixelFormat(Dxgi::Format format = Dxgi::Format::B8G8R8A8_UNORM,
-                                 AlphaMode mode = AlphaMode::Premultipled) :
+            explicit PixelFormat(Dxgi::Format format = Dxgi::Format::Unknown,
+                                 AlphaMode mode = AlphaMode::Unknown) :
                 Format(format),
                 AlphaMode(mode)
             {
@@ -4705,7 +4797,7 @@ namespace KennyKerr
             }
 
             auto CreateWicBitmapRenderTarget(Wic::Bitmap const & target,
-                                             RenderTargetProperties const & properties) const -> RenderTarget
+                                             RenderTargetProperties const & properties = RenderTargetProperties()) const -> RenderTarget
             {
                 RenderTarget result;
 
