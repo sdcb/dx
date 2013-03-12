@@ -657,6 +657,12 @@ namespace KennyKerr
             TempFile = WICBitmapEncoderCacheTempFile,
         };
 
+        enum class WICDecodeCacheOptions
+        {
+            OnDemand = WICDecodeMetadataCacheOnDemand,
+            OnLoad   = WICDecodeMetadataCacheOnLoad,
+        };
+
         struct Palette : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Palette, Details::Object, IWICPalette)
@@ -691,6 +697,11 @@ namespace KennyKerr
             KENNYKERR_DEFINE_CLASS(Bitmap, BitmapSource, IWICBitmap)
         };
 
+        struct BitmapFrameDecode : BitmapSource
+        {
+            KENNYKERR_DEFINE_CLASS(BitmapFrameDecode, BitmapSource, IWICBitmapFrameDecode)
+        };
+
         struct ColorContext : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(ColorContext, Details::Object, IWICColorContext)
@@ -704,7 +715,7 @@ namespace KennyKerr
                             REFGUID format = GUID_WICPixelFormat32bppPBGRA,
                             BitmapDitherType dither = BitmapDitherType::None,
                             double alphaThresholdPercent = 0.0,
-                            BitmapPaletteType paletteTranslate = BitmapPaletteType::MedianCut)
+                            BitmapPaletteType paletteTranslate = BitmapPaletteType::MedianCut) const
             {
                 HR((*this)->Initialize(source.Get(),
                                        format,
@@ -722,13 +733,47 @@ namespace KennyKerr
             //void Initialize(Stream const & stream, WICBitmapEncoderNoCache
         };
 
+        struct BitmapDecoder : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(BitmapDecoder, Details::Object, IWICBitmapDecoder)
+
+            auto GetFrameCount() const -> unsigned
+            {
+                unsigned count;
+                HR((*this)->GetFrameCount(&count));
+                return count;
+            }
+
+            auto GetFrame(unsigned index = 0) const -> BitmapFrameDecode
+            {
+                BitmapFrameDecode result;
+
+                HR((*this)->GetFrame(index,
+                                     result.GetAddressOf()));
+
+                return result;
+            }
+        };
+
+        struct Stream : KennyKerr::Stream
+        {
+            KENNYKERR_DEFINE_CLASS(Stream, KennyKerr::Stream, IWICStream)
+
+            void InitializeFromMemory(BYTE * buffer,
+                                      unsigned size) const
+            {
+                HR((*this)->InitializeFromMemory(buffer,
+                                                 size));
+            }
+        };
+
         struct Factory : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Factory, Details::Object, IWICImagingFactory)
 
             auto CreateBitmap(SizeU const & size,
                               REFGUID format = GUID_WICPixelFormat32bppPBGRA,
-                              BitmapCreateCacheOption cache = BitmapCreateCacheOption::OnLoad) -> Bitmap
+                              BitmapCreateCacheOption cache = BitmapCreateCacheOption::OnLoad) const -> Bitmap
             {
                 Bitmap result;
 
@@ -741,7 +786,7 @@ namespace KennyKerr
                 return result;
             }
 
-            auto CreateEncoder(REFGUID format) -> BitmapEncoder
+            auto CreateEncoder(REFGUID format) const -> BitmapEncoder
             {
                 BitmapEncoder result;
 
@@ -749,6 +794,33 @@ namespace KennyKerr
                                           nullptr,
                                           result.GetAddressOf()));
 
+                return result;
+            }
+
+            auto CreateDecoderFromStream(KennyKerr::Stream const & stream,
+                                         WICDecodeCacheOptions options = WICDecodeCacheOptions::OnDemand) const -> BitmapDecoder
+            {
+                BitmapDecoder result;
+
+                HR((*this)->CreateDecoderFromStream(stream.Get(),
+                                                    nullptr,
+                                                    static_cast<WICDecodeOptions>(options),
+                                                    result.GetAddressOf()));
+
+                return result;
+            }
+
+            auto CreateFormatConverter() const -> FormatConverter
+            {
+                FormatConverter result;
+                HR((*this)->CreateFormatConverter(result.GetAddressOf()));
+                return result;
+            }
+
+            auto CreateStream() const -> Stream
+            {
+                Stream result;
+                HR((*this)->CreateStream(result.GetAddressOf()));
                 return result;
             }
         };
