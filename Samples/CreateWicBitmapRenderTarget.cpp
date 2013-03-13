@@ -3,7 +3,6 @@
 using namespace KennyKerr;
 
 Direct2D::Color const COLOR_BLUE(0.26f, 0.56f, 0.87f);
-Direct2D::Color const COLOR_WHITE(1.0f,  1.0f,  1.0f);
 wchar_t const * const FILENAME = L"C:\\temp\\dx.png";
 
 int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)

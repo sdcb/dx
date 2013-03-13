@@ -88,11 +88,14 @@ namespace KennyKerr
         auto Get() const -> INTERFACE *     {                 return static_cast<INTERFACE *>(m_ptr.Get()); }                                  \
         auto GetAddressOf() -> INTERFACE ** { ASSERT(!m_ptr); return reinterpret_cast<INTERFACE **>(m_ptr.GetAddressOf()); }
 
-        #define KENNYKERR_DEFINE_STRUCT(STRUCT)                                                \
-        auto Get() const -> STRUCT const * { return reinterpret_cast<STRUCT const *>(this); }; \
-        auto Get() -> STRUCT *             { return reinterpret_cast<STRUCT *>(this);       }; \
-        auto Ref() const -> STRUCT const & { return *Get();                                 }; \
-        auto Ref() -> STRUCT &             { return *Get();                                 };
+        // Would love to use a static_assert here but that can't appear inside the class definition.
+        #define KENNYKERR_DEFINE_STRUCT(THIS_STRUCT, BASE_STRUCT)                                        \
+        auto Get() const -> BASE_STRUCT const * { ASSERT(sizeof(THIS_STRUCT) == sizeof(BASE_STRUCT));    \
+                                                  return reinterpret_cast<BASE_STRUCT const *>(this); }; \
+        auto Get()       -> BASE_STRUCT *       { ASSERT(sizeof(THIS_STRUCT) == sizeof(BASE_STRUCT));    \
+                                                  return reinterpret_cast<BASE_STRUCT *>(this);       }; \
+        auto Ref() const -> BASE_STRUCT const & { return *Get();                                      }; \
+        auto Ref()       -> BASE_STRUCT &       { return *Get();                                      };
     }
 
     #ifndef __cplusplus_winrt
@@ -140,7 +143,7 @@ namespace KennyKerr
 
     struct SizeU
     {
-        KENNYKERR_DEFINE_STRUCT(D2D1_SIZE_U)
+        KENNYKERR_DEFINE_STRUCT(SizeU, D2D1_SIZE_U)
 
         SizeU(D2D1_SIZE_U const & other) :
             Width(other.width),
@@ -160,7 +163,7 @@ namespace KennyKerr
 
     struct SizeF
     {
-        KENNYKERR_DEFINE_STRUCT(D2D1_SIZE_F)
+        KENNYKERR_DEFINE_STRUCT(SizeF, D2D1_SIZE_F)
 
         SizeF(D2D1_SIZE_F const & other) :
             Width(other.width),
@@ -180,7 +183,7 @@ namespace KennyKerr
 
     struct Point2F
     {
-        KENNYKERR_DEFINE_STRUCT(D2D1_POINT_2F)
+        KENNYKERR_DEFINE_STRUCT(Point2F, D2D1_POINT_2F)
 
         Point2F(D2D1_POINT_2F const & other) :
             X(other.x),
@@ -200,7 +203,7 @@ namespace KennyKerr
 
     struct Point2U
     {
-        KENNYKERR_DEFINE_STRUCT(D2D1_POINT_2U)
+        KENNYKERR_DEFINE_STRUCT(Point2U, D2D1_POINT_2U)
 
         Point2U(D2D1_POINT_2U const & other) :
             X(other.x),
@@ -220,7 +223,7 @@ namespace KennyKerr
 
     struct RectF
     {
-        KENNYKERR_DEFINE_STRUCT(D2D1_RECT_F)
+        KENNYKERR_DEFINE_STRUCT(RectF, D2D1_RECT_F)
 
         explicit RectF(float const left   = 0.0f,
                        float const top    = 0.0f,
@@ -240,7 +243,7 @@ namespace KennyKerr
 
     struct RectU
     {
-        KENNYKERR_DEFINE_STRUCT(D2D1_RECT_U)
+        KENNYKERR_DEFINE_STRUCT(RectU, D2D1_RECT_U)
 
         explicit RectU(unsigned const left   = 0,
                        unsigned const top    = 0,
@@ -348,7 +351,7 @@ namespace KennyKerr
 
         struct SampleProperties
         {
-            KENNYKERR_DEFINE_STRUCT(DXGI_SAMPLE_DESC)
+            KENNYKERR_DEFINE_STRUCT(SampleProperties, DXGI_SAMPLE_DESC)
 
             unsigned Count;
             unsigned Quality;
@@ -356,7 +359,7 @@ namespace KennyKerr
 
         struct SwapChainProperties
         {
-            KENNYKERR_DEFINE_STRUCT(DXGI_SWAP_CHAIN_DESC1)
+            KENNYKERR_DEFINE_STRUCT(SwapChainProperties, DXGI_SWAP_CHAIN_DESC1)
 
             unsigned Width;
             unsigned Height;
@@ -536,6 +539,99 @@ namespace KennyKerr
         };
         DEFINE_ENUM_FLAG_OPERATORS(CreateDeviceFlag);
 
+        enum class Usage
+        {
+            Default   = D3D11_USAGE_DEFAULT,
+            Immutable = D3D11_USAGE_IMMUTABLE,
+            Dynamic   = D3D11_USAGE_DYNAMIC,
+            Staging   = D3D11_USAGE_STAGING,
+        };
+
+        enum class BindFlag
+        {
+            None            = 0,
+            VertexBuffer    = D3D11_BIND_VERTEX_BUFFER,
+            IndexBuffer     = D3D11_BIND_INDEX_BUFFER,
+            ConstantBuffer  = D3D11_BIND_CONSTANT_BUFFER,
+            ShaderResource  = D3D11_BIND_SHADER_RESOURCE,
+            StreamOutput    = D3D11_BIND_STREAM_OUTPUT,
+            RenderTarget    = D3D11_BIND_RENDER_TARGET,
+            DepthStencil    = D3D11_BIND_DEPTH_STENCIL,
+            UnorderedAccess = D3D11_BIND_UNORDERED_ACCESS,
+            Decoder         = D3D11_BIND_DECODER,
+            VideoEncoder    = D3D11_BIND_VIDEO_ENCODER,
+        };
+        DEFINE_ENUM_FLAG_OPERATORS(BindFlag)
+
+        enum class CpuAccessFlag
+        {
+            None  = 0,
+            Write = D3D11_CPU_ACCESS_WRITE,
+            Read  = D3D11_CPU_ACCESS_READ,
+        };
+        DEFINE_ENUM_FLAG_OPERATORS(CpuAccessFlag)
+
+        enum class ResourceMiscFlag
+        {
+            None                         = 0,
+            GenerateMips                 = D3D11_RESOURCE_MISC_GENERATE_MIPS,
+            Shared                       = D3D11_RESOURCE_MISC_SHARED,
+            TextureCube                  = D3D11_RESOURCE_MISC_TEXTURECUBE,
+            DrawIndirectArgs             = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS,
+            BufferAllowRawViews          = D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS,
+            BufferStructured             = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED,
+            ResourceClamp                = D3D11_RESOURCE_MISC_RESOURCE_CLAMP,
+            SharedKeyedMutex             = D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX,
+            GdiCompatible                = D3D11_RESOURCE_MISC_GDI_COMPATIBLE,
+            SharedNtHandle               = D3D11_RESOURCE_MISC_SHARED_NTHANDLE,
+            RestrictedContent            = D3D11_RESOURCE_MISC_RESTRICTED_CONTENT,
+            RestrictSharedResource       = D3D11_RESOURCE_MISC_RESTRICT_SHARED_RESOURCE,
+            RestrictSharedResourceDriver = D3D11_RESOURCE_MISC_RESTRICT_SHARED_RESOURCE_DRIVER,
+            Guarded                      = D3D11_RESOURCE_MISC_GUARDED,
+        };
+        DEFINE_ENUM_FLAG_OPERATORS(ResourceMiscFlag)
+
+        struct TextureProperties2D
+        {
+            KENNYKERR_DEFINE_STRUCT(TextureProperties2D, D3D11_TEXTURE2D_DESC)
+
+            TextureProperties2D(Dxgi::Format format,
+                                unsigned width,
+                                unsigned height,
+                                unsigned arraySize = 1,
+                                unsigned mipLevels = 0,
+                                BindFlag bindFlags = BindFlag::ShaderResource,
+                                Usage usage = Usage::Default,
+                                CpuAccessFlag cpuAccessFlags = CpuAccessFlag::None,
+                                unsigned sampleCount = 1,
+                                unsigned sampleQuality = 0,
+                                ResourceMiscFlag miscFlags = ResourceMiscFlag::None) :
+                Width(width),
+                Height(height),
+                MipLevels(mipLevels),
+                ArraySize(arraySize),
+                Format(format),
+                Usage(usage),
+                BindFlags(bindFlags),
+                CpuAccessFlags(cpuAccessFlags),
+                MiscFlags(miscFlags)
+            {
+                Sample.Count = sampleCount;
+                Sample.Quality = sampleQuality;
+            }
+
+            unsigned Width;
+            unsigned Height;
+            unsigned MipLevels;
+            unsigned ArraySize;
+            Dxgi::Format Format;
+            Dxgi::SampleProperties Sample;
+            Usage Usage;
+            BindFlag BindFlags;
+            CpuAccessFlag CpuAccessFlags;
+            ResourceMiscFlag MiscFlags;
+        };
+
         struct MultiThread : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(MultiThread, Details::Object, ID3D10Multithread)
@@ -561,6 +657,11 @@ namespace KennyKerr
             }
         };
 
+        struct Texture2D : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Texture2D, Details::Object, ID3D11Texture2D)
+        };
+
         struct Device : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Device, Details::Object, ID3D11Device)
@@ -582,6 +683,17 @@ namespace KennyKerr
             auto GetDxgiFactory() const -> Dxgi::Factory
             {
                 return AsDxgi().GetAdapter().GetParent();
+            }
+
+            auto CreateTexture2D(TextureProperties2D const & properties) const -> Texture2D
+            {
+                Texture2D result;
+
+                HR((*this)->CreateTexture2D(properties.Get(),
+                                            nullptr,
+                                            result.GetAddressOf()));
+
+                return result;
             }
         };
 
@@ -1371,7 +1483,7 @@ namespace KennyKerr
 
         struct DrawingStateDescription
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_DRAWING_STATE_DESCRIPTION)
+            KENNYKERR_DEFINE_STRUCT(DrawingStateDescription, D2D1_DRAWING_STATE_DESCRIPTION)
 
             DrawingStateDescription(AntialiasMode antialiasMode = AntialiasMode::PerPrimitive,
                                     TextAntialiasMode textAntialiasMode = TextAntialiasMode::Default,
@@ -1395,7 +1507,7 @@ namespace KennyKerr
 
         struct DrawingStateDescription1
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_DRAWING_STATE_DESCRIPTION1)
+            KENNYKERR_DEFINE_STRUCT(DrawingStateDescription1, D2D1_DRAWING_STATE_DESCRIPTION1)
 
             DrawingStateDescription1(AntialiasMode antialiasMode = AntialiasMode::PerPrimitive,
                                      TextAntialiasMode textAntialiasMode = TextAntialiasMode::Default,
@@ -1425,7 +1537,7 @@ namespace KennyKerr
 
         struct Color
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_COLOR_F)
+            KENNYKERR_DEFINE_STRUCT(Color, D2D1_COLOR_F)
 
             Color(D2D1_COLOR_F const & other) :
                 Red(other.r),
@@ -1454,7 +1566,7 @@ namespace KennyKerr
 
         struct ArcSegment
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_ARC_SEGMENT)
+            KENNYKERR_DEFINE_STRUCT(ArcSegment, D2D1_ARC_SEGMENT)
 
             explicit ArcSegment(Point2F const & point = Point2F(),
                                 SizeF const & size = SizeF(),
@@ -1478,7 +1590,7 @@ namespace KennyKerr
 
         struct BezierSegment
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_BEZIER_SEGMENT)
+            KENNYKERR_DEFINE_STRUCT(BezierSegment, D2D1_BEZIER_SEGMENT)
 
             explicit BezierSegment(Point2F const & point1 = Point2F(),
                                    Point2F const & point2 = Point2F(),
@@ -1496,7 +1608,7 @@ namespace KennyKerr
 
         struct QuadraticBezierSegment
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_QUADRATIC_BEZIER_SEGMENT)
+            KENNYKERR_DEFINE_STRUCT(QuadraticBezierSegment, D2D1_QUADRATIC_BEZIER_SEGMENT)
 
             explicit QuadraticBezierSegment(Point2F const & point1 = Point2F(),
                                             Point2F const & point2 = Point2F()) :
@@ -1511,7 +1623,7 @@ namespace KennyKerr
 
         struct Triangle
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_TRIANGLE)
+            KENNYKERR_DEFINE_STRUCT(Triangle, D2D1_TRIANGLE)
 
             explicit Triangle(Point2F const & point1 = Point2F(),
                               Point2F const & point2 = Point2F(),
@@ -1529,7 +1641,7 @@ namespace KennyKerr
 
         struct RoundedRect
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_ROUNDED_RECT)
+            KENNYKERR_DEFINE_STRUCT(RoundedRect, D2D1_ROUNDED_RECT)
 
             explicit RoundedRect(RectF const & rect = RectF(),
                                  float radiusX = 0.0f,
@@ -1546,7 +1658,7 @@ namespace KennyKerr
 
         struct Ellipse
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_ELLIPSE)
+            KENNYKERR_DEFINE_STRUCT(Ellipse, D2D1_ELLIPSE)
 
             explicit Ellipse(Point2F const & center = Point2F(),
                              float radiusX = 0.0f,
@@ -1563,7 +1675,7 @@ namespace KennyKerr
 
         struct GradientStop
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_GRADIENT_STOP)
+            KENNYKERR_DEFINE_STRUCT(GradientStop, D2D1_GRADIENT_STOP)
 
             explicit GradientStop(float position = 0.0f,
                                   Color const & color = Direct2D::Color()) :
@@ -1578,7 +1690,7 @@ namespace KennyKerr
 
         struct PixelFormat
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_PIXEL_FORMAT)
+            KENNYKERR_DEFINE_STRUCT(PixelFormat, D2D1_PIXEL_FORMAT)
 
             PixelFormat(D2D1_PIXEL_FORMAT const & other) :
                 Format(static_cast<Dxgi::Format>(other.format)),
@@ -1599,7 +1711,7 @@ namespace KennyKerr
 
         struct PrintControlProperties
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_PRINT_CONTROL_PROPERTIES)
+            KENNYKERR_DEFINE_STRUCT(PrintControlProperties, D2D1_PRINT_CONTROL_PROPERTIES)
 
             explicit PrintControlProperties(PrintFontSubsetMode fontSubset = PrintFontSubsetMode::Default,
                                             float rasterDpi = 150.0f,
@@ -1617,7 +1729,7 @@ namespace KennyKerr
 
         struct CreationProperties
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_CREATION_PROPERTIES)
+            KENNYKERR_DEFINE_STRUCT(CreationProperties, D2D1_CREATION_PROPERTIES)
 
             CreationProperties(ThreadingMode threadingMode,
                                DebugLevel debugLevel,
@@ -1635,7 +1747,7 @@ namespace KennyKerr
 
         struct BrushProperties
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_BRUSH_PROPERTIES)
+            KENNYKERR_DEFINE_STRUCT(BrushProperties, D2D1_BRUSH_PROPERTIES)
 
             explicit BrushProperties(float opacity = 1.0,
                                      D2D1_MATRIX_3X2_F const & transform = D2D1::IdentityMatrix()) :
@@ -1649,7 +1761,7 @@ namespace KennyKerr
 
         struct ImageBrushProperties
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_IMAGE_BRUSH_PROPERTIES)
+            KENNYKERR_DEFINE_STRUCT(ImageBrushProperties, D2D1_IMAGE_BRUSH_PROPERTIES)
 
             explicit ImageBrushProperties(RectF const & sourceRectangle,
                                           ExtendMode extendModeX = ExtendMode::Clamp,
@@ -1669,7 +1781,7 @@ namespace KennyKerr
 
         struct BitmapProperties
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_BITMAP_PROPERTIES)
+            KENNYKERR_DEFINE_STRUCT(BitmapProperties, D2D1_BITMAP_PROPERTIES)
 
             explicit BitmapProperties(PixelFormat format = Direct2D::PixelFormat(),
                                       float dpiX = 0.0f,
@@ -1687,7 +1799,7 @@ namespace KennyKerr
 
         struct BitmapProperties1
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_BITMAP_PROPERTIES1)
+            KENNYKERR_DEFINE_STRUCT(BitmapProperties1, D2D1_BITMAP_PROPERTIES1)
 
             explicit BitmapProperties1(BitmapOptions options = BitmapOptions::None,
                                        PixelFormat format = Direct2D::PixelFormat(),
@@ -1711,7 +1823,7 @@ namespace KennyKerr
 
         struct BitmapBrushProperties
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_BITMAP_BRUSH_PROPERTIES)
+            KENNYKERR_DEFINE_STRUCT(BitmapBrushProperties, D2D1_BITMAP_BRUSH_PROPERTIES)
 
             explicit BitmapBrushProperties(ExtendMode extendModeX = ExtendMode::Clamp,
                                            ExtendMode extendModeY = ExtendMode::Clamp,
@@ -1729,7 +1841,7 @@ namespace KennyKerr
 
         struct BitmapBrushProperties1
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_BITMAP_BRUSH_PROPERTIES1)
+            KENNYKERR_DEFINE_STRUCT(BitmapBrushProperties1, D2D1_BITMAP_BRUSH_PROPERTIES1)
 
             explicit BitmapBrushProperties1(ExtendMode extendModeX = ExtendMode::Clamp,
                                             ExtendMode extendModeY = ExtendMode::Clamp,
@@ -1747,7 +1859,7 @@ namespace KennyKerr
 
         struct LinearGradientBrushProperties
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES)
+            KENNYKERR_DEFINE_STRUCT(LinearGradientBrushProperties, D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES)
 
             explicit LinearGradientBrushProperties(Point2F startPoint = Point2F(),
                                                    Point2F endPoint = Point2F()) :
@@ -1762,7 +1874,7 @@ namespace KennyKerr
 
         struct RadialGradientBrushProperties
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES)
+            KENNYKERR_DEFINE_STRUCT(RadialGradientBrushProperties, D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES)
 
             explicit RadialGradientBrushProperties(Point2F const & center = Point2F(),
                                                    Point2F const & offset = Point2F(),
@@ -1783,7 +1895,7 @@ namespace KennyKerr
 
         struct StrokeStyleProperties // compatible with both D2D1_STROKE_STYLE_PROPERTIES and D2D1_STROKE_STYLE_PROPERTIES1
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_STROKE_STYLE_PROPERTIES1)
+            KENNYKERR_DEFINE_STRUCT(StrokeStyleProperties, D2D1_STROKE_STYLE_PROPERTIES1)
 
             explicit StrokeStyleProperties(CapStyle startCap                 = CapStyle::Flat,
                                            CapStyle endCap                   = CapStyle::Flat,
@@ -1816,7 +1928,7 @@ namespace KennyKerr
 
         struct LayerProperties
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_LAYER_PARAMETERS)
+            KENNYKERR_DEFINE_STRUCT(LayerProperties, D2D1_LAYER_PARAMETERS)
 
             explicit LayerProperties(RectF const & contentBounds = RectF(),
                                      ID2D1Geometry * geometricMask = nullptr,
@@ -1846,7 +1958,7 @@ namespace KennyKerr
 
         struct RenderTargetProperties
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_RENDER_TARGET_PROPERTIES)
+            KENNYKERR_DEFINE_STRUCT(RenderTargetProperties, D2D1_RENDER_TARGET_PROPERTIES)
 
             explicit RenderTargetProperties(RenderTargetType type = RenderTargetType::Default,
                                             PixelFormat pixelFormat = Direct2D::PixelFormat(),
@@ -1873,7 +1985,7 @@ namespace KennyKerr
 
         struct HwndRenderTargetProperties
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_HWND_RENDER_TARGET_PROPERTIES)
+            KENNYKERR_DEFINE_STRUCT(HwndRenderTargetProperties, D2D1_HWND_RENDER_TARGET_PROPERTIES)
 
             explicit HwndRenderTargetProperties(HWND hwnd = nullptr,
                                                 SizeU const & pixelSize = SizeU(),
@@ -1891,7 +2003,7 @@ namespace KennyKerr
 
         struct MappedRect
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_MAPPED_RECT)
+            KENNYKERR_DEFINE_STRUCT(MappedRect, D2D1_MAPPED_RECT)
 
             unsigned Pitch;
             BYTE * Bits;
@@ -1899,7 +2011,7 @@ namespace KennyKerr
 
         struct RenderingControls
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_RENDERING_CONTROLS)
+            KENNYKERR_DEFINE_STRUCT(RenderingControls, D2D1_RENDERING_CONTROLS)
 
             BufferPrecision BufferPrecision;
             SizeU TileSize;
@@ -1907,7 +2019,7 @@ namespace KennyKerr
 
         struct EffectInputDescription
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_EFFECT_INPUT_DESCRIPTION)
+            KENNYKERR_DEFINE_STRUCT(EffectInputDescription, D2D1_EFFECT_INPUT_DESCRIPTION)
 
             ID2D1Effect * Effect;
             unsigned InputIndex;
@@ -1916,7 +2028,7 @@ namespace KennyKerr
 
         struct PointDescription
         {
-            KENNYKERR_DEFINE_STRUCT(D2D1_POINT_DESCRIPTION)
+            KENNYKERR_DEFINE_STRUCT(PointDescription, D2D1_POINT_DESCRIPTION)
 
             Point2F Point;
             Point2F UnitTangentVector;
