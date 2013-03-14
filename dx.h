@@ -26,6 +26,14 @@
 #endif
 #endif
 
+#ifndef VERIFY
+#ifdef _DEBUG
+#define VERIFY(expression) ASSERT(expression)
+#else
+#define VERIFY(expression) (expression)
+#endif
+#endif
+
 #ifndef TRACE
 #ifdef _DEBUG
 #include <stdio.h>
@@ -4930,6 +4938,16 @@ namespace KennyKerr
                                                    result.GetAddressOf()));
 
                 return result;
+            }
+
+            auto CreateHwndRenderTarget(HWND window) const -> HwndRenderTarget
+            {
+                RECT rect;
+                VERIFY(GetClientRect(window, &rect));
+                auto size = SizeU(rect.right, rect.bottom);
+
+                return CreateHwndRenderTarget(RenderTargetProperties(),
+                                              HwndRenderTargetProperties(window, size));
             }
 
             auto CreateDxgiSurfaceRenderTarget(Dxgi::Surface const & surface,
