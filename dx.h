@@ -4928,6 +4928,7 @@ namespace KennyKerr
                 return result;
             }
 
+            #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
             auto CreateHwndRenderTarget(RenderTargetProperties const & renderTargetProperties,
                                         HwndRenderTargetProperties const & hwndRenderTargetProperties) const -> HwndRenderTarget
             {
@@ -4949,6 +4950,7 @@ namespace KennyKerr
                 return CreateHwndRenderTarget(RenderTargetProperties(),
                                               HwndRenderTargetProperties(window, size));
             }
+            #endif
 
             auto CreateDxgiSurfaceRenderTarget(Dxgi::Surface const & surface,
                                                RenderTargetProperties const & renderTargetProperties) const -> RenderTarget
