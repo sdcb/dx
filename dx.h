@@ -419,6 +419,18 @@ namespace KennyKerr
             }
         };
 
+        struct Resource : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Resource, Details::Object, IDXGIResource)
+
+            auto GetSharedHandle() const -> HANDLE
+            {
+                HANDLE result;
+                HR((*this)->GetSharedHandle(&result));
+                return result;
+            }
+        };
+
         struct __declspec(uuid("50c83a1c-e072-4c48-87b0-3630fa36a6d0")) Factory : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Factory, Details::Object, IDXGIFactory2)
@@ -668,6 +680,13 @@ namespace KennyKerr
         struct Texture2D : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Texture2D, Details::Object, ID3D11Texture2D)
+
+            auto AsDxgiResource() const -> Dxgi::Resource
+            {
+                Dxgi::Resource result;
+                HR(m_ptr.CopyTo(result.GetAddressOf()));
+                return result;
+            }
         };
 
         struct Device : Details::Object
