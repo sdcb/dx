@@ -4444,6 +4444,13 @@ namespace KennyKerr
                 return result;
             }
 
+            auto CreateBitmapFromDxgiSurface(Dxgi::SwapChain const & swapChain,
+                                             BitmapProperties1 const & properties) const -> Bitmap1
+            {
+                return CreateBitmapFromDxgiSurface(swapChain.GetBuffer(),
+                                                   properties);
+            }
+
             auto CreateEffect(REFCLSID clsid) const -> Effect
             {
                 Effect result;
