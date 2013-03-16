@@ -689,6 +689,16 @@ namespace KennyKerr
             }
         };
 
+        struct DeviceContext : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(DeviceContext, Details::Object, ID3D11DeviceContext)
+
+            void Flush() const
+            {
+                (*this)->Flush();
+            }
+        };
+
         struct Device : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Device, Details::Object, ID3D11Device)
@@ -721,6 +731,34 @@ namespace KennyKerr
                                             result.GetAddressOf()));
 
                 return result;
+            }
+
+            auto GetImmediateContext() const -> DeviceContext
+            {
+                DeviceContext result;
+                (*this)->GetImmediateContext(result.GetAddressOf());
+                return result;
+            };
+
+            auto OpenSharedResource(HANDLE resource) const -> Dxgi::Surface
+            {
+                Dxgi::Surface result;
+
+                HR((*this)->OpenSharedResource(resource,
+                                               __uuidof(result),
+                                               reinterpret_cast<void **>(result.GetAddressOf())));
+
+                return result;
+            }
+
+            auto OpenSharedResource(Dxgi::Resource const & resource) const -> Dxgi::Surface
+            {
+                return OpenSharedResource(resource.GetSharedHandle());
+            }
+
+            auto OpenSharedResource(Texture2D const & resource) const -> Dxgi::Surface
+            {
+                return OpenSharedResource(resource.AsDxgiResource().GetSharedHandle());
             }
         };
 
