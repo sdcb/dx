@@ -2,6 +2,8 @@
 
 // Just for fun, here's an entire Direct2D-based desktop application implemented entirely in WinMain.
 
+#pragma comment(lib, "user32.lib")
+
 using namespace KennyKerr;
 
 Direct2D::Color const COLOR_WHITE(1.0f, 1.0f, 1.0f);

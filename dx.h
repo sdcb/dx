@@ -68,9 +68,11 @@ namespace KennyKerr
             Microsoft::WRL::ComPtr<IUnknown> m_ptr;
 
             Object() {}
+            Object(IUnknown * other) : m_ptr(other) {}
             Object(Object const & other) : m_ptr(other.m_ptr) {}
             Object(Object && other) : m_ptr(std::move(other.m_ptr)) {}
             void Copy(Object const & other) { m_ptr = other.m_ptr; }
+            void Copy(IUnknown * other) { m_ptr = other; }
             void Move(Object && other) { m_ptr = std::move(other.m_ptr); }
 
         public:
@@ -90,8 +92,10 @@ namespace KennyKerr
         THIS_CLASS() {}                                                                                                                        \
         THIS_CLASS(THIS_CLASS const & other) : BASE_CLASS(other) {}                                                                            \
         THIS_CLASS(THIS_CLASS && other)      : BASE_CLASS(std::move(other)) {}                                                                 \
+        THIS_CLASS(INTERFACE * other)        : BASE_CLASS(other) {}                                                                            \
         THIS_CLASS & operator=(THIS_CLASS const & other) { Copy(other);            return *this; }                                             \
         THIS_CLASS & operator=(THIS_CLASS && other)      { Move(std::move(other)); return *this; }                                             \
+        THIS_CLASS & operator=(INTERFACE * other)        { Copy(other);            return *this; }                                             \
         Details::RemoveAddRefRelease<INTERFACE> * operator->() const { return static_cast<Details::RemoveAddRefRelease<INTERFACE> *>(Get()); } \
         auto Get() const -> INTERFACE *     {                 return static_cast<INTERFACE *>(m_ptr.Get()); }                                  \
         auto GetAddressOf() -> INTERFACE ** { ASSERT(!m_ptr); return reinterpret_cast<INTERFACE **>(m_ptr.GetAddressOf()); }
