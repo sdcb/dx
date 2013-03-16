@@ -1,5 +1,7 @@
 #include "..\dx.h"
 
+#pragma comment(lib, "shell32.lib")
+
 using namespace KennyKerr;
 
 Direct2D::Color const COLOR_BLUE(0.26f, 0.56f, 0.87f);
