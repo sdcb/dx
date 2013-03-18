@@ -1,10 +1,11 @@
+// Just for fun, here's an entire Direct2D-based desktop application implemented
+// entirely in WinMain.
+
 #ifndef UNICODE
 #define UNICODE
 #endif
 
 #include "..\dx.h"
-
-// Just for fun, here's an entire Direct2D-based desktop application implemented entirely in WinMain.
 
 #pragma comment(lib, "user32.lib")
 

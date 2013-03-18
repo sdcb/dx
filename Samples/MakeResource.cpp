@@ -1,3 +1,10 @@
+// A very simple utility for embedding resources inside a project using C++ static 
+// arrays. This tends to be the simplest and most efficient way to embed a resource
+// inside an executable.
+//
+// Compile: cl MakeResource.cpp
+// Run: MakeResource.exe Image.gif > Image.cpp
+
 #include <wrl.h>
 #include <stdio.h>
 

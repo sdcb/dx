@@ -1,3 +1,11 @@
+// This sample demonstrates how to use Direct2D to render to a WIC bitmap.
+// Internally, Direct2D uses the Direct3D WARP device driver for rendering in
+// this case.
+
+#ifndef UNICODE
+#define UNICODE
+#endif
+
 #include "..\dx.h"
 
 #pragma comment(lib, "shell32.lib")

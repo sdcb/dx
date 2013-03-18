@@ -1,3 +1,8 @@
+// This sample demonstrates how to load an embedded resource (created with 
+// MakeResource.cpp) as a bitmap so that it can be rendered with Direct2D.
+// This technique works perfectly well with desktop, Windows Store,
+// and Windows Phone apps.
+
 #ifndef UNICODE
 #define UNICODE
 #endif
