@@ -1,3 +1,7 @@
+#ifndef UNICODE
+#define UNICODE
+#endif
+
 #include "..\dx.h"
 
 #pragma comment(lib, "user32.lib")

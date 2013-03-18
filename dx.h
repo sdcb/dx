@@ -1,8 +1,5 @@
 #pragma once
 
-#define _UNICODE
-#define UNICODE
-
 #include <windows.h>
 #include <d2d1_1.h>
 #include <d3d11_1.h>
@@ -46,7 +43,7 @@ inline void TRACE(WCHAR const * const format, ...)
     va_start(args, format);
     WCHAR output[512];
     vswprintf_s(output, format, args);
-    OutputDebugString(output);
+    OutputDebugStringW(output);
     va_end(args);
 }
 #else
