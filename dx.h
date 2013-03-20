@@ -2421,7 +2421,87 @@ namespace KennyKerr
                                      float flatteningTolerance,
                                      SimplifiedGeometrySink const & sink) const;
 
+            void Outline(SimplifiedGeometrySink const & sink) const;
 
+            void Outline(D2D1_MATRIX_3X2_F const & transform,
+                         SimplifiedGeometrySink const & sink) const;
+
+            void Outline(float flatteningTolerance,
+                         SimplifiedGeometrySink const & sink) const;
+
+            void Outline(D2D1_MATRIX_3X2_F const & transform,
+                         float flatteningTolerance,
+                         SimplifiedGeometrySink const & sink) const;
+
+            auto ComputeArea() const -> float;
+            auto ComputeArea(float flatteningTolerance) const -> float;
+            auto ComputeArea(D2D1_MATRIX_3X2_F const & transform) const -> float;
+
+            auto ComputeArea(D2D1_MATRIX_3X2_F const & transform,
+                             float flatteningTolerance) const -> float;
+
+            auto ComputeLength() const -> float;
+            auto ComputeLength(float flatteningTolerance) const -> float;
+            auto ComputeLength(D2D1_MATRIX_3X2_F const & transform) const -> float;
+
+            auto ComputeLength(D2D1_MATRIX_3X2_F const & transform,
+                               float flatteningTolerance) const -> float;
+
+            void ComputePointAtLength(float length,
+                                      Point2F * point,
+                                      Point2F * unitTangentVector) const;
+
+            void ComputePointAtLength(float length,
+                                      D2D1_MATRIX_3X2_F const & transform,
+                                      Point2F * point,
+                                      Point2F * unitTangentVector) const;
+
+            void ComputePointAtLength(float length,
+                                      float flatteningTolerance,
+                                      Point2F * point,
+                                      Point2F * unitTangentVector) const;
+
+            void ComputePointAtLength(float length,
+                                      D2D1_MATRIX_3X2_F const & transform,
+                                      float flatteningTolerance,
+                                      Point2F * point,
+                                      Point2F * unitTangentVector) const;
+
+            void Widen(float strokeWidth,
+                       SimplifiedGeometrySink const & sink) const;
+
+            void Widen(float strokeWidth,
+                       StrokeStyle const & strokeStyle,
+                       SimplifiedGeometrySink const & sink) const;
+
+            void Widen(float strokeWidth,
+                       D2D1_MATRIX_3X2_F const & transform,
+                       SimplifiedGeometrySink const & sink) const;
+
+            void Widen(float strokeWidth,
+                       float flatteningTolerance,
+                       SimplifiedGeometrySink const & sink) const;
+
+            void Widen(float strokeWidth,
+                       StrokeStyle const & strokeStyle,
+                       D2D1_MATRIX_3X2_F const & transform,
+                       SimplifiedGeometrySink const & sink) const;
+
+            void Widen(float strokeWidth,
+                       D2D1_MATRIX_3X2_F const & transform,
+                       float flatteningTolerance,
+                       SimplifiedGeometrySink const & sink) const;
+
+            void Widen(float strokeWidth,
+                       StrokeStyle const & strokeStyle,
+                       float flatteningTolerance,
+                       SimplifiedGeometrySink const & sink) const;
+
+            void Widen(float strokeWidth,
+                       StrokeStyle const & strokeStyle,
+                       D2D1_MATRIX_3X2_F const & transform,
+                       float flatteningTolerance,
+                       SimplifiedGeometrySink const & sink) const;
         };
 
 
@@ -3977,6 +4057,267 @@ namespace KennyKerr
                                             sink.Get()));
         }
 
+        inline void Geometry::Outline(SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Outline(nullptr,
+                                D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                sink.Get()));
+        }
+
+        inline void Geometry::Outline(D2D1_MATRIX_3X2_F const & transform,
+                                      SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Outline(&transform,
+                                D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                sink.Get()));
+        }
+
+        inline void Geometry::Outline(float flatteningTolerance,
+                                      SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Outline(nullptr,
+                                flatteningTolerance,
+                                sink.Get()));
+        }
+
+        inline void Geometry::Outline(D2D1_MATRIX_3X2_F const & transform,
+                                      float flatteningTolerance,
+                                      SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Outline(&transform,
+                                flatteningTolerance,
+                                sink.Get()));
+        }
+
+        inline auto Geometry::ComputeArea() const -> float
+        {
+            float result;
+
+            HR((*this)->ComputeArea(nullptr,
+                                    D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                    &result));
+
+            return result;
+        }
+
+        inline auto Geometry::ComputeArea(float flatteningTolerance) const -> float
+        {
+            float result;
+
+            HR((*this)->ComputeArea(nullptr,
+                                    flatteningTolerance,
+                                    &result));
+
+            return result;
+        }
+
+        inline auto Geometry::ComputeArea(D2D1_MATRIX_3X2_F const & transform) const -> float
+        {
+            float result;
+
+            HR((*this)->ComputeArea(&transform,
+                                    D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                    &result));
+
+            return result;
+        }
+
+        inline auto Geometry::ComputeArea(D2D1_MATRIX_3X2_F const & transform,
+                                          float flatteningTolerance) const -> float
+        {
+            float result;
+
+            HR((*this)->ComputeArea(&transform,
+                                    flatteningTolerance,
+                                    &result));
+
+            return result;
+        }
+
+        inline auto Geometry::ComputeLength() const -> float
+        {
+            float result;
+
+            HR((*this)->ComputeLength(nullptr,
+                                      D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                      &result));
+
+            return result;
+        }
+
+        inline auto Geometry::ComputeLength(float flatteningTolerance) const -> float
+        {
+            float result;
+
+            HR((*this)->ComputeLength(nullptr,
+                                      flatteningTolerance,
+                                      &result));
+
+            return result;
+        }
+
+        inline auto Geometry::ComputeLength(D2D1_MATRIX_3X2_F const & transform) const -> float
+        {
+            float result;
+
+            HR((*this)->ComputeLength(&transform,
+                                      D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                      &result));
+
+            return result;
+        }
+
+        inline auto Geometry::ComputeLength(D2D1_MATRIX_3X2_F const & transform,
+                                            float flatteningTolerance) const -> float
+        {
+            float result;
+
+            HR((*this)->ComputeLength(&transform,
+                                      flatteningTolerance,
+                                      &result));
+
+            return result;
+        }
+
+        inline void Geometry::ComputePointAtLength(float length,
+                                                   Point2F * point,
+                                                   Point2F * unitTangentVector) const
+        {
+            HR((*this)->ComputePointAtLength(length,
+                                             nullptr,
+                                             D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                             point ? point->Get() : nullptr,
+                                             unitTangentVector ? unitTangentVector->Get() : nullptr));
+        }
+
+        inline void Geometry::ComputePointAtLength(float length,
+                                                   D2D1_MATRIX_3X2_F const & transform,
+                                                   Point2F * point,
+                                                   Point2F * unitTangentVector) const
+        {
+            HR((*this)->ComputePointAtLength(length,
+                                             &transform,
+                                             D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                             point ? point->Get() : nullptr,
+                                             unitTangentVector ? unitTangentVector->Get() : nullptr));
+        }
+
+        inline void Geometry::ComputePointAtLength(float length,
+                                                   float flatteningTolerance,
+                                                   Point2F * point,
+                                                   Point2F * unitTangentVector) const
+        {
+            HR((*this)->ComputePointAtLength(length,
+                                             nullptr,
+                                             flatteningTolerance,
+                                             point ? point->Get() : nullptr,
+                                             unitTangentVector ? unitTangentVector->Get() : nullptr));
+        }
+
+        inline void Geometry::ComputePointAtLength(float length,
+                                                   D2D1_MATRIX_3X2_F const & transform,
+                                                   float flatteningTolerance,
+                                                   Point2F * point,
+                                                   Point2F * unitTangentVector) const
+        {
+            HR((*this)->ComputePointAtLength(length,
+                                             &transform,
+                                             flatteningTolerance,
+                                             point ? point->Get() : nullptr,
+                                             unitTangentVector ? unitTangentVector->Get() : nullptr));
+        }
+
+        inline void Geometry::Widen(float strokeWidth,
+                                    SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Widen(strokeWidth,
+                              nullptr,
+                              nullptr,
+                              D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                              sink.Get()));
+        }
+
+        inline void Geometry::Widen(float strokeWidth,
+                                    StrokeStyle const & strokeStyle,
+                                    SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Widen(strokeWidth,
+                              strokeStyle.Get(),
+                              nullptr,
+                              D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                              sink.Get()));
+        }
+
+        inline void Geometry::Widen(float strokeWidth,
+                                    D2D1_MATRIX_3X2_F const & transform,
+                                    SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Widen(strokeWidth,
+                              nullptr,
+                              &transform,
+                              D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                              sink.Get()));
+        }
+
+        inline void Geometry::Widen(float strokeWidth,
+                                    float flatteningTolerance,
+                                    SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Widen(strokeWidth,
+                              nullptr,
+                              nullptr,
+                              flatteningTolerance,
+                              sink.Get()));
+        }
+
+        inline void Geometry::Widen(float strokeWidth,
+                                    StrokeStyle const & strokeStyle,
+                                    D2D1_MATRIX_3X2_F const & transform,
+                                    SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Widen(strokeWidth,
+                              strokeStyle.Get(),
+                              &transform,
+                              D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                              sink.Get()));
+        }
+
+        inline void Geometry::Widen(float strokeWidth,
+                                    D2D1_MATRIX_3X2_F const & transform,
+                                    float flatteningTolerance,
+                                    SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Widen(strokeWidth,
+                              nullptr,
+                              &transform,
+                              flatteningTolerance,
+                              sink.Get()));
+        }
+
+        inline void Geometry::Widen(float strokeWidth,
+                                    StrokeStyle const & strokeStyle,
+                                    float flatteningTolerance,
+                                    SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Widen(strokeWidth,
+                              strokeStyle.Get(),
+                              nullptr,
+                              flatteningTolerance,
+                              sink.Get()));
+        }
+
+        inline void Geometry::Widen(float strokeWidth,
+                                    StrokeStyle const & strokeStyle,
+                                    D2D1_MATRIX_3X2_F const & transform,
+                                    float flatteningTolerance,
+                                    SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Widen(strokeWidth,
+                              strokeStyle.Get(),
+                              &transform,
+                              flatteningTolerance,
+                              sink.Get()));
+        }
     }
 
     #pragma endregion Implementation
