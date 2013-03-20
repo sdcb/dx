@@ -2963,23 +2963,277 @@ namespace KennyKerr
             auto IsSupported(RenderTargetProperties const & properties) const -> bool;
         };
 
-
-
-
-
-
-
         struct BitmapRenderTarget : RenderTarget
         {
             KENNYKERR_DEFINE_CLASS(BitmapRenderTarget, RenderTarget, ID2D1BitmapRenderTarget)
 
-            //auto GetBitmap() const -> Bitmap
-            //{
-            //    Bitmap result;
-            //    HR((*this)->GetBitmap(result.GetAddressOf()));
-            //    return result;
-            //}
+            auto GetBitmap() const -> Bitmap;
         };
+
+        struct HwndRenderTarget : RenderTarget
+        {
+            KENNYKERR_DEFINE_CLASS(HwndRenderTarget, RenderTarget, ID2D1HwndRenderTarget)
+
+            auto CheckWindowState() const -> WindowState;
+            auto Resize(SizeU const & size) const -> HRESULT;
+            auto GetHwnd() const -> HWND;
+        };
+
+        #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
+        struct GdiInteropRenderTarget : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(GdiInteropRenderTarget, Details::Object, ID2D1GdiInteropRenderTarget)
+
+            auto GetDC(DcInitializeMode mode) const -> HDC;
+            void ReleaseDC() const;
+            void ReleaseDC(RECT const & rect) const;
+        };
+        #endif
+
+        struct DcRenderTarget : RenderTarget
+        {
+            KENNYKERR_DEFINE_CLASS(DcRenderTarget, RenderTarget, ID2D1DCRenderTarget)
+
+            void BindDC(HDC dc,
+                        RECT const & rect) const;
+        };
+
+        struct GdiMetafileSink : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(GdiMetafileSink, Details::Object, ID2D1GdiMetafileSink)
+        };
+
+        struct GdiMetafile : Resource
+        {
+            KENNYKERR_DEFINE_CLASS(GdiMetafile, Resource, ID2D1GdiMetafile)
+
+            void Stream(GdiMetafileSink const & sink) const;
+            void GetBounds(RectF & rect) const;
+        };
+
+        struct CommandSink : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(CommandSink, Details::Object, ID2D1CommandSink)
+        };
+
+        struct CommandList : Image
+        {
+            KENNYKERR_DEFINE_CLASS(CommandList, Image, ID2D1CommandList)
+
+            void Stream(CommandSink const & sink) const;
+            void Close() const;
+        };
+
+        struct PrintControl : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(PrintControl, Details::Object, ID2D1PrintControl)
+
+            // TODO: AddPage overloads
+
+            void Close() const;
+        };
+
+        struct ImageBrush : Brush
+        {
+            KENNYKERR_DEFINE_CLASS(ImageBrush, Brush, ID2D1ImageBrush)
+
+            void SetImage() const;
+            void SetImage(Image const & image) const;
+            void SetExtendModeX(ExtendMode mode) const;
+            void SetExtendModeY(ExtendMode mode) const;
+            void SetInterpolationMode(InterpolationMode mode) const;
+            void SetSourceRectangle(RectF const & rect) const;
+            auto GetImage() const -> Image;
+            auto GetExtendModeX() const -> ExtendMode;
+            auto GetExtendModeY() const -> ExtendMode;
+            auto GetInterpolationMode() const -> InterpolationMode;
+            void GetSourceRectangle(RectF & rect) const;
+        };
+
+        struct DeviceContext : RenderTarget
+        {
+            KENNYKERR_DEFINE_CLASS(DeviceContext, RenderTarget, ID2D1DeviceContext)
+
+            auto CreateBitmap(SizeU const & size,
+                              BitmapProperties1 const & properties) const -> Bitmap1;
+
+            auto CreateBitmap(SizeU const & size,
+                              void const * data,
+                              unsigned pitch,
+                              BitmapProperties1 const & properties) const -> Bitmap1;
+
+            using RenderTarget::CreateBitmap;
+
+            // These methods are renamed to disambiguate since we can't match on the return type.
+            auto CreateBitmapFromWicBitmap1(Wic::BitmapSource const & source) const -> Bitmap1;
+
+            auto CreateBitmapFromWicBitmap1(Wic::BitmapSource const & source,
+                                            BitmapProperties1 const & properties) const -> Bitmap1;
+
+            auto CreateColorContext(ColorSpace space,
+                                    BYTE const * profile,
+                                    unsigned size) const -> ColorContext;
+
+            auto CreateColorContextFromFilename(PCWSTR filename) const -> ColorContext;
+            auto CreateColorContextFromWicColorContext(Wic::ColorContext const & source) const -> ColorContext;
+
+            auto CreateBitmapFromDxgiSurface(Dxgi::Surface const & surface) const -> Bitmap1;
+
+            auto CreateBitmapFromDxgiSurface(Dxgi::Surface const & surface,
+                                             BitmapProperties1 const & properties) const -> Bitmap1;
+
+            auto CreateBitmapFromDxgiSurface(Dxgi::SwapChain const & swapChain) const -> Bitmap1;
+
+            auto CreateBitmapFromDxgiSurface(Dxgi::SwapChain const & swapChain,
+                                             BitmapProperties1 const & properties) const -> Bitmap1;
+
+            auto CreateEffect(REFCLSID clsid) const -> Effect;
+            auto CreateEffectShadow() const -> Effect;
+
+            auto CreateGradientStopCollection(GradientStop const * stops,
+                                              unsigned count,
+                                              ColorSpace preInterpolationSpace,
+                                              ColorSpace postInterpolationSpace,
+                                              BufferPrecision bufferPrecision,
+                                              ExtendMode extendMode,
+                                              ColorInterpolationMode colorInterpolationMode) const -> GradientStopCollection1;
+
+            template <size_t Count>
+            auto CreateGradientStopCollection(GradientStop const (&stops)[Count],
+                                              ColorSpace preInterpolationSpace,
+                                              ColorSpace postInterpolationSpace,
+                                              BufferPrecision bufferPrecision,
+                                              ExtendMode extendMode,
+                                              ColorInterpolationMode colorInterpolationMode) const -> GradientStopCollection1
+            {
+                return CreateGradientStopCollection(stops,
+                                                    Count,
+                                                    preInterpolationSpace,
+                                                    postInterpolationSpace,
+                                                    bufferPrecision,
+                                                    extendMode,
+                                                    colorInterpolationMode);
+            }
+
+            using RenderTarget::CreateGradientStopCollection;
+
+            auto CreateImageBrush(ImageBrushProperties const & imageBrushProperties) const -> ImageBrush;
+
+            auto CreateImageBrush(ImageBrushProperties const & imageBrushProperties,
+                                  BrushProperties const & brushProperties) const -> ImageBrush;
+
+            auto CreateImageBrush(Image const & image,
+                                  ImageBrushProperties const & imageBrushProperties) const -> ImageBrush;
+
+            auto CreateImageBrush(Image const & image,
+                                  ImageBrushProperties const & imageBrushProperties,
+                                  BrushProperties const & brushProperties) const -> ImageBrush;
+
+            // These methods are renamed to disambiguate since we can't match on the return type.
+            auto CreateBitmapBrush1() const -> BitmapBrush1;
+            auto CreateBitmapBrush1(Bitmap const & bitmap) const -> BitmapBrush1;
+            auto CreateBitmapBrush1(BitmapBrushProperties1 const & bitmapBrushProperties) const -> BitmapBrush1;
+            auto CreateBitmapBrush1(BrushProperties const & brushProperties) const -> BitmapBrush1;
+
+            auto CreateBitmapBrush1(Bitmap const & bitmap,
+                                    BitmapBrushProperties1 const & bitmapBrushProperties) const -> BitmapBrush1;
+
+            auto CreateBitmapBrush1(Bitmap const & bitmap,
+                                    BrushProperties const & brushProperties) const -> BitmapBrush1;
+
+            auto CreateBitmapBrush1(BitmapBrushProperties1 const & bitmapBrushProperties,
+                                    BrushProperties const & brushProperties) const -> BitmapBrush1;
+
+            auto CreateBitmapBrush1(Bitmap const & bitmap,
+                                    BitmapBrushProperties1 const & bitmapBrushProperties,
+                                    BrushProperties const & brushProperties) const -> BitmapBrush1;
+
+            auto CreateCommandList() const -> CommandList;
+            auto IsDxgiFormatSupported(Dxgi::Format format) const -> bool;
+            auto IsBufferPrecisionSupported(BufferPrecision precision) const -> bool;
+
+            void GetImageLocalBounds(Image const & image,
+                                     RectF & bounds) const;
+
+            void GetImageWorldBounds(Image const & image,
+                                     RectF & bounds) const;
+
+            // TODO: GetGlyphRunWorldBounds
+
+            auto GetDevice() const -> Device;
+            void SetTarget(Image const & image) const;
+            void SetTarget() const;
+            auto GetTarget() const -> Image;
+
+            void SetRenderingControls(RenderingControls const & controls) const;
+            void GetRenderingControls(RenderingControls & controls) const;
+            void SetPrimitiveBlend(PrimitiveBlend blend) const;
+            auto GetPrimitiveBlend() const -> PrimitiveBlend;
+            void SetUnitMode(UnitMode mode) const;
+            auto GetUnitMode() const -> UnitMode;
+
+            // TODO: DrawGlyphRun
+
+            void DrawImage(Image const & image,
+                           InterpolationMode interpolationMode = InterpolationMode::Linear,
+                           CompositeMode compositeMode = CompositeMode::SourceOver) const;
+
+            void DrawImage(Image const & image,
+                           Point2F const & targetOffset,
+                           InterpolationMode interpolationMode = InterpolationMode::Linear,
+                           CompositeMode compositeMode = CompositeMode::SourceOver) const;
+
+            void DrawImage(Image const & image,
+                           RectF const & imageRectangle,
+                           InterpolationMode interpolationMode = InterpolationMode::Linear,
+                           CompositeMode compositeMode = CompositeMode::SourceOver) const;
+
+            void DrawImage(Image const & image,
+                           Point2F const & targetOffset,
+                           RectF const & imageRectangle,
+                           InterpolationMode interpolationMode = InterpolationMode::Linear,
+                           CompositeMode compositeMode = CompositeMode::SourceOver) const;
+
+            void DrawGdiMetafile(GdiMetafile const & metafile) const;
+
+            void DrawGdiMetafile(GdiMetafile const & metafile,
+                                 Point2F const & targetOffset) const;
+
+            // TODO: DrawBitmap
+
+            // TODO: PushLayer
+
+            void InvalidateEffectInputRectangle(Effect const & effect,
+                                                unsigned input,
+                                                RectF const & rect) const;
+
+            auto GetEffectInvalidRectangleCount(Effect const & effect) -> unsigned;
+
+            void GetEffectInvalidRectangles(Effect const & effect,
+                                            RectF * rectangles,
+                                            unsigned count) const;
+
+            // TODO GetEffectInvalidRectangles template
+
+            // TODO: GetEffectRequiredInputRectangles
+
+            void FillOpacityMask(Bitmap const & opacityMask,
+                                 Brush const & brush) const;
+
+            void FillOpacityMask(Bitmap const & opacityMask,
+                                 Brush const & brush,
+                                 RectF const & destinationRectangle) const;
+
+            void FillOpacityMask(Bitmap const & opacityMask,
+                                 Brush const & brush,
+                                 RectF const & destinationRectangle,
+                                 RectF const & sourceRectangle) const;
+
+        };
+
+
+
+
 
 
 
@@ -5965,6 +6219,651 @@ namespace KennyKerr
         {
             return 0 != (*this)->IsSupported(properties.Get());
         }
+
+        inline auto BitmapRenderTarget::GetBitmap() const -> Bitmap
+        {
+            Bitmap result;
+            HR((*this)->GetBitmap(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto HwndRenderTarget::CheckWindowState() const -> WindowState
+        {
+            return static_cast<WindowState>((*this)->CheckWindowState());
+        }
+
+        inline auto HwndRenderTarget::Resize(SizeU const & size) const -> HRESULT
+        {
+            return (*this)->Resize(size.Get());
+        }
+
+        inline auto HwndRenderTarget::GetHwnd() const -> HWND
+        {
+            return (*this)->GetHwnd();
+        }
+
+        #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
+
+        inline auto GdiInteropRenderTarget::GetDC(DcInitializeMode mode) const -> HDC
+        {
+            HDC dc;
+            HR((*this)->GetDC(static_cast<D2D1_DC_INITIALIZE_MODE>(mode), &dc));
+            return dc;
+        }
+
+        inline void GdiInteropRenderTarget::ReleaseDC() const
+        {
+            HR((*this)->ReleaseDC(nullptr));
+        }
+
+        inline void GdiInteropRenderTarget::ReleaseDC(RECT const & rect) const
+        {
+            HR((*this)->ReleaseDC(&rect));
+        }
+
+        #endif
+
+        inline void DcRenderTarget::BindDC(HDC dc,
+                                           RECT const & rect) const
+        {
+            HR((*this)->BindDC(dc, &rect));
+        }
+
+        inline void GdiMetafile::Stream(GdiMetafileSink const & sink) const
+        {
+            HR((*this)->Stream(sink.Get()));
+        }
+
+        inline void GdiMetafile::GetBounds(RectF & rect) const
+        {
+            HR((*this)->GetBounds(rect.Get()));
+        }
+
+        inline void CommandList::Stream(CommandSink const & sink) const
+        {
+            HR((*this)->Stream(sink.Get()));
+        }
+
+        inline void CommandList::Close() const
+        {
+            HR((*this)->Close());
+        }
+
+        inline void PrintControl::Close() const
+        {
+            HR((*this)->Close());
+        }
+
+        inline void ImageBrush::SetImage() const
+        {
+            (*this)->SetImage(nullptr);
+        }
+
+        inline void ImageBrush::SetImage(Image const & image) const
+        {
+            (*this)->SetImage(image.Get());
+        }
+
+        inline void ImageBrush::SetExtendModeX(ExtendMode mode) const
+        {
+            (*this)->SetExtendModeX(static_cast<D2D1_EXTEND_MODE>(mode));
+        }
+
+        inline void ImageBrush::SetExtendModeY(ExtendMode mode) const
+        {
+            (*this)->SetExtendModeY(static_cast<D2D1_EXTEND_MODE>(mode));
+        }
+
+        inline void ImageBrush::SetInterpolationMode(InterpolationMode mode) const
+        {
+            (*this)->SetInterpolationMode(static_cast<D2D1_INTERPOLATION_MODE>(mode));
+        }
+
+        inline void ImageBrush::SetSourceRectangle(RectF const & rect) const
+        {
+            (*this)->SetSourceRectangle(rect.Get());
+        }
+
+        inline auto ImageBrush::GetImage() const -> Image
+        {
+            Image result;
+            (*this)->GetImage(result.GetAddressOf());
+            return result;
+        }
+
+        inline auto ImageBrush::GetExtendModeX() const -> ExtendMode
+        {
+            return static_cast<ExtendMode>((*this)->GetExtendModeX());
+        }
+
+        inline auto ImageBrush::GetExtendModeY() const -> ExtendMode
+        {
+            return static_cast<ExtendMode>((*this)->GetExtendModeY());
+        }
+
+        inline auto ImageBrush::GetInterpolationMode() const -> InterpolationMode
+        {
+            return static_cast<InterpolationMode>((*this)->GetInterpolationMode());
+        }
+
+        inline void ImageBrush::GetSourceRectangle(RectF & rect) const
+        {
+            (*this)->GetSourceRectangle(rect.Get());
+        }
+
+        inline auto DeviceContext::CreateBitmap(SizeU const & size,
+                                                BitmapProperties1 const & properties) const -> Bitmap1
+        {
+            return CreateBitmap(size,
+                                nullptr, 0,
+                                properties);
+        }
+
+        inline auto DeviceContext::CreateBitmap(SizeU const & size,
+                                                void const * data,
+                                                unsigned pitch,
+                                                BitmapProperties1 const & properties) const -> Bitmap1
+        {
+            Bitmap1 result;
+
+            HR((*this)->CreateBitmap(size.Ref(),
+                                     data,
+                                     pitch,
+                                     properties.Get(),
+                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateBitmapFromWicBitmap1(Wic::BitmapSource const & source) const -> Bitmap1
+        {
+            Bitmap1 result;
+
+            HR((*this)->CreateBitmapFromWicBitmap(source.Get(),
+                                                  nullptr,
+                                                  result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateBitmapFromWicBitmap1(Wic::BitmapSource const & source,
+                                                              BitmapProperties1 const & properties) const -> Bitmap1
+        {
+            Bitmap1 result;
+
+            HR((*this)->CreateBitmapFromWicBitmap(source.Get(),
+                                                  properties.Get(),
+                                                  result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateColorContext(ColorSpace space,
+                                                      BYTE const * profile,
+                                                      unsigned size) const -> ColorContext
+        {
+            ColorContext result;
+
+            HR((*this)->CreateColorContext(static_cast<D2D1_COLOR_SPACE>(space),
+                                            profile,
+                                            size,
+                                            result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateColorContextFromFilename(PCWSTR filename) const -> ColorContext
+        {
+            ColorContext result;
+
+            HR((*this)->CreateColorContextFromFilename(filename,
+                                                       result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateColorContextFromWicColorContext(Wic::ColorContext const & source) const -> ColorContext
+        {
+            ColorContext result;
+
+            HR((*this)->CreateColorContextFromWicColorContext(source.Get(),
+                                                              result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateBitmapFromDxgiSurface(Dxgi::Surface const & surface) const -> Bitmap1
+        {
+            Bitmap1 result;
+
+            HR((*this)->CreateBitmapFromDxgiSurface(surface.Get(),
+                                                    nullptr,
+                                                    result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateBitmapFromDxgiSurface(Dxgi::Surface const & surface,
+                                                               BitmapProperties1 const & properties) const -> Bitmap1
+        {
+            Bitmap1 result;
+
+            HR((*this)->CreateBitmapFromDxgiSurface(surface.Get(),
+                                                    properties.Get(),
+                                                    result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateBitmapFromDxgiSurface(Dxgi::SwapChain const & swapChain) const -> Bitmap1
+        {
+            return CreateBitmapFromDxgiSurface(swapChain.GetBuffer());
+        }
+
+        inline auto DeviceContext::CreateBitmapFromDxgiSurface(Dxgi::SwapChain const & swapChain,
+                                                               BitmapProperties1 const & properties) const -> Bitmap1
+        {
+            return CreateBitmapFromDxgiSurface(swapChain.GetBuffer(),
+                                               properties);
+        }
+
+        inline auto DeviceContext::CreateEffect(REFCLSID clsid) const -> Effect
+        {
+            Effect result;
+
+            HR((*this)->CreateEffect(clsid,
+                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateEffectShadow() const -> Effect
+        {
+            struct __declspec(uuid("C67EA361-1863-4e69-89DB-695D3E9A5B6B")) Class;
+
+            return CreateEffect(__uuidof(Class));
+        }
+
+        inline auto DeviceContext::CreateGradientStopCollection(GradientStop const * stops,
+                                                                unsigned count,
+                                                                ColorSpace preInterpolationSpace,
+                                                                ColorSpace postInterpolationSpace,
+                                                                BufferPrecision bufferPrecision,
+                                                                ExtendMode extendMode,
+                                                                ColorInterpolationMode colorInterpolationMode) const -> GradientStopCollection1
+        {
+            GradientStopCollection1 result;
+
+            HR((*this)->CreateGradientStopCollection(stops->Get(),
+                                                     count,
+                                                     static_cast<D2D1_COLOR_SPACE>(preInterpolationSpace),
+                                                     static_cast<D2D1_COLOR_SPACE>(postInterpolationSpace),
+                                                     static_cast<D2D1_BUFFER_PRECISION>(bufferPrecision),
+                                                     static_cast<D2D1_EXTEND_MODE>(extendMode),
+                                                     static_cast<D2D1_COLOR_INTERPOLATION_MODE>(colorInterpolationMode),
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateImageBrush(ImageBrushProperties const & imageBrushProperties) const -> ImageBrush
+        {
+            ImageBrush result;
+
+            HR((*this)->CreateImageBrush(nullptr,
+                                         imageBrushProperties.Get(),
+                                         nullptr,
+                                         result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateImageBrush(ImageBrushProperties const & imageBrushProperties,
+                                                    BrushProperties const & brushProperties) const -> ImageBrush
+        {
+            ImageBrush result;
+
+            HR((*this)->CreateImageBrush(nullptr,
+                                         imageBrushProperties.Get(),
+                                         brushProperties.Get(),
+                                         result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateImageBrush(Image const & image,
+                                                    ImageBrushProperties const & imageBrushProperties) const -> ImageBrush
+        {
+            ImageBrush result;
+
+            HR((*this)->CreateImageBrush(image.Get(),
+                                         imageBrushProperties.Get(),
+                                         nullptr,
+                                         result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateImageBrush(Image const & image,
+                                                    ImageBrushProperties const & imageBrushProperties,
+                                                    BrushProperties const & brushProperties) const -> ImageBrush
+        {
+            ImageBrush result;
+
+            HR((*this)->CreateImageBrush(image.Get(),
+                                         imageBrushProperties.Get(),
+                                         brushProperties.Get(),
+                                         result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateBitmapBrush1() const -> BitmapBrush1
+        {
+            BitmapBrush1 result;
+
+            HR((*this)->CreateBitmapBrush(nullptr,
+                                          nullptr,
+                                          nullptr,
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateBitmapBrush1(Bitmap const & bitmap) const -> BitmapBrush1
+        {
+            BitmapBrush1 result;
+
+            HR((*this)->CreateBitmapBrush(bitmap.Get(),
+                                          nullptr,
+                                          nullptr,
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateBitmapBrush1(BitmapBrushProperties1 const & bitmapBrushProperties) const -> BitmapBrush1
+        {
+            BitmapBrush1 result;
+
+            HR((*this)->CreateBitmapBrush(nullptr,
+                                          bitmapBrushProperties.Get(),
+                                          nullptr,
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateBitmapBrush1(BrushProperties const & brushProperties) const -> BitmapBrush1
+        {
+            BitmapBrush1 result;
+
+            HR((*this)->CreateBitmapBrush(nullptr,
+                                          nullptr,
+                                          brushProperties.Get(),
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateBitmapBrush1(Bitmap const & bitmap,
+                                                      BitmapBrushProperties1 const & bitmapBrushProperties) const -> BitmapBrush1
+        {
+            BitmapBrush1 result;
+
+            HR((*this)->CreateBitmapBrush(bitmap.Get(),
+                                          bitmapBrushProperties.Get(),
+                                          nullptr,
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateBitmapBrush1(Bitmap const & bitmap,
+                                                      BrushProperties const & brushProperties) const -> BitmapBrush1
+        {
+            BitmapBrush1 result;
+
+            HR((*this)->CreateBitmapBrush(bitmap.Get(),
+                                          nullptr,
+                                          brushProperties.Get(),
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateBitmapBrush1(BitmapBrushProperties1 const & bitmapBrushProperties,
+                                                      BrushProperties const & brushProperties) const -> BitmapBrush1
+        {
+            BitmapBrush1 result;
+
+            HR((*this)->CreateBitmapBrush(nullptr,
+                                          bitmapBrushProperties.Get(),
+                                          brushProperties.Get(),
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateBitmapBrush1(Bitmap const & bitmap,
+                                                      BitmapBrushProperties1 const & bitmapBrushProperties,
+                                                      BrushProperties const & brushProperties) const -> BitmapBrush1
+        {
+            BitmapBrush1 result;
+
+            HR((*this)->CreateBitmapBrush(bitmap.Get(),
+                                          bitmapBrushProperties.Get(),
+                                          brushProperties.Get(),
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto DeviceContext::CreateCommandList() const -> CommandList
+        {
+            CommandList result;
+            HR((*this)->CreateCommandList(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto DeviceContext::IsDxgiFormatSupported(Dxgi::Format format) const -> bool
+        {
+            return 0 != (*this)->IsDxgiFormatSupported(static_cast<DXGI_FORMAT>(format));
+        }
+
+        inline auto DeviceContext::IsBufferPrecisionSupported(BufferPrecision precision) const -> bool
+        {
+            return 0 != (*this)->IsBufferPrecisionSupported(static_cast<D2D1_BUFFER_PRECISION>(precision));
+        }
+
+        inline void DeviceContext::GetImageLocalBounds(Image const & image,
+                                                       RectF & bounds) const
+        {
+            HR((*this)->GetImageLocalBounds(image.Get(),
+                                            bounds.Get()));
+        }
+
+        inline void DeviceContext::GetImageWorldBounds(Image const & image,
+                                                       RectF & bounds) const
+        {
+            HR((*this)->GetImageWorldBounds(image.Get(),
+                                            bounds.Get()));
+        }
+
+        inline auto DeviceContext::GetDevice() const -> Device
+        {
+            Device result;
+            (*this)->GetDevice(result.GetAddressOf());
+            return result;
+        }
+
+        inline void DeviceContext::SetTarget(Image const & image) const
+        {
+            (*this)->SetTarget(image.Get());
+        }
+
+        inline void DeviceContext::SetTarget() const
+        {
+            (*this)->SetTarget(nullptr);
+        }
+
+        inline auto DeviceContext::GetTarget() const -> Image
+        {
+            Image result;
+            (*this)->GetTarget(result.GetAddressOf());
+            return result;
+        }
+
+        inline void DeviceContext::SetRenderingControls(RenderingControls const & controls) const
+        {
+            (*this)->SetRenderingControls(controls.Get());
+        }
+
+        inline void DeviceContext::GetRenderingControls(RenderingControls & controls) const
+        {
+            (*this)->GetRenderingControls(controls.Get());
+        }
+
+        inline void DeviceContext::SetPrimitiveBlend(PrimitiveBlend blend) const
+        {
+            (*this)->SetPrimitiveBlend(static_cast<D2D1_PRIMITIVE_BLEND>(blend));
+        }
+
+        inline auto DeviceContext::GetPrimitiveBlend() const -> PrimitiveBlend
+        {
+            return static_cast<PrimitiveBlend>((*this)->GetPrimitiveBlend());
+        }
+
+        inline void DeviceContext::SetUnitMode(UnitMode mode) const
+        {
+            (*this)->SetUnitMode(static_cast<D2D1_UNIT_MODE>(mode));
+        }
+
+        inline auto DeviceContext::GetUnitMode() const -> UnitMode
+        {
+            return static_cast<UnitMode>((*this)->GetUnitMode());
+        }
+
+        inline void DeviceContext::DrawImage(Image const & image,
+                                             InterpolationMode interpolationMode,
+                                             CompositeMode compositeMode) const
+        {
+            (*this)->DrawImage(image.Get(),
+                               nullptr,
+                               nullptr,
+                               static_cast<D2D1_INTERPOLATION_MODE>(interpolationMode),
+                               static_cast<D2D1_COMPOSITE_MODE>(compositeMode));
+        }
+
+        inline void DeviceContext::DrawImage(Image const & image,
+                                             Point2F const & targetOffset,
+                                             InterpolationMode interpolationMode,
+                                             CompositeMode compositeMode) const
+        {
+            (*this)->DrawImage(image.Get(),
+                               targetOffset.Get(),
+                               nullptr,
+                               static_cast<D2D1_INTERPOLATION_MODE>(interpolationMode),
+                               static_cast<D2D1_COMPOSITE_MODE>(compositeMode));
+        }
+
+        inline void DeviceContext::DrawImage(Image const & image,
+                                             RectF const & imageRectangle,
+                                             InterpolationMode interpolationMode,
+                                             CompositeMode compositeMode) const
+        {
+            (*this)->DrawImage(image.Get(),
+                               nullptr,
+                               imageRectangle.Get(),
+                               static_cast<D2D1_INTERPOLATION_MODE>(interpolationMode),
+                               static_cast<D2D1_COMPOSITE_MODE>(compositeMode));
+        }
+
+        inline void DeviceContext::DrawImage(Image const & image,
+                                             Point2F const & targetOffset,
+                                             RectF const & imageRectangle,
+                                             InterpolationMode interpolationMode,
+                                             CompositeMode compositeMode) const
+        {
+            (*this)->DrawImage(image.Get(),
+                               targetOffset.Get(),
+                               imageRectangle.Get(),
+                               static_cast<D2D1_INTERPOLATION_MODE>(interpolationMode),
+                               static_cast<D2D1_COMPOSITE_MODE>(compositeMode));
+        }
+
+        inline void DeviceContext::DrawGdiMetafile(GdiMetafile const & metafile) const
+        {
+            (*this)->DrawGdiMetafile(metafile.Get());
+        }
+
+        inline void DeviceContext::DrawGdiMetafile(GdiMetafile const & metafile,
+                                                   Point2F const & targetOffset) const
+        {
+            (*this)->DrawGdiMetafile(metafile.Get(),
+                                     targetOffset.Get());
+        }
+
+        inline void DeviceContext::InvalidateEffectInputRectangle(Effect const & effect,
+                                                                  unsigned input,
+                                                                  RectF const & rect) const
+        {
+            HR((*this)->InvalidateEffectInputRectangle(effect.Get(),
+                                                       input,
+                                                       rect.Get()));
+        }
+
+        inline auto DeviceContext::GetEffectInvalidRectangleCount(Effect const & effect) -> unsigned
+        {
+            unsigned result;
+
+            HR((*this)->GetEffectInvalidRectangleCount(effect.Get(),
+                                                       &result));
+
+            return result;
+        }
+
+        inline void DeviceContext::GetEffectInvalidRectangles(Effect const & effect,
+                                                              RectF * rectangles,
+                                                              unsigned count) const
+        {
+            HR((*this)->GetEffectInvalidRectangles(effect.Get(),
+                                                   rectangles->Get(),
+                                                   count));
+        }
+
+        inline void DeviceContext::FillOpacityMask(Bitmap const & opacityMask,
+                                                   Brush const & brush) const
+        {
+            (*this)->FillOpacityMask(opacityMask.Get(),
+                                     brush.Get(),
+                                     nullptr,
+                                     nullptr);
+        }
+
+        inline void DeviceContext::FillOpacityMask(Bitmap const & opacityMask,
+                                                   Brush const & brush,
+                                                   RectF const & destinationRectangle) const
+        {
+            (*this)->FillOpacityMask(opacityMask.Get(),
+                                     brush.Get(),
+                                     destinationRectangle.Get(),
+                                     nullptr);
+        }
+
+        inline void DeviceContext::FillOpacityMask(Bitmap const & opacityMask,
+                                                   Brush const & brush,
+                                                   RectF const & destinationRectangle,
+                                                   RectF const & sourceRectangle) const
+        {
+            (*this)->FillOpacityMask(opacityMask.Get(),
+                                     brush.Get(),
+                                     destinationRectangle.Get(),
+                                     sourceRectangle.Get());
+        }
+
+
+
 
     } // Direct2D
 
