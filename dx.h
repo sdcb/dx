@@ -3228,19 +3228,25 @@ namespace KennyKerr
                                  Brush const & brush,
                                  RectF const & destinationRectangle,
                                  RectF const & sourceRectangle) const;
-
         };
-
-
-
-
-
-
 
         struct Device : Resource
         {
             KENNYKERR_DEFINE_CLASS(Device, Resource, ID2D1Device)
+
+            auto CreateDeviceContext(DeviceContextOptions options = DeviceContextOptions::None) const -> DeviceContext;
+
+            // TODO: CreatePrintControl
+
+            void SetMaximumTextureMemory(UINT64 maximumInBytes) const;
+            auto GetMaximumTextureMemory() const -> UINT64;
+            void ClearResources(unsigned millisecondsSinceUse = 0) const;
         };
+
+
+
+
+
 
 
         struct Factory : Details::Object
@@ -6862,8 +6868,30 @@ namespace KennyKerr
                                      sourceRectangle.Get());
         }
 
+        inline auto Device::CreateDeviceContext(DeviceContextOptions options) const -> DeviceContext
+        {
+            DeviceContext result;
 
+            HR((*this)->CreateDeviceContext(static_cast<D2D1_DEVICE_CONTEXT_OPTIONS>(options),
+                                            result.GetAddressOf()));
 
+            return result;
+        }
+
+        inline void Device::SetMaximumTextureMemory(UINT64 maximumInBytes) const
+        {
+            (*this)->SetMaximumTextureMemory(maximumInBytes);
+        }
+
+        inline auto Device::GetMaximumTextureMemory() const -> UINT64
+        {
+            return (*this)->GetMaximumTextureMemory();
+        }
+
+        inline void Device::ClearResources(unsigned millisecondsSinceUse) const
+        {
+            (*this)->ClearResources(millisecondsSinceUse);
+        }
 
     } // Direct2D
 
