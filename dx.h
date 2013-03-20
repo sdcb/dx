@@ -2504,7 +2504,482 @@ namespace KennyKerr
                        SimplifiedGeometrySink const & sink) const;
         };
 
+        struct RectangleGeometry : Geometry
+        {
+            KENNYKERR_DEFINE_CLASS(RectangleGeometry, Geometry, ID2D1RectangleGeometry)
 
+            void GetRect(RectF & rect) const;
+        };
+
+        struct RoundedRectangleGeometry : Geometry
+        {
+            KENNYKERR_DEFINE_CLASS(RoundedRectangleGeometry, Geometry, ID2D1RoundedRectangleGeometry)
+
+            void GetRoundedRect(RoundedRect & rect) const;
+        };
+
+        struct EllipseGeometry : Geometry
+        {
+            KENNYKERR_DEFINE_CLASS(EllipseGeometry, Geometry, ID2D1EllipseGeometry)
+
+            void GetEllipse(Ellipse & ellipse) const;
+        };
+
+        struct GeometryGroup : Geometry
+        {
+            KENNYKERR_DEFINE_CLASS(GeometryGroup, Geometry, ID2D1GeometryGroup)
+
+            auto GetFillMode() const -> FillMode;
+            auto GetSourceGeometryCount() const -> unsigned;
+
+            // TODO: GetSourceGeometries
+        };
+
+        struct TransformedGeometry : Geometry
+        {
+            KENNYKERR_DEFINE_CLASS(TransformedGeometry, Geometry, ID2D1TransformedGeometry)
+
+            auto GetSourceGeometry() const -> Geometry;
+            void GetTransform(D2D1_MATRIX_3X2_F & transform) const;
+        };
+
+        struct GeometrySink : SimplifiedGeometrySink
+        {
+            KENNYKERR_DEFINE_CLASS(GeometrySink, SimplifiedGeometrySink, ID2D1GeometrySink)
+
+            void AddLine(Point2F const & point) const;
+            void AddBezier(BezierSegment const & bezier) const;
+            void AddQuadraticBezier(QuadraticBezierSegment const & bezier) const;
+            void AddArc(ArcSegment const & arc) const;
+
+            void AddQuadraticBeziers(QuadraticBezierSegment const * beziers,
+                                     unsigned count) const;
+
+            template <size_t Count>
+            void AddQuadraticBeziers(QuadraticBezierSegment const (&beziers),
+                                     unsigned count) const
+            {
+                AddQuadraticBeziers(beziers,
+                                    Count);
+            }
+        };
+
+        struct PathGeometry : Geometry
+        {
+            KENNYKERR_DEFINE_CLASS(PathGeometry, Geometry, ID2D1PathGeometry)
+
+            auto Open() const -> GeometrySink;
+            void Stream(GeometrySink const & sink) const;
+            auto GetSegmentCount() const -> unsigned;
+            auto GetFigureCount() const -> unsigned;
+        };
+
+        struct PathGeometry1 : PathGeometry
+        {
+            KENNYKERR_DEFINE_CLASS(PathGeometry1, PathGeometry, ID2D1PathGeometry1)
+
+            void ComputePointAndSegmentAtLength(float length,
+                                                unsigned startSegment,
+                                                PointDescription & pointDescription) const;
+
+            void ComputePointAndSegmentAtLength(float length,
+                                                unsigned startSegment,
+                                                D2D1_MATRIX_3X2_F const & transform,
+                                                PointDescription & pointDescription) const;
+
+            void ComputePointAndSegmentAtLength(float length,
+                                                unsigned startSegment,
+                                                float flatteningTolerance,
+                                                PointDescription & pointDescription) const;
+
+            void ComputePointAndSegmentAtLength(float length,
+                                                unsigned startSegment,
+                                                D2D1_MATRIX_3X2_F const & transform,
+                                                float flatteningTolerance,
+                                                PointDescription & pointDescription) const;
+        };
+
+        struct Properties : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Properties, Details::Object, ID2D1Properties)
+        };
+
+        struct Effect : Properties
+        {
+            KENNYKERR_DEFINE_CLASS(Effect, Properties, ID2D1Effect)
+
+            void SetInput(unsigned index = 0,
+                          bool invalidate = true) const;
+
+            void SetInput(unsigned index,
+                          Image const & input,
+                          bool invalidate = true) const;
+
+            void SetInput(Image const & input,
+                          bool invalidate = true) const;
+
+            void SetInputCount(unsigned count) const;
+            auto GetInput(unsigned index = 0) const -> Image;
+            auto GetInputCount() const -> unsigned;
+            auto GetOutput() const -> Image;
+
+            void SetInputEffect(unsigned index,
+                                Effect const & input,
+                                bool invalidate = true);
+        };
+
+        struct Mesh : Resource
+        {
+            KENNYKERR_DEFINE_CLASS(Mesh, Resource, ID2D1Mesh)
+
+            auto Open() const -> TessellationSink;
+        };
+
+        struct Layer : Resource
+        {
+            KENNYKERR_DEFINE_CLASS(Layer, Resource, ID2D1Layer)
+
+            auto GetSize() const -> SizeF;
+        };
+
+        struct DrawingStateBlock : Resource
+        {
+            KENNYKERR_DEFINE_CLASS(DrawingStateBlock, Resource, ID2D1DrawingStateBlock)
+
+            void GetDescription(DrawingStateDescription & description) const;
+            void SetDescription(DrawingStateDescription const & description) const;
+            void SetTextRenderingParams() const;
+            void SetTextRenderingParams(DirectWrite::RenderingParams const & params) const;
+            auto GetTextRenderingParams() const -> DirectWrite::RenderingParams;
+        };
+
+        struct DrawingStateBlock1 : DrawingStateBlock
+        {
+            KENNYKERR_DEFINE_CLASS(DrawingStateBlock1, DrawingStateBlock, ID2D1DrawingStateBlock1)
+
+            void GetDescription(DrawingStateDescription1 & description) const;
+            void SetDescription(DrawingStateDescription1 const & description) const;
+        };
+
+        struct RenderTarget : Resource
+        {
+            KENNYKERR_DEFINE_CLASS(RenderTarget, Resource, ID2D1RenderTarget)
+
+            auto CreateBitmap(SizeU const & size,
+                              BitmapProperties const & properties) const -> Bitmap;
+
+            auto CreateBitmap(SizeU const & size,
+                              void const * data,
+                              unsigned pitch,
+                              BitmapProperties const & properties) const -> Bitmap;
+
+            auto CreateBitmapFromWicBitmap(Wic::BitmapSource const & source) const -> Bitmap;
+
+            auto CreateBitmapFromWicBitmap(Wic::BitmapSource const & source,
+                                           BitmapProperties const & properties) const -> Bitmap;
+
+            template <typename T>
+            auto CreateSharedBitmap(T const & source) const -> Bitmap
+            {
+                Bitmap result;
+
+                HR((*this)->CreateSharedBitmap(__uuidof(T),
+                                               source.Get(),
+                                               nullptr,
+                                               result.GetAddressOf()));
+
+                return result;
+            }
+
+            template <typename T>
+            auto CreateSharedBitmap(T const & source,
+                                    BitmapProperties const & properties) const -> Bitmap
+            {
+                Bitmap result;
+
+                HR((*this)->CreateSharedBitmap(__uuidof(T),
+                                               source.Get(),
+                                               properties.Get(),
+                                               result.GetAddressOf()));
+
+                return result;
+            }
+
+            auto CreateBitmapBrush() const -> BitmapBrush;
+            auto CreateBitmapBrush(Bitmap const & bitmap) const -> BitmapBrush;
+            auto CreateBitmapBrush(BitmapBrushProperties const & bitmapBrushProperties) const -> BitmapBrush;
+            auto CreateBitmapBrush(BrushProperties const & brushProperties) const -> BitmapBrush;
+
+            auto CreateBitmapBrush(Bitmap const & bitmap,
+                                   BitmapBrushProperties const & bitmapBrushProperties) const -> BitmapBrush;
+
+            auto CreateBitmapBrush(Bitmap const & bitmap,
+                                   BrushProperties const & brushProperties) const -> BitmapBrush;
+
+            auto CreateBitmapBrush(BitmapBrushProperties const & bitmapBrushProperties,
+                                   BrushProperties const & brushProperties) const -> BitmapBrush;
+
+            auto CreateBitmapBrush(Bitmap const & bitmap,
+                                   BitmapBrushProperties const & bitmapBrushProperties,
+                                   BrushProperties const & brushProperties) const -> BitmapBrush;
+
+            auto CreateSolidColorBrush(Color const & color) const -> SolidColorBrush;
+
+            auto CreateSolidColorBrush(Color const & color,
+                                       BrushProperties const &  properties) const -> SolidColorBrush;
+
+            auto CreateGradientStopCollection(GradientStop const * stops,
+                                              unsigned count,
+                                              Gamma gamma = Gamma::_2_2,
+                                              ExtendMode mode = ExtendMode::Clamp) const -> GradientStopCollection;
+
+            template <size_t Count>
+            auto CreateGradientStopCollection(GradientStop const (&stops)[Count],
+                                              Gamma gamma = Gamma::_2_2,
+                                              ExtendMode mode = ExtendMode::Clamp) const -> GradientStopCollection
+            {
+                return CreateGradientStopCollection(stops,
+                                                    Count,
+                                                    gamma,
+                                                    mode);
+            }
+
+            auto CreateLinearGradientBrush(LinearGradientBrushProperties const & linearGradientBrushProperties,
+                                           GradientStopCollection const & stops) const -> LinearGradientBrush;
+
+            auto CreateLinearGradientBrush(LinearGradientBrushProperties const & linearGradientBrushProperties,
+                                           BrushProperties const & brushProperties,
+                                           GradientStopCollection const & stops) const -> LinearGradientBrush;
+
+            auto CreateRadialGradientBrush(RadialGradientBrushProperties const & radialGradientBrushProperties,
+                                           GradientStopCollection const & stops) const -> RadialGradientBrush;
+
+            auto CreateRadialGradientBrush(RadialGradientBrushProperties const & radialGradientBrushProperties,
+                                           BrushProperties const & brushProperties,
+                                           GradientStopCollection const & stops) const -> RadialGradientBrush;
+
+            auto CreateCompatibleRenderTarget() const -> BitmapRenderTarget;
+            auto CreateCompatibleRenderTarget(SizeF const & desiredSize) const -> BitmapRenderTarget;
+            auto CreateCompatibleRenderTarget(SizeU const & desiredPixelSize) const -> BitmapRenderTarget;
+            auto CreateCompatibleRenderTarget(PixelFormat const & desiredFormat) const -> BitmapRenderTarget;
+            auto CreateCompatibleRenderTarget(CompatibleRenderTargetOptions options) const -> BitmapRenderTarget;
+
+            auto CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                              SizeU const & desiredPixelSize) const -> BitmapRenderTarget;
+
+            auto CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                              PixelFormat const & desiredFormat) const -> BitmapRenderTarget;
+
+            auto CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                              CompatibleRenderTargetOptions options) const -> BitmapRenderTarget;
+
+            auto CreateCompatibleRenderTarget(SizeU const & desiredPixelSize,
+                                              PixelFormat const & desiredFormat) const -> BitmapRenderTarget;
+
+            auto CreateCompatibleRenderTarget(SizeU const & desiredPixelSize,
+                                              CompatibleRenderTargetOptions options) const -> BitmapRenderTarget;
+
+            auto CreateCompatibleRenderTarget(PixelFormat const & desiredFormat,
+                                              CompatibleRenderTargetOptions options) const -> BitmapRenderTarget;
+
+            auto CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                              SizeU const & desiredPixelSize,
+                                              PixelFormat const & desiredFormat) const -> BitmapRenderTarget;
+
+            auto CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                              PixelFormat const & desiredFormat,
+                                              CompatibleRenderTargetOptions options) const -> BitmapRenderTarget;
+
+            auto CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                              SizeU const & desiredPixelSize,
+                                              CompatibleRenderTargetOptions options) const -> BitmapRenderTarget;
+
+            auto CreateCompatibleRenderTarget(SizeU const & desiredPixelSize,
+                                              PixelFormat const & desiredFormat,
+                                              CompatibleRenderTargetOptions options) const -> BitmapRenderTarget;
+
+            auto CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                              SizeU const & desiredPixelSize,
+                                              PixelFormat const & desiredFormat,
+                                              CompatibleRenderTargetOptions options) const -> BitmapRenderTarget;
+
+            auto CreateLayer() const -> Layer;
+            auto CreateLayer(SizeF const & size) const -> Layer;
+            auto CreatMesh() const -> Mesh;
+
+            void DrawLine(Point2F const & point0,
+                          Point2F const & point1,
+                          Brush const & brush,
+                          float strokeWidth = 1.0f) const;
+
+            void DrawLine(Point2F const & point0,
+                          Point2F const & point1,
+                          Brush const & brush,
+                          float strokeWidth,
+                          StrokeStyle const & strokeStyle) const;
+
+            void DrawRectangle(RectF const & rect,
+                               Brush const & brush,
+                               float strokeWidth = 1.0f) const;
+
+            void DrawRectangle(RectF const & rect,
+                               Brush const & brush,
+                               float strokeWidth,
+                               StrokeStyle const & strokeStyle) const;
+
+            void FillRectangle(RectF const & rect,
+                               Brush const & brush) const;
+
+            void DrawRoundedRectangle(RoundedRect const & rect,
+                                      Brush const & brush,
+                                      float strokeWidth = 1.0f) const;
+
+            void DrawRoundedRectangle(RoundedRect const & rect,
+                                      Brush const & brush,
+                                      float strokeWidth,
+                                      StrokeStyle const & strokeStyle) const;
+
+            void FillRoundedRectangle(RoundedRect const & rect,
+                                      Brush const & brush) const;
+
+            void DrawEllipse(Ellipse const & ellipse,
+                             Brush const & brush,
+                             float strokeWidth = 1.0f) const;
+
+            void DrawEllipse(Ellipse const & ellipse,
+                             Brush const & brush,
+                             float strokeWidth,
+                             StrokeStyle const & strokeStyle) const;
+
+            void FillEllipse(Ellipse const & ellipse,
+                             Brush const & brush) const;
+
+            void DrawGeometry(Geometry const & geometry,
+                              Brush const & brush,
+                              float strokeWidth = 1.0f) const;
+
+            void DrawGeometry(Geometry const & geometry,
+                              Brush const & brush,
+                              float strokeWidth,
+                              StrokeStyle const & strokeStyle) const;
+
+            void FillGeometry(Geometry const & geometry,
+                              Brush const & brush) const;
+
+            void FillGeometry(Geometry const & geometry,
+                              Brush const & brush,
+                              Brush const & opacityBrush) const;
+
+            void FillMesh(Mesh const & mesh,
+                          Brush const & brush) const;
+
+            void FillOpacityMask(Bitmap const & mask,
+                                 Brush const & brush,
+                                 OpacityMaskContent content) const;
+
+            void FillOpacityMask(Bitmap const & mask,
+                                 Brush const & brush,
+                                 OpacityMaskContent content,
+                                 RectF const & destination,
+                                 RectF const & source) const;
+
+            void DrawBitmap(Bitmap const & bitmap) const;
+
+            void DrawBitmap(Bitmap const & bitmap,
+                            RectF const & destination) const;
+
+            void DrawBitmap(Bitmap const & bitmap,
+                            RectF const & destination,
+                            float opacity) const;
+
+            void DrawBitmap(Bitmap const & bitmap,
+                            RectF const & destination,
+                            float opacity,
+                            BitmapInterpolationMode mode) const;
+
+            void DrawBitmap(Bitmap const & bitmap,
+                            RectF const & destination,
+                            float opacity,
+                            BitmapInterpolationMode mode,
+                            RectF const & source) const;
+
+            void DrawText(wchar_t const * string,
+                          unsigned length,
+                          DirectWrite::TextFormat const & textFormat,
+                          RectF const & layoutRect,
+                          Brush const & brush,
+                          DrawTextOptions options = DrawTextOptions::None,
+                          DirectWrite::MeasuringMode measuringMode = DirectWrite::MeasuringMode::Natural) const;
+
+            void DrawTextLayout(Point2F const & origin,
+                                DirectWrite::TextLayout const & textLayout,
+                                Brush const & brush,
+                                DrawTextOptions options = DrawTextOptions::None) const;
+
+            // TODO: DrawGlyphRun
+
+            void SetTransform(D2D1_MATRIX_3X2_F const & transform) const;
+            void GetTransform(D2D1_MATRIX_3X2_F & transform) const;
+            void SetAntialiasMode(AntialiasMode mode) const;
+            auto GetAntialiasMode() const -> AntialiasMode;
+            void SetTextAntialiasMode(TextAntialiasMode mode) const;
+            auto GetTextAntialiasMode() const -> TextAntialiasMode;
+            void SetTextRenderingParams() const;
+            void SetTextRenderingParams(DirectWrite::RenderingParams const & params) const;
+            auto GetTextRenderingParams() const -> DirectWrite::RenderingParams;
+            void SetTags(UINT64 tag1, UINT64 tag2) const;
+            void GetTags(UINT64 & tag1, UINT64 & tag2) const;
+
+            void PushLayer(LayerParameters const & parameters) const;
+
+            void PushLayer(LayerParameters const & parameters,
+                           Layer const & layer) const;
+
+            void PopLayer() const;
+            void Flush() const;
+            void Flush(UINT64 & tag1, UINT64 & tag2) const;
+
+            void SaveDrawingState(DrawingStateBlock const & block) const;
+            void RestoreDrawingState(DrawingStateBlock const & block) const;
+
+            void PushAxisAlignedClip(RectF const & rect,
+                                     AntialiasMode mode) const;
+
+            void PopAxisAlignedClip() const;
+
+            void Clear() const;
+            void Clear(Color const & color) const;
+
+            void BeginDraw() const;
+            auto EndDraw() const -> HRESULT;
+            auto EndDraw(UINT64 & tag1, UINT64 & tag2) const -> HRESULT;
+
+            auto GetPixelFormat() const -> PixelFormat;
+            void SetDpi(float x, float y) const;
+            void GetDpi(float & x, float & y) const;
+            auto GetSize() const -> SizeF;
+            auto GetPixelSize() const -> SizeU;
+            auto GetMaximumBitmapSize() const -> unsigned;
+            auto IsSupported(RenderTargetProperties const & properties) const -> bool;
+        };
+
+
+
+
+
+
+
+        struct BitmapRenderTarget : RenderTarget
+        {
+            KENNYKERR_DEFINE_CLASS(BitmapRenderTarget, RenderTarget, ID2D1BitmapRenderTarget)
+
+            //auto GetBitmap() const -> Bitmap
+            //{
+            //    Bitmap result;
+            //    HR((*this)->GetBitmap(result.GetAddressOf()));
+            //    return result;
+            //}
+        };
 
 
 
@@ -2513,10 +2988,6 @@ namespace KennyKerr
             KENNYKERR_DEFINE_CLASS(Device, Resource, ID2D1Device)
         };
 
-        struct RenderTarget : Resource
-        {
-            KENNYKERR_DEFINE_CLASS(RenderTarget, Resource, ID2D1RenderTarget)
-        };
 
         struct Factory : Details::Object
         {
@@ -4318,7 +4789,1184 @@ namespace KennyKerr
                               flatteningTolerance,
                               sink.Get()));
         }
-    }
+
+        inline void RectangleGeometry::GetRect(RectF & rect) const
+        {
+            (*this)->GetRect(rect.Get());
+        }
+
+        inline void RoundedRectangleGeometry::GetRoundedRect(RoundedRect & rect) const
+        {
+            (*this)->GetRoundedRect(rect.Get());
+        }
+
+        inline void EllipseGeometry::GetEllipse(Ellipse & ellipse) const
+        {
+            (*this)->GetEllipse(ellipse.Get());
+        }
+
+        inline auto GeometryGroup::GetFillMode() const -> FillMode
+        {
+            return static_cast<FillMode>((*this)->GetFillMode());
+        }
+
+        inline auto GeometryGroup::GetSourceGeometryCount() const -> unsigned
+        {
+            return (*this)->GetSourceGeometryCount();
+        }
+
+        inline auto TransformedGeometry::GetSourceGeometry() const -> Geometry
+        {
+            Geometry result;
+            (*this)->GetSourceGeometry(result.GetAddressOf());
+            return result;
+        }
+
+        inline void TransformedGeometry::GetTransform(D2D1_MATRIX_3X2_F & transform) const
+        {
+            (*this)->GetTransform(&transform);
+        }
+
+        inline void GeometrySink::AddLine(Point2F const & point) const
+        {
+            (*this)->AddLine(point.Ref());
+        }
+
+        inline void GeometrySink::AddBezier(BezierSegment const & bezier) const
+        {
+            (*this)->AddBezier(bezier.Ref());
+        }
+
+        inline void GeometrySink::AddQuadraticBezier(QuadraticBezierSegment const & bezier) const
+        {
+            (*this)->AddQuadraticBezier(bezier.Ref());
+        }
+
+        inline void GeometrySink::AddArc(ArcSegment const & arc) const
+        {
+            (*this)->AddArc(arc.Ref());
+        }
+
+        inline void GeometrySink::AddQuadraticBeziers(QuadraticBezierSegment const * beziers,
+                                                      unsigned count) const
+        {
+            ASSERT(beziers);
+            ASSERT(count);
+
+            (*this)->AddQuadraticBeziers(beziers->Get(),
+                                         count);
+        }
+
+        inline auto PathGeometry::Open() const -> GeometrySink
+        {
+            GeometrySink result;
+            HR((*this)->Open(result.GetAddressOf()));
+            return result;
+        }
+
+        inline void PathGeometry::Stream(GeometrySink const & sink) const
+        {
+            HR((*this)->Stream(sink.Get()));
+        }
+
+        inline auto PathGeometry::GetSegmentCount() const -> unsigned
+        {
+            unsigned result;
+            HR((*this)->GetSegmentCount(&result));
+            return result;
+        }
+
+        inline auto PathGeometry::GetFigureCount() const -> unsigned
+        {
+            unsigned result;
+            HR((*this)->GetFigureCount(&result));
+            return result;
+        }
+
+        inline void PathGeometry1::ComputePointAndSegmentAtLength(float length,
+                                                                  unsigned startSegment,
+                                                                  PointDescription & pointDescription) const
+        {
+            HR((*this)->ComputePointAndSegmentAtLength(length,
+                                                       startSegment,
+                                                       nullptr,
+                                                       D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                                       pointDescription.Get()));
+        }
+
+        inline void PathGeometry1::ComputePointAndSegmentAtLength(float length,
+                                                                  unsigned startSegment,
+                                                                  D2D1_MATRIX_3X2_F const & transform,
+                                                                  PointDescription & pointDescription) const
+        {
+            HR((*this)->ComputePointAndSegmentAtLength(length,
+                                                       startSegment,
+                                                       &transform,
+                                                       D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                                       pointDescription.Get()));
+        }
+
+        inline void PathGeometry1::ComputePointAndSegmentAtLength(float length,
+                                                                  unsigned startSegment,
+                                                                  float flatteningTolerance,
+                                                                  PointDescription & pointDescription) const
+        {
+            HR((*this)->ComputePointAndSegmentAtLength(length,
+                                                       startSegment,
+                                                       nullptr,
+                                                       flatteningTolerance,
+                                                       pointDescription.Get()));
+        }
+
+        inline void PathGeometry1::ComputePointAndSegmentAtLength(float length,
+                                                                  unsigned startSegment,
+                                                                  D2D1_MATRIX_3X2_F const & transform,
+                                                                  float flatteningTolerance,
+                                                                  PointDescription & pointDescription) const
+        {
+            HR((*this)->ComputePointAndSegmentAtLength(length,
+                                                       startSegment,
+                                                       &transform,
+                                                       flatteningTolerance,
+                                                       pointDescription.Get()));
+        }
+
+        inline void Effect::SetInput(unsigned index,
+                                     bool invalidate) const
+        {
+            (*this)->SetInput(index,
+                              nullptr,
+                              invalidate);
+        }
+
+        inline void Effect::SetInput(unsigned index,
+                                     Image const & input,
+                                     bool invalidate) const
+        {
+            (*this)->SetInput(index,
+                              input.Get(),
+                              invalidate);
+        }
+
+        inline void Effect::SetInput(Image const & input,
+                                     bool invalidate) const
+        {
+            SetInput(0,
+                     input,
+                     invalidate);
+        }
+
+        inline void Effect::SetInputCount(unsigned count) const
+        {
+            HR((*this)->SetInputCount(count));
+        }
+
+        inline auto Effect::GetInput(unsigned index) const -> Image
+        {
+            Image result;
+
+            (*this)->GetInput(index,
+                              result.GetAddressOf());
+
+            return result;
+        }
+
+        inline auto Effect::GetInputCount() const -> unsigned
+        {
+            return (*this)->GetInputCount();
+        }
+
+        inline auto Effect::GetOutput() const -> Image
+        {
+            Image result;
+            (*this)->GetOutput(result.GetAddressOf());
+            return result;
+        }
+
+        inline void Effect::SetInputEffect(unsigned index,
+                                           Effect const & input,
+                                           bool invalidate)
+        {
+            auto output = input.GetOutput();
+
+            if (output)
+            {
+                SetInput(index, output, invalidate);
+            }
+            else
+            {
+                SetInput(index, invalidate);
+            }
+        }
+
+        inline auto Mesh::Open() const -> TessellationSink
+        {
+            TessellationSink result;
+            HR((*this)->Open(result.GetAddressOf()));
+            return result;
+        }
+
+        auto Layer::GetSize() const -> SizeF
+        {
+            return (*this)->GetSize();
+        }
+
+        inline void DrawingStateBlock::GetDescription(DrawingStateDescription & description) const
+        {
+            (*this)->GetDescription(description.Get());
+        }
+
+        inline void DrawingStateBlock::SetDescription(DrawingStateDescription const & description) const
+        {
+            (*this)->SetDescription(description.Get());
+        }
+
+        inline void DrawingStateBlock::SetTextRenderingParams() const
+        {
+            (*this)->SetTextRenderingParams();
+        }
+
+        inline void DrawingStateBlock::SetTextRenderingParams(DirectWrite::RenderingParams const & params) const
+        {
+            (*this)->SetTextRenderingParams(params.Get());
+        }
+
+        inline auto DrawingStateBlock::GetTextRenderingParams() const -> DirectWrite::RenderingParams
+        {
+            DirectWrite::RenderingParams result;
+            (*this)->GetTextRenderingParams(result.GetAddressOf());
+            return result;
+        }
+
+        void DrawingStateBlock1::GetDescription(DrawingStateDescription1 & description) const
+        {
+            (*this)->GetDescription(description.Get());
+        }
+
+        void DrawingStateBlock1::SetDescription(DrawingStateDescription1 const & description) const
+        {
+            (*this)->SetDescription(description.Get());
+        }
+
+        inline auto RenderTarget::CreateBitmap(SizeU const & size,
+                                               void const * data,
+                                               unsigned pitch,
+                                               BitmapProperties const & properties) const -> Bitmap
+        {
+            Bitmap result;
+
+            HR((*this)->CreateBitmap(size.Ref(),
+                                     data,
+                                     pitch,
+                                     properties.Get(),
+                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateBitmap(SizeU const & size,
+                                               BitmapProperties const & properties) const -> Bitmap
+        {
+            return CreateBitmap(size,
+                                nullptr, 0, // not initialized
+                                properties);
+        }
+
+        inline auto RenderTarget::CreateBitmapFromWicBitmap(Wic::BitmapSource const & source) const -> Bitmap
+        {
+            Bitmap result;
+
+            HR((*this)->CreateBitmapFromWicBitmap(source.Get(),
+                                                  nullptr,
+                                                  result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateBitmapFromWicBitmap(Wic::BitmapSource const & source,
+                                                            BitmapProperties const & properties) const -> Bitmap
+        {
+            Bitmap result;
+
+            HR((*this)->CreateBitmapFromWicBitmap(source.Get(),
+                                                  properties.Get(),
+                                                  result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateBitmapBrush() const -> BitmapBrush
+        {
+            BitmapBrush result;
+
+            HR((*this)->CreateBitmapBrush(nullptr,
+                                          nullptr,
+                                          nullptr,
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateBitmapBrush(Bitmap const & bitmap) const -> BitmapBrush
+        {
+            BitmapBrush result;
+
+            HR((*this)->CreateBitmapBrush(bitmap.Get(),
+                                          nullptr,
+                                          nullptr,
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateBitmapBrush(BitmapBrushProperties const & bitmapBrushProperties) const -> BitmapBrush
+        {
+            BitmapBrush result;
+
+            HR((*this)->CreateBitmapBrush(nullptr,
+                                          bitmapBrushProperties.Get(),
+                                          nullptr,
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateBitmapBrush(BrushProperties const & brushProperties) const -> BitmapBrush
+        {
+            BitmapBrush result;
+
+            HR((*this)->CreateBitmapBrush(nullptr,
+                                          nullptr,
+                                          brushProperties.Get(),
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateBitmapBrush(Bitmap const & bitmap,
+                                                    BitmapBrushProperties const & bitmapBrushProperties) const -> BitmapBrush
+        {
+            BitmapBrush result;
+
+            HR((*this)->CreateBitmapBrush(bitmap.Get(),
+                                          bitmapBrushProperties.Get(),
+                                          nullptr,
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateBitmapBrush(Bitmap const & bitmap,
+                                                    BrushProperties const & brushProperties) const -> BitmapBrush
+        {
+            BitmapBrush result;
+
+            HR((*this)->CreateBitmapBrush(bitmap.Get(),
+                                          nullptr,
+                                          brushProperties.Get(),
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateBitmapBrush(BitmapBrushProperties const & bitmapBrushProperties,
+                                                    BrushProperties const & brushProperties) const -> BitmapBrush
+        {
+            BitmapBrush result;
+
+            HR((*this)->CreateBitmapBrush(nullptr,
+                                          bitmapBrushProperties.Get(),
+                                          brushProperties.Get(),
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateBitmapBrush(Bitmap const & bitmap,
+                                                    BitmapBrushProperties const & bitmapBrushProperties,
+                                                    BrushProperties const & brushProperties) const -> BitmapBrush
+        {
+            BitmapBrush result;
+
+            HR((*this)->CreateBitmapBrush(bitmap.Get(),
+                                          bitmapBrushProperties.Get(),
+                                          brushProperties.Get(),
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateSolidColorBrush(Color const & color) const -> SolidColorBrush
+        {
+            SolidColorBrush result;
+
+            HR((*this)->CreateSolidColorBrush(color.Get(),
+                                              nullptr,
+                                              result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateSolidColorBrush(Color const & color,
+                                                        BrushProperties const &  properties) const -> SolidColorBrush
+        {
+            SolidColorBrush result;
+
+            HR((*this)->CreateSolidColorBrush(color.Get(),
+                                              properties.Get(),
+                                              result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateGradientStopCollection(GradientStop const * stops,
+                                                               unsigned count,
+                                                               Gamma gamma,
+                                                               ExtendMode mode) const -> GradientStopCollection
+        {
+            GradientStopCollection result;
+
+            HR((*this)->CreateGradientStopCollection(stops->Get(),
+                                                     count,
+                                                     static_cast<D2D1_GAMMA>(gamma),
+                                                     static_cast<D2D1_EXTEND_MODE>(mode),
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateLinearGradientBrush(LinearGradientBrushProperties const & linearGradientBrushProperties,
+                                                            GradientStopCollection const & stops) const -> LinearGradientBrush
+        {
+            LinearGradientBrush result;
+
+            HR((*this)->CreateLinearGradientBrush(linearGradientBrushProperties.Get(),
+                                                  nullptr,
+                                                  stops.Get(),
+                                                  result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateLinearGradientBrush(LinearGradientBrushProperties const & linearGradientBrushProperties,
+                                                            BrushProperties const & brushProperties,
+                                                            GradientStopCollection const & stops) const -> LinearGradientBrush
+        {
+            LinearGradientBrush result;
+
+            HR((*this)->CreateLinearGradientBrush(linearGradientBrushProperties.Get(),
+                                                  brushProperties.Get(),
+                                                  stops.Get(),
+                                                  result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateRadialGradientBrush(RadialGradientBrushProperties const & radialGradientBrushProperties,
+                                                            GradientStopCollection const & stops) const -> RadialGradientBrush
+        {
+            RadialGradientBrush result;
+
+            HR((*this)->CreateRadialGradientBrush(radialGradientBrushProperties.Get(),
+                                                  nullptr,
+                                                  stops.Get(),
+                                                  result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateRadialGradientBrush(RadialGradientBrushProperties const & radialGradientBrushProperties,
+                                                            BrushProperties const & brushProperties,
+                                                            GradientStopCollection const & stops) const -> RadialGradientBrush
+        {
+            RadialGradientBrush result;
+
+            HR((*this)->CreateRadialGradientBrush(radialGradientBrushProperties.Get(),
+                                                  brushProperties.Get(),
+                                                  stops.Get(),
+                                                  result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget() const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(nullptr,
+                                                     nullptr,
+                                                     nullptr,
+                                                     D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS_NONE,
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & desiredSize) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(desiredSize.Get(),
+                                                     nullptr,
+                                                     nullptr,
+                                                     D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS_NONE,
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeU const & desiredPixelSize) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(nullptr,
+                                                     desiredPixelSize.Get(),
+                                                     nullptr,
+                                                     D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS_NONE,
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(PixelFormat const & desiredFormat) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(nullptr,
+                                                     nullptr,
+                                                     desiredFormat.Get(),
+                                                     D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS_NONE,
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(CompatibleRenderTargetOptions options) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(nullptr,
+                                                     nullptr,
+                                                     nullptr,
+                                                     static_cast<D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS>(options),
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                                               SizeU const & desiredPixelSize) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(desiredSize.Get(),
+                                                     desiredPixelSize.Get(),
+                                                     nullptr,
+                                                     D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS_NONE,
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                                               PixelFormat const & desiredFormat) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(desiredSize.Get(),
+                                                     nullptr,
+                                                     desiredFormat.Get(),
+                                                     D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS_NONE,
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                                               CompatibleRenderTargetOptions options) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(desiredSize.Get(),
+                                                     nullptr,
+                                                     nullptr,
+                                                     static_cast<D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS>(options),
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeU const & desiredPixelSize,
+                                                               PixelFormat const & desiredFormat) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(nullptr,
+                                                     desiredPixelSize.Get(),
+                                                     desiredFormat.Get(),
+                                                     D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS_NONE,
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeU const & desiredPixelSize,
+                                                               CompatibleRenderTargetOptions options) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(nullptr,
+                                                     desiredPixelSize.Get(),
+                                                     nullptr,
+                                                     static_cast<D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS>(options),
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(PixelFormat const & desiredFormat,
+                                                               CompatibleRenderTargetOptions options) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(nullptr,
+                                                     nullptr,
+                                                     desiredFormat.Get(),
+                                                     static_cast<D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS>(options),
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                                               SizeU const & desiredPixelSize,
+                                                               PixelFormat const & desiredFormat) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(desiredSize.Get(),
+                                                     desiredPixelSize.Get(),
+                                                     desiredFormat.Get(),
+                                                     D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS_NONE,
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                                               PixelFormat const & desiredFormat,
+                                                               CompatibleRenderTargetOptions options) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(desiredSize.Get(),
+                                                     nullptr,
+                                                     desiredFormat.Get(),
+                                                     static_cast<D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS>(options),
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                                               SizeU const & desiredPixelSize,
+                                                               CompatibleRenderTargetOptions options) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(desiredSize.Get(),
+                                                     desiredPixelSize.Get(),
+                                                     nullptr,
+                                                     static_cast<D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS>(options),
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeU const & desiredPixelSize,
+                                                               PixelFormat const & desiredFormat,
+                                                               CompatibleRenderTargetOptions options) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(nullptr,
+                                                     desiredPixelSize.Get(),
+                                                     desiredFormat.Get(),
+                                                     static_cast<D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS>(options),
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateCompatibleRenderTarget(SizeF const & desiredSize,
+                                                               SizeU const & desiredPixelSize,
+                                                               PixelFormat const & desiredFormat,
+                                                               CompatibleRenderTargetOptions options) const -> BitmapRenderTarget
+        {
+            BitmapRenderTarget result;
+
+            HR((*this)->CreateCompatibleRenderTarget(desiredSize.Get(),
+                                                     desiredPixelSize.Get(),
+                                                     desiredFormat.Get(),
+                                                     static_cast<D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS>(options),
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreateLayer() const -> Layer
+        {
+            Layer result;
+            HR((*this)->CreateLayer(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto RenderTarget::CreateLayer(SizeF const & size) const -> Layer
+        {
+            Layer result;
+
+            HR((*this)->CreateLayer(size.Get(),
+                                    result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto RenderTarget::CreatMesh() const -> Mesh
+        {
+            Mesh result;
+            HR((*this)->CreateMesh(result.GetAddressOf()));
+            return result;
+        }
+
+        inline void RenderTarget::DrawLine(Point2F const & point0,
+                                           Point2F const & point1,
+                                           Brush const & brush,
+                                           float strokeWidth) const
+        {
+            (*this)->DrawLine(point0.Ref(),
+                              point1.Ref(),
+                              brush.Get(),
+                              strokeWidth,
+                              nullptr);
+        }
+
+        inline void RenderTarget::DrawLine(Point2F const & point0,
+                                           Point2F const & point1,
+                                           Brush const & brush,
+                                           float strokeWidth,
+                                           StrokeStyle const & strokeStyle) const
+        {
+            (*this)->DrawLine(point0.Ref(),
+                              point1.Ref(),
+                              brush.Get(),
+                              strokeWidth,
+                              strokeStyle.Get());
+        }
+
+        inline void RenderTarget::DrawRectangle(RectF const & rect,
+                                                Brush const & brush,
+                                                float strokeWidth) const
+        {
+            (*this)->DrawRectangle(rect.Ref(),
+                                   brush.Get(),
+                                   strokeWidth,
+                                   nullptr);
+        }
+
+        inline void RenderTarget::DrawRectangle(RectF const & rect,
+                                                Brush const & brush,
+                                                float strokeWidth,
+                                                StrokeStyle const & strokeStyle) const
+        {
+            (*this)->DrawRectangle(rect.Get(),
+                                   brush.Get(),
+                                   strokeWidth,
+                                   strokeStyle.Get());
+        }
+
+        inline void RenderTarget::FillRectangle(RectF const & rect,
+                                                Brush const & brush) const
+        {
+            (*this)->FillRectangle(rect.Get(),
+                                   brush.Get());
+        }
+
+        inline void RenderTarget::DrawRoundedRectangle(RoundedRect const & rect,
+                                                       Brush const & brush,
+                                                       float strokeWidth) const
+        {
+            (*this)->DrawRoundedRectangle(rect.Get(),
+                                          brush.Get(),
+                                          strokeWidth,
+                                          nullptr);
+        }
+
+        inline void RenderTarget::DrawRoundedRectangle(RoundedRect const & rect,
+                                                       Brush const & brush,
+                                                       float strokeWidth,
+                                                       StrokeStyle const & strokeStyle) const
+        {
+            (*this)->DrawRoundedRectangle(rect.Ref(),
+                                          brush.Get(),
+                                          strokeWidth,
+                                          strokeStyle.Get());
+        }
+
+        inline void RenderTarget::FillRoundedRectangle(RoundedRect const & rect,
+                                                       Brush const & brush) const
+        {
+            (*this)->FillRoundedRectangle(rect.Get(),
+                                          brush.Get());
+        }
+
+        inline void RenderTarget::DrawEllipse(Ellipse const & ellipse,
+                                              Brush const & brush,
+                                              float strokeWidth) const
+        {
+            (*this)->DrawEllipse(ellipse.Get(),
+                                 brush.Get(),
+                                 strokeWidth,
+                                 nullptr);
+        }
+
+        inline void RenderTarget::DrawEllipse(Ellipse const & ellipse,
+                                              Brush const & brush,
+                                              float strokeWidth,
+                                              StrokeStyle const & strokeStyle) const
+        {
+            (*this)->DrawEllipse(ellipse.Get(),
+                                 brush.Get(),
+                                 strokeWidth,
+                                 strokeStyle.Get());
+        }
+
+        inline void RenderTarget::FillEllipse(Ellipse const & ellipse,
+                                              Brush const & brush) const
+        {
+            (*this)->FillEllipse(ellipse.Get(),
+                                 brush.Get());
+        }
+
+        inline void RenderTarget::DrawGeometry(Geometry const & geometry,
+                                               Brush const & brush,
+                                               float strokeWidth) const
+        {
+            (*this)->DrawGeometry(geometry.Get(),
+                                  brush.Get(),
+                                  strokeWidth,
+                                  nullptr);
+        }
+
+        inline void RenderTarget::DrawGeometry(Geometry const & geometry,
+                                               Brush const & brush,
+                                               float strokeWidth,
+                                               StrokeStyle const & strokeStyle) const
+        {
+            (*this)->DrawGeometry(geometry.Get(),
+                                  brush.Get(),
+                                  strokeWidth,
+                                  strokeStyle.Get());
+        }
+
+        inline void RenderTarget::FillGeometry(Geometry const & geometry,
+                                               Brush const & brush) const
+        {
+            (*this)->FillGeometry(geometry.Get(),
+                                  brush.Get(),
+                                  nullptr);
+        }
+
+        inline void RenderTarget::FillGeometry(Geometry const & geometry,
+                                               Brush const & brush,
+                                               Brush const & opacityBrush) const
+        {
+            (*this)->FillGeometry(geometry.Get(),
+                                  brush.Get(),
+                                  opacityBrush.Get());
+        }
+
+        inline void RenderTarget::FillMesh(Mesh const & mesh,
+                                           Brush const & brush) const
+        {
+            (*this)->FillMesh(mesh.Get(),
+                              brush.Get());
+        }
+
+        inline void RenderTarget::FillOpacityMask(Bitmap const & mask,
+                                                  Brush const & brush,
+                                                  OpacityMaskContent content) const
+        {
+            (*this)->FillOpacityMask(mask.Get(),
+                                     brush.Get(),
+                                     static_cast<D2D1_OPACITY_MASK_CONTENT>(content),
+                                     nullptr,
+                                     nullptr);
+        }
+
+        inline void RenderTarget::FillOpacityMask(Bitmap const & mask,
+                                                  Brush const & brush,
+                                                  OpacityMaskContent content,
+                                                  RectF const & destination,
+                                                  RectF const & source) const
+        {
+            (*this)->FillOpacityMask(mask.Get(),
+                                     brush.Get(),
+                                     static_cast<D2D1_OPACITY_MASK_CONTENT>(content),
+                                     destination.Get(),
+                                     source.Get());
+        }
+
+        inline void RenderTarget::DrawBitmap(Bitmap const & bitmap) const
+        {
+            (*this)->DrawBitmap(bitmap.Get(),
+                                nullptr,
+                                1.0f,
+                                D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+                                nullptr);
+        }
+
+        inline void RenderTarget::DrawBitmap(Bitmap const & bitmap,
+                                             RectF const & destination) const
+        {
+            (*this)->DrawBitmap(bitmap.Get(),
+                                destination.Get(),
+                                1.0f,
+                                D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+                                nullptr);
+        }
+
+        inline void RenderTarget::DrawBitmap(Bitmap const & bitmap,
+                                             RectF const & destination,
+                                             float opacity) const
+        {
+            (*this)->DrawBitmap(bitmap.Get(),
+                                destination.Get(),
+                                opacity,
+                                D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+                                nullptr);
+        }
+
+        inline void RenderTarget::DrawBitmap(Bitmap const & bitmap,
+                                             RectF const & destination,
+                                             float opacity,
+                                             BitmapInterpolationMode mode) const
+        {
+            (*this)->DrawBitmap(bitmap.Get(),
+                                destination.Get(),
+                                opacity,
+                                static_cast<D2D1_BITMAP_INTERPOLATION_MODE>(mode),
+                                nullptr);
+        }
+
+        inline void RenderTarget::DrawBitmap(Bitmap const & bitmap,
+                                             RectF const & destination,
+                                             float opacity,
+                                             BitmapInterpolationMode mode,
+                                             RectF const & source) const
+        {
+            (*this)->DrawBitmap(bitmap.Get(),
+                                destination.Get(),
+                                opacity,
+                                static_cast<D2D1_BITMAP_INTERPOLATION_MODE>(mode),
+                                source.Get());
+        }
+
+        inline void RenderTarget::DrawText(wchar_t const * string,
+                                           unsigned length,
+                                           DirectWrite::TextFormat const & textFormat,
+                                           RectF const & layoutRect,
+                                           Brush const & brush,
+                                           DrawTextOptions options,
+                                           DirectWrite::MeasuringMode measuringMode) const
+        {
+            (*this)->DrawText(string,
+                              length,
+                              textFormat.Get(),
+                              layoutRect.Get(),
+                              brush.Get(),
+                              static_cast<D2D1_DRAW_TEXT_OPTIONS>(options),
+                              static_cast<DWRITE_MEASURING_MODE>(measuringMode));
+        }
+
+        inline void RenderTarget::DrawTextLayout(Point2F const & origin,
+                                                 DirectWrite::TextLayout const & textLayout,
+                                                 Brush const & brush,
+                                                 DrawTextOptions options) const
+        {
+            (*this)->DrawTextLayout(origin.Ref(),
+                                    textLayout.Get(),
+                                    brush.Get(),
+                                    static_cast<D2D1_DRAW_TEXT_OPTIONS>(options));
+        }
+
+        inline void RenderTarget::SetTransform(D2D1_MATRIX_3X2_F const & transform) const
+        {
+            (*this)->SetTransform(transform);
+        }
+
+        inline void RenderTarget::GetTransform(D2D1_MATRIX_3X2_F & transform) const
+        {
+            (*this)->GetTransform(&transform);
+        }
+
+        inline void RenderTarget::SetAntialiasMode(AntialiasMode mode) const
+        {
+            (*this)->SetAntialiasMode(static_cast<D2D1_ANTIALIAS_MODE>(mode));
+        }
+
+        inline auto RenderTarget::GetAntialiasMode() const -> AntialiasMode
+        {
+            static_cast<D2D1_ANTIALIAS_MODE>((*this)->GetAntialiasMode());
+        }
+
+        inline void RenderTarget::SetTextAntialiasMode(TextAntialiasMode mode) const
+        {
+            (*this)->SetTextAntialiasMode(static_cast<D2D1_TEXT_ANTIALIAS_MODE>(mode));
+        }
+
+        inline auto RenderTarget::GetTextAntialiasMode() const -> TextAntialiasMode
+        {
+            static_cast<D2D1_TEXT_ANTIALIAS_MODE>((*this)->GetTextAntialiasMode());
+        }
+
+        inline void RenderTarget::SetTextRenderingParams() const
+        {
+            (*this)->SetTextRenderingParams(nullptr);
+        }
+
+        inline void RenderTarget::SetTextRenderingParams(DirectWrite::RenderingParams const & params) const
+        {
+            (*this)->SetTextRenderingParams(params.Get());
+        }
+
+        inline auto RenderTarget::GetTextRenderingParams() const -> DirectWrite::RenderingParams
+        {
+            DirectWrite::RenderingParams result;
+            (*this)->GetTextRenderingParams(result.GetAddressOf());
+            return result;
+        }
+
+        inline void RenderTarget::SetTags(UINT64 tag1, UINT64 tag2) const
+        {
+            (*this)->SetTags(tag1, tag2);
+        }
+
+        inline void RenderTarget::GetTags(UINT64 & tag1, UINT64 & tag2) const
+        {
+            (*this)->GetTags(&tag1, &tag2);
+        }
+
+        inline void RenderTarget::PushLayer(LayerParameters const & parameters) const
+        {
+            (*this)->PushLayer(parameters.Get(),
+                               nullptr);
+        }
+
+        inline void RenderTarget::PushLayer(LayerParameters const & parameters,
+                                            Layer const & layer) const
+        {
+            (*this)->PushLayer(parameters.Get(),
+                               layer.Get());
+        }
+
+        inline void RenderTarget::PopLayer() const
+        {
+            (*this)->PopLayer();
+        }
+
+        inline void RenderTarget::Flush() const
+        {
+            HR((*this)->Flush(nullptr, nullptr));
+        }
+
+        inline void RenderTarget::Flush(UINT64 & tag1, UINT64 & tag2) const
+        {
+            HR((*this)->Flush(&tag1, &tag2));
+        }
+
+        inline void RenderTarget::SaveDrawingState(DrawingStateBlock const & block) const
+        {
+            (*this)->SaveDrawingState(block.Get());
+        }
+
+        inline void RenderTarget::RestoreDrawingState(DrawingStateBlock const & block) const
+        {
+            (*this)->RestoreDrawingState(block.Get());
+        }
+
+        inline void RenderTarget::PushAxisAlignedClip(RectF const & rect,
+                                                      AntialiasMode mode) const
+        {
+            (*this)->PushAxisAlignedClip(rect.Get(),
+                                         static_cast<D2D1_ANTIALIAS_MODE>(mode));
+        }
+
+        inline void RenderTarget::PopAxisAlignedClip() const
+        {
+            (*this)->PopAxisAlignedClip();
+        }
+
+        inline void RenderTarget::Clear() const
+        {
+            (*this)->Clear();
+        }
+
+        inline void RenderTarget::Clear(Color const & color) const
+        {
+            (*this)->Clear(color.Get());
+        }
+
+        inline void RenderTarget::BeginDraw() const
+        {
+            (*this)->BeginDraw();
+        }
+
+        inline auto RenderTarget::EndDraw() const -> HRESULT
+        {
+            return (*this)->EndDraw();
+        }
+
+        inline auto RenderTarget::EndDraw(UINT64 & tag1, UINT64 & tag2) const -> HRESULT
+        {
+            return (*this)->EndDraw(&tag1, &tag2);
+        }
+
+        inline auto RenderTarget::GetPixelFormat() const -> PixelFormat
+        {
+            return (*this)->GetPixelFormat();
+        }
+
+        inline void RenderTarget::SetDpi(float x, float y) const
+        {
+            (*this)->SetDpi(x, y);
+        }
+
+        inline void RenderTarget::GetDpi(float & x, float & y) const
+        {
+            (*this)->GetDpi(&x, &y);
+        }
+
+        inline auto RenderTarget::GetSize() const -> SizeF
+        {
+            return (*this)->GetSize();
+        }
+
+        inline auto RenderTarget::GetPixelSize() const -> SizeU
+        {
+            return (*this)->GetPixelSize();
+        }
+
+        inline auto RenderTarget::GetMaximumBitmapSize() const -> unsigned
+        {
+            return (*this)->GetMaximumBitmapSize();
+        }
+
+        inline auto RenderTarget::IsSupported(RenderTargetProperties const & properties) const -> bool
+        {
+            return 0 != (*this)->IsSupported(properties.Get());
+        }
+
+    } // Direct2D
 
     #pragma endregion Implementation
 }
