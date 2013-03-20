@@ -103,15 +103,16 @@ namespace KennyKerr
         auto GetAddressOf() -> INTERFACE ** { ASSERT(!m_ptr); return reinterpret_cast<INTERFACE **>(m_ptr.GetAddressOf()); }
 
         // Would love to use a static_assert here but that can't appear inside the class definition.
-        #define KENNYKERR_DEFINE_STRUCT(THIS_STRUCT, BASE_STRUCT)                                        \
-        THIS_STRUCT(BASE_STRUCT const & other) { *this = reinterpret_cast<THIS_STRUCT const &>(other); } \
-        auto Get() const -> BASE_STRUCT const * { ASSERT(sizeof(THIS_STRUCT) == sizeof(BASE_STRUCT));    \
-                                                  return reinterpret_cast<BASE_STRUCT const *>(this); }; \
-        auto Get()       -> BASE_STRUCT *       { ASSERT(sizeof(THIS_STRUCT) == sizeof(BASE_STRUCT));    \
-                                                  return reinterpret_cast<BASE_STRUCT *>(this);       }; \
-        auto Ref() const -> BASE_STRUCT const & { return *Get();                                      }; \
-        auto Ref()       -> BASE_STRUCT &       { return *Get();                                      };
-    }
+        #define KENNYKERR_DEFINE_STRUCT(THIS_STRUCT, BASE_STRUCT)                                          \
+        THIS_STRUCT(BASE_STRUCT const & other)  { *this = reinterpret_cast<THIS_STRUCT const &>(other); }  \
+        auto Get() const -> BASE_STRUCT const * { ASSERT(sizeof(THIS_STRUCT) == sizeof(BASE_STRUCT));      \
+                                                  return reinterpret_cast<BASE_STRUCT const *>(this);   }; \
+        auto Get()       -> BASE_STRUCT *       { ASSERT(sizeof(THIS_STRUCT) == sizeof(BASE_STRUCT));      \
+                                                  return reinterpret_cast<BASE_STRUCT *>(this);         }; \
+        auto Ref() const -> BASE_STRUCT const & { return *Get();                                        }; \
+        auto Ref()       -> BASE_STRUCT &       { return *Get();                                        };
+
+    } // Details
 
     #ifndef __cplusplus_winrt
     struct Exception
@@ -814,7 +815,10 @@ namespace KennyKerr
 
         static RectF Infinite()
         {
-            return RectF(-D2D1::FloatMax(), -D2D1::FloatMax(), D2D1::FloatMax(),  D2D1::FloatMax());
+            return RectF(-D2D1::FloatMax(),
+                         -D2D1::FloatMax(),
+                         D2D1::FloatMax(),
+                         D2D1::FloatMax());
         }
 
         explicit RectF(float const left   = 0.0f,
@@ -1488,7 +1492,7 @@ namespace KennyKerr
             KENNYKERR_DEFINE_STRUCT(MappedRect, D2D1_MAPPED_RECT)
 
             explicit MappedRect(unsigned const pitch = 0,
-                                BYTE * bits = nullptr) :
+                                BYTE * bits          = nullptr) :
                 Pitch(pitch),
                 Bits(bits)
             {}
@@ -1502,7 +1506,7 @@ namespace KennyKerr
             KENNYKERR_DEFINE_STRUCT(RenderingControls, D2D1_RENDERING_CONTROLS)
 
             explicit RenderingControls(BufferPrecision bufferPrecision = BufferPrecision::Unknown,
-                                       SizeU const & tileSize = SizeU()) :
+                                       SizeU const & tileSize          = SizeU()) :
                 BufferPrecision(bufferPrecision),
                 TileSize(tileSize)
             {}
@@ -1570,7 +1574,8 @@ namespace KennyKerr
         struct Factory2;
         struct Adapter;
         struct Device1;
-    }
+
+    } // Dxgi
 
     namespace Direct3D
     {
@@ -1578,7 +1583,8 @@ namespace KennyKerr
         struct Texture2D;
         struct DeviceContext;
         struct Device;
-    }
+
+    } // Direct3D
 
     namespace Wic
     {
@@ -1594,7 +1600,8 @@ namespace KennyKerr
         struct BitmapDecoder;
         struct Stream;
         struct Factory;
-    }
+
+    } // Wic
 
     namespace Wam
     {
@@ -1602,14 +1609,16 @@ namespace KennyKerr
         struct TransitionLibrary;
         struct Transition;
         struct Variable;
-    }
+
+    } // Wam
 
     namespace DirectWrite
     {
         struct RenderingParams;
         struct TextFormat;
         struct TextLayout;
-    }
+
+    } // DirectWrite
 
     namespace Direct2D
     {
@@ -1661,7 +1670,8 @@ namespace KennyKerr
         struct MultiThread;
         struct Factory;
         struct Factory1;
-    }
+
+    } // Direct2D
 
     #pragma endregion Forward declarations
 
@@ -1736,7 +1746,7 @@ namespace KennyKerr
             auto Factory2::RegisterOcclusionStatusWindow(HWND window,
                                                          unsigned const message = WM_USER) const -> DWORD;
 
-            void Factory2::UnregisterOcclusionStatus(DWORD cookie) const;
+            void Factory2::UnregisterOcclusionStatus(DWORD const cookie) const;
         };
 
         struct Adapter : Details::Object
@@ -1757,7 +1767,8 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_CLASS(Device1, Device, IDXGIDevice1)
         };
-    }
+
+    } // Dxgi
 
     namespace Direct3D
     {
@@ -1765,7 +1776,7 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_CLASS(MultiThread, Details::Object, ID3D10Multithread)
 
-            void MultiThreadEnter() const;
+            void Enter() const;
             void Leave() const;
             auto SetMultithreadProtected(bool protect = true) const -> bool;
             auto GetMultithreadProtected() const -> bool;
@@ -1805,7 +1816,7 @@ namespace KennyKerr
             KENNYKERR_DEFINE_CLASS(Device1, Device, ID3D11Device1)
         };
 
-    }
+    } // Direct3D
 
     namespace Wic
     {
@@ -1930,7 +1941,8 @@ namespace KennyKerr
 
             auto CreateImageEncoder(Direct2D::Device const & device) const -> ImageEncoder;
         };
-    }
+
+    } // Wic
 
     namespace Wam
     {
@@ -1964,7 +1976,8 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_CLASS(Variable, Details::Object, IUIAnimationVariable)
         };
-    }
+
+    } // Wam
 
     namespace DirectWrite
     {
@@ -1988,7 +2001,8 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_CLASS(TextLayout, TextFormat, IDWriteTextLayout)
         };
-    }
+
+    } // DirectWrite
 
     namespace Direct2D
     {
@@ -2062,36 +2076,36 @@ namespace KennyKerr
             auto GetPixelSize() const -> SizeU;
             auto GetPixelFormat() const -> PixelFormat;
             void GetDpi(float & x, float & y) const;
-            void CopyFromBitmap(Bitmap const & other) const;
+            void CopyFromBitmap(Bitmap const & bitmap) const;
 
-            void CopyFromBitmap(Bitmap const & other,
-                                Point2U const & destination) const;
+            void CopyFromBitmap(Point2U const & destination,
+                                Bitmap const & bitmap) const;
 
-            void CopyFromBitmap(Bitmap const & other,
+            void CopyFromBitmap(Bitmap const & bitmap,
                                 RectU const & source) const;
 
-            void CopyFromBitmap(Bitmap const & other,
-                                Point2U const & destination,
+            void CopyFromBitmap(Point2U const & destination,
+                                Bitmap const & bitmap,
                                 RectU const & source) const;
 
-            void CopyFromRenderTarget(RenderTarget const & other) const;
+            void CopyFromRenderTarget(RenderTarget const & renderTarget) const;
 
-            void CopyFromRenderTarget(RenderTarget const & other,
-                                      Point2U const & destination) const;
+            void CopyFromRenderTarget(Point2U const & destination,
+                                      RenderTarget const & renderTarget) const;
 
-            void CopyFromRenderTarget(RenderTarget const & other,
+            void CopyFromRenderTarget(RenderTarget const & renderTarget,
                                       RectU const & source) const;
 
-            void CopyFromRenderTarget(RenderTarget const & other,
-                                      Point2U const & destination,
+            void CopyFromRenderTarget(Point2U const & destination,
+                                      RenderTarget const & renderTarget,
                                       RectU const & source) const;
 
             void CopyFromMemory(void const * data,
                                 unsigned pitch) const;
 
-            void CopyFromMemory(void const * data,
-                                unsigned pitch,
-                                RectU const & destination) const;
+            void CopyFromMemory(RectU const & destination,
+                                void const * data,
+                                unsigned pitch) const;
         };
 
         struct ColorContext : Resource
@@ -2254,6 +2268,181 @@ namespace KennyKerr
             auto GetStrokeTransformType() const -> StrokeTransformType;
         };
 
+        struct Geometry : Resource
+        {
+            KENNYKERR_DEFINE_CLASS(Geometry, Resource, ID2D1Geometry)
+
+            void GetBounds(RectF & bounds) const;
+
+            void GetBounds(D2D1_MATRIX_3X2_F const & transform,
+                           RectF & bounds) const;
+
+            void GetWidenedBounds(float strokeWidth,
+                                  RectF & bounds) const;
+
+            void GetWidenedBounds(float strokeWidth,
+                                  StrokeStyle const & strokeStyle,
+                                  RectF & bounds) const;
+
+            void GetWidenedBounds(float strokeWidth,
+                                  D2D1_MATRIX_3X2_F const & transform,
+                                  RectF & bounds) const;
+
+            void GetWidenedBounds(float strokeWidth,
+                                  float flatteningTolerance,
+                                  RectF & bounds) const;
+
+            void GetWidenedBounds(float strokeWidth,
+                                  StrokeStyle const & strokeStyle,
+                                  D2D1_MATRIX_3X2_F const & transform,
+                                  RectF & bounds) const;
+
+            void GetWidenedBounds(float strokeWidth,
+                                  StrokeStyle const & strokeStyle,
+                                  float flatteningTolerance,
+                                  RectF & bounds) const;
+
+            void GetWidenedBounds(float strokeWidth,
+                                  D2D1_MATRIX_3X2_F const & transform,
+                                  float flatteningTolerance,
+                                  RectF & bounds) const;
+
+            void GetWidenedBounds(float strokeWidth,
+                                  StrokeStyle const & strokeStyle,
+                                  D2D1_MATRIX_3X2_F const & transform,
+                                  float flatteningTolerance,
+                                  RectF & bounds) const;
+
+            auto StrokeContainsPoint(Point2F const & point,
+                                     float strokeWidth) const -> bool;
+
+            auto StrokeContainsPoint(Point2F const & point,
+                                     float strokeWidth,
+                                     StrokeStyle const & strokeStyle) const -> bool;
+
+            auto StrokeContainsPoint(Point2F const & point,
+                                     float strokeWidth,
+                                     D2D1_MATRIX_3X2_F const & transform) const -> bool;
+
+            auto StrokeContainsPoint(Point2F const & point,
+                                     float strokeWidth,
+                                     float flatteningTolerance) const -> bool;
+
+            auto StrokeContainsPoint(Point2F const & point,
+                                     float strokeWidth,
+                                     StrokeStyle const & strokeStyle,
+                                     D2D1_MATRIX_3X2_F const & transform) const -> bool;
+
+            auto StrokeContainsPoint(Point2F const & point,
+                                     float strokeWidth,
+                                     StrokeStyle const & strokeStyle,
+                                     float flatteningTolerance) const -> bool;
+
+            auto StrokeContainsPoint(Point2F const & point,
+                                     float strokeWidth,
+                                     D2D1_MATRIX_3X2_F const & transform,
+                                     float flatteningTolerance) const -> bool;
+
+            auto StrokeContainsPoint(Point2F const & point,
+                                     float strokeWidth,
+                                     StrokeStyle const & strokeStyle,
+                                     D2D1_MATRIX_3X2_F const & transform,
+                                     float flatteningTolerance) const -> bool;
+
+            auto FillContainsPoint(Point2F const & point) const -> bool;
+
+            auto FillContainsPoint(Point2F const & point,
+                                   D2D1_MATRIX_3X2_F const & transform) const -> bool;
+
+            auto FillContainsPoint(Point2F const & point,
+                                   float flatteningTolerance) const -> bool;
+
+            auto FillContainsPoint(Point2F const & point,
+                                   D2D1_MATRIX_3X2_F const & transform,
+                                   float flatteningTolerance) const -> bool;
+
+            auto CompareWithGeometry(Geometry const & geometry) const -> GeometryRelation;
+
+            auto CompareWithGeometry(Geometry const & geometry,
+                                     D2D1_MATRIX_3X2_F const & transform) const -> GeometryRelation;
+
+            auto CompareWithGeometry(Geometry const & geometry,
+                                     float flatteningTolerance) const -> GeometryRelation;
+
+            auto CompareWithGeometry(Geometry const & geometry,
+                                     D2D1_MATRIX_3X2_F const & transform,
+                                     float flatteningTolerance) const -> GeometryRelation;
+
+            void Simplify(GeometrySimplificationOption option,
+                          SimplifiedGeometrySink const & sink) const;
+
+            void Simplify(GeometrySimplificationOption option,
+                          D2D1_MATRIX_3X2_F const & transform,
+                          SimplifiedGeometrySink const & sink) const;
+
+            void Simplify(GeometrySimplificationOption option,
+                          float flatteningTolerance,
+                          SimplifiedGeometrySink const & sink) const;
+
+            void Simplify(GeometrySimplificationOption option,
+                          D2D1_MATRIX_3X2_F const & transform,
+                          float flatteningTolerance,
+                          SimplifiedGeometrySink const & sink) const;
+
+            void Tessellate(TessellationSink const & sink) const;
+
+            void Tessellate(D2D1_MATRIX_3X2_F const & transform,
+                            TessellationSink const & sink) const;
+
+            void Tessellate(float flatteningTolerance,
+                            TessellationSink const & sink) const;
+
+            void Tessellate(D2D1_MATRIX_3X2_F const & transform,
+                            float flatteningTolerance,
+                            TessellationSink const & sink) const;
+
+            void CombineWithGeometry(Geometry const & geometry,
+                                     CombineMode mode,
+                                     SimplifiedGeometrySink const & sink) const;
+
+            void CombineWithGeometry(Geometry const & geometry,
+                                     CombineMode mode,
+                                     D2D1_MATRIX_3X2_F const & transform,
+                                     SimplifiedGeometrySink const & sink) const;
+
+            void CombineWithGeometry(Geometry const & geometry,
+                                     CombineMode mode,
+                                     float flatteningTolerance,
+                                     SimplifiedGeometrySink const & sink) const;
+
+            void CombineWithGeometry(Geometry const & geometry,
+                                     CombineMode mode,
+                                     D2D1_MATRIX_3X2_F const & transform,
+                                     float flatteningTolerance,
+                                     SimplifiedGeometrySink const & sink) const;
+
+
+        };
+
+
+
+
+
+        struct Device : Resource
+        {
+            KENNYKERR_DEFINE_CLASS(Device, Resource, ID2D1Device)
+        };
+
+        struct RenderTarget : Resource
+        {
+            KENNYKERR_DEFINE_CLASS(RenderTarget, Resource, ID2D1RenderTarget)
+        };
+
+        struct Factory : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Factory, Details::Object, ID2D1Factory)
+        };
+
     } // Direct2D
 
     #pragma endregion Classes
@@ -2386,7 +2575,8 @@ namespace KennyKerr
         inline auto SwapChain::Present(unsigned const sync,
                                        Dxgi::Present const flags) const -> HRESULT
         {
-            return (*this)->Present(sync, static_cast<unsigned>(flags));
+            return (*this)->Present(sync,
+                                    static_cast<unsigned>(flags));
         }
 
         inline auto SwapChain::GetBuffer(unsigned const index) const -> Surface
@@ -2471,7 +2661,7 @@ namespace KennyKerr
             return cookie;
         }
 
-        inline void Factory2::UnregisterOcclusionStatus(DWORD cookie) const
+        inline void Factory2::UnregisterOcclusionStatus(DWORD const cookie) const
         {
             (*this)->UnregisterOcclusionStatus(cookie);
         }
@@ -2492,11 +2682,12 @@ namespace KennyKerr
             HR((*this)->GetAdapter(result.GetAddressOf()));
             return result;
         }
-    }
+
+    } // Dxgi
 
     namespace Direct3D
     {
-        inline void MultiThread::MultiThreadEnter() const
+        inline void MultiThread::Enter() const
         {
             (*this)->Enter();
         }
@@ -2586,7 +2777,7 @@ namespace KennyKerr
             return OpenSharedResource(resource.AsDxgiResource().GetSharedHandle());
         }
 
-    }
+    } // Direct3D
 
     namespace Wic
     {
@@ -2668,14 +2859,14 @@ namespace KennyKerr
 
         inline auto BitmapEncoder::CreateNewFrame() const -> BitmapFrameEncode
         {
-            BitmapFrameEncode frame;
+            BitmapFrameEncode result;
             PropertyBag2 properties;
 
-            CreateNewFrame(frame,
+            CreateNewFrame(result,
                            properties);
 
-            frame.Initialize(properties);
-            return frame;
+            result.Initialize(properties);
+            return result;
         }
 
         inline void BitmapEncoder::Commit() const
@@ -2734,8 +2925,8 @@ namespace KennyKerr
             BitmapEncoder result;
 
             HR((*this)->CreateEncoder(format,
-                                        nullptr,
-                                        result.GetAddressOf()));
+                                      nullptr,
+                                      result.GetAddressOf()));
 
             return result;
         }
@@ -2776,7 +2967,8 @@ namespace KennyKerr
 
             return result;
         }
-    }
+
+    } // Wic
 
     namespace Wam
     {
@@ -2814,7 +3006,8 @@ namespace KennyKerr
 
             return result;
         }
-    }
+
+    } // Wam
 
     namespace DirectWrite
     {
@@ -2842,7 +3035,8 @@ namespace KennyKerr
         {
             return static_cast<RenderingMode>((*this)->GetRenderingMode());
         }
-    }
+
+    } // DirectWrite
 
     namespace Direct2D
     {
@@ -2870,7 +3064,7 @@ namespace KennyKerr
             ASSERT(count);
 
             (*this)->AddLines(points->Get(),
-                                count);
+                              count);
         }
 
         inline void SimplifiedGeometrySink::AddBeziers(BezierSegment const * beziers,
@@ -2895,7 +3089,7 @@ namespace KennyKerr
             ASSERT(count);
 
             (*this)->AddTriangles(triangles->Get(),
-                                    count);
+                                  count);
         }
 
         inline void TessellationSink::Close()
@@ -2930,67 +3124,67 @@ namespace KennyKerr
             (*this)->GetDpi(&x, &y);
         }
 
-        inline void Bitmap::CopyFromBitmap(Bitmap const & other) const
+        inline void Bitmap::CopyFromBitmap(Bitmap const & bitmap) const
         {
             HR((*this)->CopyFromBitmap(nullptr,
-                                       other.Get(),
+                                       bitmap.Get(),
                                        nullptr));
         }
 
-        inline void Bitmap::CopyFromBitmap(Bitmap const & other,
-                                           Point2U const & destination) const
+        inline void Bitmap::CopyFromBitmap(Point2U const & destination,
+                                           Bitmap const & bitmap) const
         {
             HR((*this)->CopyFromBitmap(destination.Get(),
-                                       other.Get(),
+                                       bitmap.Get(),
                                        nullptr));
         }
 
-        inline void Bitmap::CopyFromBitmap(Bitmap const & other,
+        inline void Bitmap::CopyFromBitmap(Bitmap const & bitmap,
                                            RectU const & source) const
         {
             HR((*this)->CopyFromBitmap(nullptr,
-                                       other.Get(),
+                                       bitmap.Get(),
                                        source.Get()));
         }
 
-        inline void Bitmap::CopyFromBitmap(Bitmap const & other,
-                                           Point2U const & destination,
+        inline void Bitmap::CopyFromBitmap(Point2U const & destination,
+                                           Bitmap const & bitmap,
                                            RectU const & source) const
         {
             HR((*this)->CopyFromBitmap(destination.Get(),
-                                       other.Get(),
+                                       bitmap.Get(),
                                        source.Get()));
         }
 
-        inline void Bitmap::CopyFromRenderTarget(RenderTarget const & other) const
+        inline void Bitmap::CopyFromRenderTarget(RenderTarget const & renderTarget) const
         {
             HR((*this)->CopyFromRenderTarget(nullptr,
-                                             other.Get(),
+                                             renderTarget.Get(),
                                              nullptr));
         }
 
-        inline void Bitmap::CopyFromRenderTarget(RenderTarget const & other,
-                                                 Point2U const & destination) const
+        inline void Bitmap::CopyFromRenderTarget(Point2U const & destination,
+                                                 RenderTarget const & renderTarget) const
         {
             HR((*this)->CopyFromRenderTarget(destination.Get(),
-                                             other.Get(),
+                                             renderTarget.Get(),
                                              nullptr));
         }
 
-        inline void Bitmap::CopyFromRenderTarget(RenderTarget const & other,
+        inline void Bitmap::CopyFromRenderTarget(RenderTarget const & renderTarget,
                                                  RectU const & source) const
         {
             HR((*this)->CopyFromRenderTarget(nullptr,
-                                             other.Get(),
+                                             renderTarget.Get(),
                                              source.Get()));
         }
 
-        inline void Bitmap::CopyFromRenderTarget(RenderTarget const & other,
-                                                 Point2U const & destination,
+        inline void Bitmap::CopyFromRenderTarget(Point2U const & destination,
+                                                 RenderTarget const & renderTarget,
                                                  RectU const & source) const
         {
             HR((*this)->CopyFromRenderTarget(destination.Get(),
-                                             other.Get(),
+                                             renderTarget.Get(),
                                              source.Get()));
         }
 
@@ -3002,9 +3196,9 @@ namespace KennyKerr
                                        pitch));
         }
 
-        inline void Bitmap::CopyFromMemory(void const * data,
-                                           unsigned pitch,
-                                           RectU const & destination) const
+        inline void Bitmap::CopyFromMemory(RectU const & destination,
+                                           void const * data,
+                                           unsigned pitch) const
         {
             HR((*this)->CopyFromMemory(destination.Get(),
                                        data,
@@ -3321,6 +3515,468 @@ namespace KennyKerr
         {
             static_cast<StrokeTransformType>((*this)->GetStrokeTransformType());
         }
+
+        inline void Geometry::GetBounds(RectF & bounds) const
+        {
+            HR((*this)->GetBounds(nullptr,
+                                  bounds.Get()));
+        }
+
+        inline void Geometry::GetBounds(D2D1_MATRIX_3X2_F const & transform,
+                                        RectF & bounds) const
+        {
+            HR((*this)->GetBounds(transform,
+                                  bounds.Get()));
+        }
+
+        inline void Geometry::GetWidenedBounds(float strokeWidth,
+                                               RectF & bounds) const
+        {
+            HR((*this)->GetWidenedBounds(strokeWidth,
+                                         nullptr,
+                                         nullptr,
+                                         D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                         bounds.Get()));
+        }
+
+        inline void Geometry::GetWidenedBounds(float strokeWidth,
+                                               StrokeStyle const & strokeStyle,
+                                               RectF & bounds) const
+        {
+            HR((*this)->GetWidenedBounds(strokeWidth,
+                                         strokeStyle.Get(),
+                                         nullptr,
+                                         D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                         bounds.Get()));
+        }
+
+        inline void Geometry::GetWidenedBounds(float strokeWidth,
+                                               D2D1_MATRIX_3X2_F const & transform,
+                                               RectF & bounds) const
+        {
+            HR((*this)->GetWidenedBounds(strokeWidth,
+                                         nullptr,
+                                         &transform,
+                                         D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                         bounds.Get()));
+        }
+
+        inline void Geometry::GetWidenedBounds(float strokeWidth,
+                                               float flatteningTolerance,
+                                               RectF & bounds) const
+        {
+            HR((*this)->GetWidenedBounds(strokeWidth,
+                                         nullptr,
+                                         nullptr,
+                                         flatteningTolerance,
+                                         bounds.Get()));
+        }
+
+        inline void Geometry::GetWidenedBounds(float strokeWidth,
+                                               StrokeStyle const & strokeStyle,
+                                               D2D1_MATRIX_3X2_F const & transform,
+                                               RectF & bounds) const
+        {
+            HR((*this)->GetWidenedBounds(strokeWidth,
+                                         strokeStyle.Get(),
+                                         &transform,
+                                         D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                         bounds.Get()));
+        }
+
+        inline void Geometry::GetWidenedBounds(float strokeWidth,
+                                               StrokeStyle const & strokeStyle,
+                                               float flatteningTolerance,
+                                               RectF & bounds) const
+        {
+            HR((*this)->GetWidenedBounds(strokeWidth,
+                                         strokeStyle.Get(),
+                                         nullptr,
+                                         flatteningTolerance,
+                                         bounds.Get()));
+        }
+
+        inline void Geometry::GetWidenedBounds(float strokeWidth,
+                                               D2D1_MATRIX_3X2_F const & transform,
+                                               float flatteningTolerance,
+                                               RectF & bounds) const
+        {
+            HR((*this)->GetWidenedBounds(strokeWidth,
+                                         nullptr,
+                                         &transform,
+                                         flatteningTolerance,
+                                         bounds.Get()));
+        }
+
+        inline void Geometry::GetWidenedBounds(float strokeWidth,
+                                               StrokeStyle const & strokeStyle,
+                                               D2D1_MATRIX_3X2_F const & transform,
+                                               float flatteningTolerance,
+                                               RectF & bounds) const
+        {
+            HR((*this)->GetWidenedBounds(strokeWidth,
+                                         strokeStyle.Get(),
+                                         &transform,
+                                         flatteningTolerance,
+                                         bounds.Get()));
+        }
+
+        inline auto Geometry::StrokeContainsPoint(Point2F const & point,
+                                                  float strokeWidth) const -> bool
+        {
+            BOOL contains;
+
+            HR((*this)->StrokeContainsPoint(point.Ref(),
+                                            strokeWidth,
+                                            nullptr,
+                                            nullptr,
+                                            D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                            &contains));
+
+            return 0 != contains;
+        }
+
+        inline auto Geometry::StrokeContainsPoint(Point2F const & point,
+                                                  float strokeWidth,
+                                                  StrokeStyle const & strokeStyle) const -> bool
+        {
+            BOOL contains;
+
+            HR((*this)->StrokeContainsPoint(point.Ref(),
+                                            strokeWidth,
+                                            strokeStyle.Get(),
+                                            nullptr,
+                                            D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                            &contains));
+
+            return 0 != contains;
+        }
+
+        inline auto Geometry::StrokeContainsPoint(Point2F const & point,
+                                                  float strokeWidth,
+                                                  D2D1_MATRIX_3X2_F const & transform) const -> bool
+        {
+            BOOL contains;
+
+            HR((*this)->StrokeContainsPoint(point.Ref(),
+                                            strokeWidth,
+                                            nullptr,
+                                            &transform,
+                                            D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                            &contains));
+
+            return 0 != contains;
+        }
+
+        inline auto Geometry::StrokeContainsPoint(Point2F const & point,
+                                                  float strokeWidth,
+                                                  float flatteningTolerance) const -> bool
+        {
+            BOOL contains;
+
+            HR((*this)->StrokeContainsPoint(point.Ref(),
+                                            strokeWidth,
+                                            nullptr,
+                                            nullptr,
+                                            flatteningTolerance,
+                                            &contains));
+
+            return 0 != contains;
+        }
+
+        inline auto Geometry::StrokeContainsPoint(Point2F const & point,
+                                                  float strokeWidth,
+                                                  StrokeStyle const & strokeStyle,
+                                                  D2D1_MATRIX_3X2_F const & transform) const -> bool
+        {
+            BOOL contains;
+
+            HR((*this)->StrokeContainsPoint(point.Ref(),
+                                            strokeWidth,
+                                            strokeStyle.Get(),
+                                            &transform,
+                                            D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                            &contains));
+
+            return 0 != contains;
+        }
+
+        inline auto Geometry::StrokeContainsPoint(Point2F const & point,
+                                                  float strokeWidth,
+                                                  StrokeStyle const & strokeStyle,
+                                                  float flatteningTolerance) const -> bool
+        {
+            BOOL contains;
+
+            HR((*this)->StrokeContainsPoint(point.Ref(),
+                                            strokeWidth,
+                                            strokeStyle.Get(),
+                                            nullptr,
+                                            flatteningTolerance,
+                                            &contains));
+
+            return 0 != contains;
+        }
+
+        inline auto Geometry::StrokeContainsPoint(Point2F const & point,
+                                                  float strokeWidth,
+                                                  D2D1_MATRIX_3X2_F const & transform,
+                                                  float flatteningTolerance) const -> bool
+        {
+            BOOL contains;
+
+            HR((*this)->StrokeContainsPoint(point.Ref(),
+                                            strokeWidth,
+                                            nullptr,
+                                            &transform,
+                                            flatteningTolerance,
+                                            &contains));
+
+            return 0 != contains;
+        }
+
+        inline auto Geometry::StrokeContainsPoint(Point2F const & point,
+                                                  float strokeWidth,
+                                                  StrokeStyle const & strokeStyle,
+                                                  D2D1_MATRIX_3X2_F const & transform,
+                                                  float flatteningTolerance) const -> bool
+        {
+            BOOL contains;
+
+            HR((*this)->StrokeContainsPoint(point.Ref(),
+                                            strokeWidth,
+                                            strokeStyle.Get(),
+                                            &transform,
+                                            flatteningTolerance,
+                                            &contains));
+
+            return 0 != contains;
+        }
+
+        inline auto Geometry::FillContainsPoint(Point2F const & point) const -> bool
+        {
+            BOOL contains;
+
+            HR((*this)->FillContainsPoint(point.Ref(),
+                                          nullptr,
+                                          D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                          &contains));
+
+            return 0 != contains;
+        }
+
+        inline auto Geometry::FillContainsPoint(Point2F const & point,
+                                                D2D1_MATRIX_3X2_F const & transform) const -> bool
+        {
+            BOOL contains;
+
+            HR((*this)->FillContainsPoint(point.Ref(),
+                                          &transform,
+                                          D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                          &contains));
+
+            return 0 != contains;
+        }
+
+        inline auto Geometry::FillContainsPoint(Point2F const & point,
+                                                float flatteningTolerance) const -> bool
+        {
+            BOOL contains;
+
+            HR((*this)->FillContainsPoint(point.Ref(),
+                                          nullptr,
+                                          flatteningTolerance,
+                                          &contains));
+
+            return 0 != contains;
+        }
+
+        inline auto Geometry::FillContainsPoint(Point2F const & point,
+                                                D2D1_MATRIX_3X2_F const & transform,
+                                                float flatteningTolerance) const -> bool
+        {
+            BOOL contains;
+
+            HR((*this)->FillContainsPoint(point.Ref(),
+                                          &transform,
+                                          flatteningTolerance,
+                                          &contains));
+
+            return 0 != contains;
+        }
+
+        inline auto Geometry::CompareWithGeometry(Geometry const & geometry) const -> GeometryRelation
+        {
+            D2D1_GEOMETRY_RELATION result;
+
+            HR((*this)->CompareWithGeometry(geometry.Get(),
+                                            nullptr,
+                                            D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                            &result));
+
+            return static_cast<GeometryRelation>(result);
+        }
+
+        inline auto Geometry::CompareWithGeometry(Geometry const & geometry,
+                                                  D2D1_MATRIX_3X2_F const & transform) const -> GeometryRelation
+        {
+            D2D1_GEOMETRY_RELATION result;
+
+            HR((*this)->CompareWithGeometry(geometry.Get(),
+                                            &transform,
+                                            D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                            &result));
+
+            return static_cast<GeometryRelation>(result);
+        }
+
+        inline auto Geometry::CompareWithGeometry(Geometry const & geometry,
+                                                  float flatteningTolerance) const -> GeometryRelation
+        {
+            D2D1_GEOMETRY_RELATION result;
+
+            HR((*this)->CompareWithGeometry(geometry.Get(),
+                                            nullptr,
+                                            flatteningTolerance,
+                                            &result));
+
+            return static_cast<GeometryRelation>(result);
+        }
+
+        inline auto Geometry::CompareWithGeometry(Geometry const & geometry,
+                                                  D2D1_MATRIX_3X2_F const & transform,
+                                                  float flatteningTolerance) const -> GeometryRelation
+        {
+            D2D1_GEOMETRY_RELATION result;
+
+            HR((*this)->CompareWithGeometry(geometry.Get(),
+                                            &transform,
+                                            flatteningTolerance,
+                                            &result));
+
+            return static_cast<GeometryRelation>(result);
+        }
+
+        inline void Geometry::Simplify(GeometrySimplificationOption option,
+                                       SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Simplify(static_cast<D2D1_GEOMETRY_SIMPLIFICATION_OPTION>(option),
+                                 nullptr,
+                                 D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                 sink.Get()));
+        }
+
+        inline void Geometry::Simplify(GeometrySimplificationOption option,
+                                       D2D1_MATRIX_3X2_F const & transform,
+                                       SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Simplify(static_cast<D2D1_GEOMETRY_SIMPLIFICATION_OPTION>(option),
+                                 &transform,
+                                 D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                 sink.Get()));
+        }
+
+        inline void Geometry::Simplify(GeometrySimplificationOption option,
+                                       float flatteningTolerance,
+                                       SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Simplify(static_cast<D2D1_GEOMETRY_SIMPLIFICATION_OPTION>(option),
+                                 nullptr,
+                                 flatteningTolerance,
+                                 sink.Get()));
+        }
+
+        inline void Geometry::Simplify(GeometrySimplificationOption option,
+                                       D2D1_MATRIX_3X2_F const & transform,
+                                       float flatteningTolerance,
+                                       SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->Simplify(static_cast<D2D1_GEOMETRY_SIMPLIFICATION_OPTION>(option),
+                                 &transform,
+                                 flatteningTolerance,
+                                 sink.Get()));
+        }
+
+        inline void Geometry::Tessellate(TessellationSink const & sink) const
+        {
+            HR((*this)->Tessellate(nullptr,
+                                   D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                   sink.Get()));
+        }
+
+        inline void Geometry::Tessellate(D2D1_MATRIX_3X2_F const & transform,
+                                         TessellationSink const & sink) const
+        {
+            HR((*this)->Tessellate(&transform,
+                                   D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                   sink.Get()));
+        }
+
+        inline void Geometry::Tessellate(float flatteningTolerance,
+                                         TessellationSink const & sink) const
+        {
+            HR((*this)->Tessellate(nullptr,
+                                   flatteningTolerance,
+                                   sink.Get()));
+        }
+
+        inline void Geometry::Tessellate(D2D1_MATRIX_3X2_F const & transform,
+                                         float flatteningTolerance,
+                                         TessellationSink const & sink) const
+        {
+            HR((*this)->Tessellate(&transform,
+                                   flatteningTolerance,
+                                   sink.Get()));
+        }
+
+        inline void Geometry::CombineWithGeometry(Geometry const & geometry,
+                                                  CombineMode mode,
+                                                  SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->CombineWithGeometry(geometry.Get(),
+                                            static_cast<D2D1_COMBINE_MODE>(mode),
+                                            nullptr,
+                                            D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                            sink.Get()));
+        }
+
+        inline void Geometry::CombineWithGeometry(Geometry const & geometry,
+                                                  CombineMode mode,
+                                                  D2D1_MATRIX_3X2_F const & transform,
+                                                  SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->CombineWithGeometry(geometry.Get(),
+                                            static_cast<D2D1_COMBINE_MODE>(mode),
+                                            &transform,
+                                            D2D1_DEFAULT_FLATTENING_TOLERANCE,
+                                            sink.Get()));
+        }
+
+        inline void Geometry::CombineWithGeometry(Geometry const & geometry,
+                                                  CombineMode mode,
+                                                  float flatteningTolerance,
+                                                  SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->CombineWithGeometry(geometry.Get(),
+                                            static_cast<D2D1_COMBINE_MODE>(mode),
+                                            nullptr,
+                                            flatteningTolerance,
+                                            sink.Get()));
+        }
+
+        inline void Geometry::CombineWithGeometry(Geometry const & geometry,
+                                                  CombineMode mode,
+                                                  D2D1_MATRIX_3X2_F const & transform,
+                                                  float flatteningTolerance,
+                                                  SimplifiedGeometrySink const & sink) const
+        {
+            HR((*this)->CombineWithGeometry(geometry.Get(),
+                                            static_cast<D2D1_COMBINE_MODE>(mode),
+                                            &transform,
+                                            flatteningTolerance,
+                                            sink.Get()));
+        }
+
     }
 
     #pragma endregion Implementation
