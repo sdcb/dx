@@ -1729,24 +1729,24 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_CLASS(Factory2, Details::Object, IDXGIFactory2)
 
-            auto Factory2::CreateSwapChainForHwnd(Details::Object const & device, // Direct3D or Dxgi Device
-                                                  HWND window,
-                                                  SwapChainDescription1 const & description) const -> SwapChain;
+            auto CreateSwapChainForHwnd(Details::Object const & device, // Direct3D or Dxgi Device
+                                        HWND window,
+                                        SwapChainDescription1 const & description) const -> SwapChain;
 
-            auto Factory2::CreateSwapChainForCoreWindow(Details::Object const & device,  // Direct3D or Dxgi Device
-                                                        IUnknown * window,
-                                                        SwapChainDescription1 const & description) const -> SwapChain;
+            auto CreateSwapChainForCoreWindow(Details::Object const & device,  // Direct3D or Dxgi Device
+                                              IUnknown * window,
+                                              SwapChainDescription1 const & description) const -> SwapChain;
 
             #ifdef __cplusplus_winrt
-            auto Factory2::CreateSwapChainForCoreWindow(Device const & device,  // Direct3D or Dxgi Device
-                                                        Windows::UI::Core::CoreWindow ^ window,
-                                                        SwapChainDescription1 const & description) const -> SwapChain;
+            auto CreateSwapChainForCoreWindow(Details::Object const & device,  // Direct3D or Dxgi Device
+                                              Windows::UI::Core::CoreWindow ^ window,
+                                              SwapChainDescription1 const & description) const -> SwapChain;
             #endif
 
-            auto Factory2::RegisterOcclusionStatusWindow(HWND window,
-                                                         unsigned const message = WM_USER) const -> DWORD;
+            auto RegisterOcclusionStatusWindow(HWND window,
+                                               unsigned const message = WM_USER) const -> DWORD;
 
-            void Factory2::UnregisterOcclusionStatus(DWORD const cookie) const;
+            void UnregisterOcclusionStatus(DWORD const cookie) const;
         };
 
         struct Adapter : Details::Object
@@ -3526,7 +3526,7 @@ namespace KennyKerr
         }
 
         #ifdef __cplusplus_winrt
-        inline auto Factory2::CreateSwapChainForCoreWindow(Device const & device,  // Direct3D or Dxgi Device
+        inline auto Factory2::CreateSwapChainForCoreWindow(Details::Object const & device,  // Direct3D or Dxgi Device
                                                            Windows::UI::Core::CoreWindow ^ window,
                                                            SwapChainDescription1 const & description) const -> SwapChain
         {
