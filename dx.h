@@ -3243,15 +3243,75 @@ namespace KennyKerr
             void ClearResources(unsigned millisecondsSinceUse = 0) const;
         };
 
+        struct MultiThread : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(MultiThread, Details::Object, ID2D1Multithread)
 
-
-
-
-
+            auto GetMultithreadProtected() const -> bool;
+            void Enter() const;
+            void Leave() const;
+        };
 
         struct Factory : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Factory, Details::Object, ID2D1Factory)
+
+            auto AsMultiThread() const -> MultiThread;
+            auto GetDesktopDpi() const -> float;
+            auto CreateRectangleGeometry(RectF const & rect) const -> RectangleGeometry;
+            auto CreateRoundedRectangleGeometry(RoundedRect const & roundedRect) const -> RoundedRectangleGeometry;
+            auto CreateEllipseGeometry(Ellipse const & ellipse) const -> EllipseGeometry;
+
+            // TODO: CreateGeometryGroup
+
+            auto CreateTransformedGeometry(Geometry const & source,
+                                           D2D1_MATRIX_3X2_F const & transform) -> TransformedGeometry;
+
+            auto CreatePathGeometry() const -> PathGeometry;
+
+            auto CreateStrokeStyle(StrokeStyleProperties const & properties,
+                                   float const * dashes = nullptr,
+                                   unsigned count = 0) const -> StrokeStyle;
+
+            template <size_t Count>
+            auto CreateStrokeStyle(StrokeStyleProperties const & properties,
+                                   float const (&dashes)[Count]) const -> StrokeStyle
+            {
+                return CreateStrokeStyle(properties,
+                                         dashes,
+                                         Count);
+            }
+
+            auto CreateDrawingStateBlock() const -> DrawingStateBlock;
+            auto CreateDrawingStateBlock(DrawingStateDescription const & description) const -> DrawingStateBlock;
+
+            auto CreateDrawingStateBlock(DrawingStateDescription const & description,
+                                         DirectWrite::RenderingParams const & params) const -> DrawingStateBlock;
+
+            auto CreateWicBitmapRenderTarget(Wic::Bitmap const & target,
+                                             RenderTargetProperties const & properties) const -> RenderTarget;
+
+            #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
+            auto CreateHwndRenderTarget(RenderTargetProperties const & renderTargetProperties,
+                                        HwndRenderTargetProperties const & hwndRenderTargetProperties) const -> HwndRenderTarget;
+
+            auto CreateHwndRenderTarget(HWND window) const -> HwndRenderTarget;
+            #endif
+
+            auto CreateDxgiSurfaceRenderTarget(Dxgi::Surface const & surface,
+                                               RenderTargetProperties const & renderTargetProperties) const -> RenderTarget;
+
+            auto CreateDcRenderTarget(RenderTargetProperties const & renderTargetProperties) const -> DcRenderTarget;
+        };
+
+        struct Factory1 : Factory
+        {
+            KENNYKERR_DEFINE_CLASS(Factory1, Factory, ID2D1Factory1)
+
+            auto CreateDevice(Dxgi::Device const & device) const -> Device;
+            auto CreateDevice(Direct3D::Device const & device) const -> Device;
+
+            // TODO: remaining methods
         };
 
     } // Direct2D
@@ -3364,6 +3424,22 @@ namespace KennyKerr
 
     namespace Direct2D
     {
+        inline auto CreateFactory(FactoryType mode = FactoryType::SingleThreaded) -> Factory1
+        {
+            Factory1 result;
+
+            #ifdef _DEBUG
+            D2D1_FACTORY_OPTIONS options = { D2D1_DEBUG_LEVEL_INFORMATION };
+            #else
+            D2D1_FACTORY_OPTIONS options = { D2D1_DEBUG_LEVEL_NONE };
+            #endif
+
+            HR(D2D1CreateFactory(static_cast<D2D1_FACTORY_TYPE>(mode),
+                                 options,
+                                 result.GetAddressOf()));
+
+            return result;
+        }
     }
 
     #pragma endregion Functions
@@ -6891,6 +6967,207 @@ namespace KennyKerr
         inline void Device::ClearResources(unsigned millisecondsSinceUse) const
         {
             (*this)->ClearResources(millisecondsSinceUse);
+        }
+
+        inline auto MultiThread::GetMultithreadProtected() const -> bool
+        {
+            return 0 != (*this)->GetMultithreadProtected();
+        }
+
+        inline void MultiThread::Enter() const
+        {
+            (*this)->Enter();
+        }
+
+        inline void MultiThread::Leave() const
+        {
+            (*this)->Leave();
+        }
+
+        inline auto Factory::AsMultiThread() const -> MultiThread
+        {
+            MultiThread result;
+            HR(m_ptr.CopyTo(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto Factory::GetDesktopDpi() const -> float
+        {
+            float x, y;
+            (*this)->GetDesktopDpi(&x, &y);
+            return x;
+        }
+
+        inline auto Factory::CreateRectangleGeometry(RectF const & rect) const -> RectangleGeometry
+        {
+            RectangleGeometry result;
+
+            HR((*this)->CreateRectangleGeometry(rect.Get(),
+                                                result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateRoundedRectangleGeometry(RoundedRect const & roundedRect) const -> RoundedRectangleGeometry
+        {
+            RoundedRectangleGeometry result;
+
+            HR((*this)->CreateRoundedRectangleGeometry(roundedRect.Get(),
+                                                       result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateEllipseGeometry(Ellipse const & ellipse) const -> EllipseGeometry
+        {
+            EllipseGeometry result;
+
+            HR((*this)->CreateEllipseGeometry(ellipse.Get(),
+                                              result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateTransformedGeometry(Geometry const & source,
+                                                       D2D1_MATRIX_3X2_F const & transform) -> TransformedGeometry
+        {
+            TransformedGeometry result;
+
+            HR((*this)->CreateTransformedGeometry(source.Get(),
+                                                  transform,
+                                                  result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreatePathGeometry() const -> PathGeometry
+        {
+            PathGeometry result;
+            HR((*this)->CreatePathGeometry(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto Factory::CreateStrokeStyle(StrokeStyleProperties const & properties,
+                                               float const * dashes,
+                                               unsigned count) const -> StrokeStyle
+        {
+            StrokeStyle result;
+
+            HR((*this)->CreateStrokeStyle(properties.Get(),
+                                          dashes,
+                                          count,
+                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateDrawingStateBlock() const -> DrawingStateBlock
+        {
+            DrawingStateBlock result;
+
+            HR((*this)->CreateDrawingStateBlock(nullptr,
+                                                nullptr,
+                                                result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateDrawingStateBlock(DrawingStateDescription const & description) const -> DrawingStateBlock
+        {
+            DrawingStateBlock result;
+
+            HR((*this)->CreateDrawingStateBlock(description.Get(),
+                                                nullptr,
+                                                result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateDrawingStateBlock(DrawingStateDescription const & description,
+                                                     DirectWrite::RenderingParams const & params) const -> DrawingStateBlock
+        {
+            DrawingStateBlock result;
+
+            HR((*this)->CreateDrawingStateBlock(description.Get(),
+                                                params.Get(),
+                                                result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateWicBitmapRenderTarget(Wic::Bitmap const & target,
+                                                         RenderTargetProperties const & properties) const -> RenderTarget
+        {
+            RenderTarget result;
+
+            HR((*this)->CreateWicBitmapRenderTarget(target.Get(),
+                                                    properties.Get(),
+                                                    result.GetAddressOf()));
+
+            return result;
+        }
+
+        #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
+
+        inline auto Factory::CreateHwndRenderTarget(RenderTargetProperties const & renderTargetProperties,
+                                                    HwndRenderTargetProperties const & hwndRenderTargetProperties) const -> HwndRenderTarget
+        {
+            HwndRenderTarget result;
+
+            HR((*this)->CreateHwndRenderTarget(renderTargetProperties.Get(),
+                                               hwndRenderTargetProperties.Get(),
+                                               result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateHwndRenderTarget(HWND window) const -> HwndRenderTarget
+        {
+            RECT rect;
+            VERIFY(GetClientRect(window, &rect));
+            auto size = SizeU(rect.right, rect.bottom);
+
+            return CreateHwndRenderTarget(RenderTargetProperties(),
+                                          HwndRenderTargetProperties(window, size));
+        }
+
+        #endif
+
+        inline auto Factory::CreateDxgiSurfaceRenderTarget(Dxgi::Surface const & surface,
+                                                           RenderTargetProperties const & renderTargetProperties) const -> RenderTarget
+        {
+            RenderTarget result;
+
+            HR((*this)->CreateDxgiSurfaceRenderTarget(surface.Get(),
+                                                      renderTargetProperties.Get(),
+                                                      result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateDcRenderTarget(RenderTargetProperties const & renderTargetProperties) const -> DcRenderTarget
+        {
+            DcRenderTarget result;
+
+            HR((*this)->CreateDCRenderTarget(renderTargetProperties.Get(),
+                                             result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory1::CreateDevice(Dxgi::Device const & device) const -> Device
+        {
+            Device result;
+
+            HR((*this)->CreateDevice(device.Get(),
+                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory1::CreateDevice(Direct3D::Device const & device) const -> Device
+        {
+            return CreateDevice(device.AsDxgi());
         }
 
     } // Direct2D
