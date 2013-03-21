@@ -1955,6 +1955,8 @@ namespace KennyKerr
             void ScheduleTransition(Variable const & variable,
                                     Transition const & transition,
                                     double time) const;
+
+            void Update(double time) const;
         };
 
         struct TransitionLibrary : Details::Object
@@ -1975,6 +1977,9 @@ namespace KennyKerr
         struct Variable : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Variable, Details::Object, IUIAnimationVariable)
+
+            auto GetValue() const -> double;
+            auto GetValueF() const -> float;
         };
 
     } // Wam
@@ -3878,6 +3883,11 @@ namespace KennyKerr
                                            time));
         }
 
+        inline void Manager::Update(double time) const
+        {
+            HR((*this)->Update(time));
+        }
+
         inline auto TransitionLibrary::CreateAccelerateDecelerateTransition(double duration,
                                                                             double finalValue,
                                                                             double accelerationRatio,
@@ -3893,6 +3903,19 @@ namespace KennyKerr
 
             return result;
         }
+
+        inline auto Variable::GetValue() const -> double
+        {
+            double value;
+            HR((*this)->GetValue(&value));
+            return value;
+        }
+
+        inline auto Variable::GetValueF() const -> float
+        {
+            return static_cast<float>(GetValue());
+        }
+
 
     } // Wam
 
