@@ -7,7 +7,6 @@
 #include <wincodec.h>
 #include <uianimation.h>
 #include <wrl.h>
-#include <crtdbg.h>
 #include <memory>
 
 #pragma comment(lib, "d2d1")
@@ -216,6 +215,15 @@ namespace KennyKerr
         };
         DEFINE_ENUM_FLAG_OPERATORS(Present)
 
+        enum class ModeRotation
+        {
+            Unspecified = DXGI_MODE_ROTATION_UNSPECIFIED,
+            Identity    = DXGI_MODE_ROTATION_IDENTITY,
+            Rotate90    = DXGI_MODE_ROTATION_ROTATE90,
+            Rotate180   = DXGI_MODE_ROTATION_ROTATE180,
+            Rotate270   = DXGI_MODE_ROTATION_ROTATE270,
+        };
+
     } // Dxgi
 
     namespace Direct3D
@@ -357,6 +365,12 @@ namespace KennyKerr
 
     namespace DirectWrite
     {
+        enum class FactoryType
+        {
+            Shared   = DWRITE_FACTORY_TYPE_SHARED,
+            Isolated = DWRITE_FACTORY_TYPE_ISOLATED,
+        };
+
         enum class PixelGeometry
         {
             Flat = DWRITE_PIXEL_GEOMETRY_FLAT,
@@ -1600,6 +1614,7 @@ namespace KennyKerr
         struct BitmapDecoder;
         struct Stream;
         struct Factory;
+        struct Factory2;
 
     } // Wic
 
@@ -1617,6 +1632,8 @@ namespace KennyKerr
         struct RenderingParams;
         struct TextFormat;
         struct TextLayout;
+        struct Factory;
+        struct Factory1;
 
     } // DirectWrite
 
@@ -1716,6 +1733,9 @@ namespace KennyKerr
         struct SwapChain1 : SwapChain
         {
             KENNYKERR_DEFINE_CLASS(SwapChain1, SwapChain, IDXGISwapChain1)
+
+            void SetRotation(ModeRotation mode) const;
+            auto GetRotation() const -> ModeRotation;
         };
 
         struct Resource : Details::Object
@@ -1731,17 +1751,20 @@ namespace KennyKerr
 
             auto CreateSwapChainForHwnd(Details::Object const & device, // Direct3D or Dxgi Device
                                         HWND window,
-                                        SwapChainDescription1 const & description) const -> SwapChain;
+                                        SwapChainDescription1 const & description) const -> SwapChain1;
 
-            auto CreateSwapChainForCoreWindow(Details::Object const & device,  // Direct3D or Dxgi Device
+            auto CreateSwapChainForCoreWindow(Details::Object const & device, // Direct3D or Dxgi Device
                                               IUnknown * window,
-                                              SwapChainDescription1 const & description) const -> SwapChain;
+                                              SwapChainDescription1 const & description) const -> SwapChain1;
 
             #ifdef __cplusplus_winrt
-            auto CreateSwapChainForCoreWindow(Details::Object const & device,  // Direct3D or Dxgi Device
+            auto CreateSwapChainForCoreWindow(Details::Object const & device, // Direct3D or Dxgi Device
                                               Windows::UI::Core::CoreWindow ^ window,
-                                              SwapChainDescription1 const & description) const -> SwapChain;
+                                              SwapChainDescription1 const & description) const -> SwapChain1;
             #endif
+
+            auto CreateSwapChainForComposition(Details::Object const & device, // Direct3D or Dxgi Device
+                                               SwapChainDescription1 const & description) const -> SwapChain1;
 
             auto RegisterOcclusionStatusWindow(HWND window,
                                                unsigned const message = WM_USER) const -> DWORD;
@@ -1766,6 +1789,9 @@ namespace KennyKerr
         struct Device1 : Device
         {
             KENNYKERR_DEFINE_CLASS(Device1, Device, IDXGIDevice1)
+
+            void SetMaximumFrameLatency(unsigned maxLatency = 1) const;
+            auto GetMaximumFrameLatency() const -> unsigned;
         };
 
     } // Dxgi
@@ -1794,6 +1820,26 @@ namespace KennyKerr
             KENNYKERR_DEFINE_CLASS(DeviceContext, Details::Object, ID3D11DeviceContext)
 
             void Flush() const;
+        };
+
+        struct DeviceContext1 : DeviceContext
+        {
+            KENNYKERR_DEFINE_CLASS(DeviceContext1, DeviceContext, ID3D11DeviceContext1)
+        };
+
+        struct View : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(View, Details::Object, ID3D11View)
+        };
+
+        struct RenderTargetView : View
+        {
+            KENNYKERR_DEFINE_CLASS(RenderTargetView, View, ID3D11RenderTargetView)
+        };
+
+        struct DepthStencilView : View
+        {
+            KENNYKERR_DEFINE_CLASS(DepthStencilView, View, ID3D11DepthStencilView)
         };
 
         struct Device : Details::Object
@@ -2005,6 +2051,16 @@ namespace KennyKerr
         struct TextLayout : TextFormat
         {
             KENNYKERR_DEFINE_CLASS(TextLayout, TextFormat, IDWriteTextLayout)
+        };
+
+        struct Factory : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Factory, Details::Object, IDWriteFactory)
+        };
+
+        struct __declspec(uuid("30572f99-dac6-41db-a16e-0486307e606a")) Factory1 : Factory
+        {
+            KENNYKERR_DEFINE_CLASS(Factory1, Factory, IDWriteFactory1)
         };
 
     } // DirectWrite
@@ -3371,22 +3427,25 @@ namespace KennyKerr
                                      nullptr); // device context
         }
 
-        inline auto CreateDevice(CreateDeviceFlag flags = CreateDeviceFlag::BgraSupport) -> Device
+        inline auto CreateDevice(CreateDeviceFlag flags = CreateDeviceFlag::BgraSupport) -> Device1
         {
-            Device result;
+            Device device;
 
-            auto hr = CreateDevice(result,
+            auto hr = CreateDevice(device,
                                    DriverType::Hardware,
                                    flags);
 
             if (DXGI_ERROR_UNSUPPORTED == hr)
             {
-                hr = CreateDevice(result,
+                hr = CreateDevice(device,
                                   DriverType::Warp,
                                   flags);
             }
 
             HR(hr);
+
+            Device1 result;
+            HR(device->QueryInterface(result.GetAddressOf()));
             return result;
         }
     }
@@ -3427,9 +3486,23 @@ namespace KennyKerr
         }
     }
 
+    namespace DirectWrite
+    {
+        inline auto CreateFactory(FactoryType type = FactoryType::Shared) -> Factory1
+        {
+            Factory1 result;
+
+            HR(DWriteCreateFactory(static_cast<DWRITE_FACTORY_TYPE>(type),
+                                   __uuidof(result),
+                                   reinterpret_cast<IUnknown **>(result.GetAddressOf())));
+
+            return result;
+        }
+    }
+
     namespace Direct2D
     {
-        inline auto CreateFactory(FactoryType mode = FactoryType::SingleThreaded) -> Factory1
+        inline auto CreateFactory(FactoryType type = FactoryType::SingleThreaded) -> Factory1
         {
             Factory1 result;
 
@@ -3439,7 +3512,7 @@ namespace KennyKerr
             D2D1_FACTORY_OPTIONS options = { D2D1_DEBUG_LEVEL_NONE };
             #endif
 
-            HR(D2D1CreateFactory(static_cast<D2D1_FACTORY_TYPE>(mode),
+            HR(D2D1CreateFactory(static_cast<D2D1_FACTORY_TYPE>(type),
                                  options,
                                  result.GetAddressOf()));
 
@@ -3492,6 +3565,18 @@ namespace KennyKerr
                                           0); // flags
         }
 
+        inline void SwapChain1::SetRotation(ModeRotation mode) const
+        {
+            HR((*this)->SetRotation(static_cast<DXGI_MODE_ROTATION>(mode)));
+        }
+
+        inline auto SwapChain1::GetRotation() const -> ModeRotation
+        {
+            ModeRotation result;
+            HR((*this)->GetRotation(reinterpret_cast<DXGI_MODE_ROTATION *>(&result)));
+            return result;
+        }
+
         inline auto Resource::GetSharedHandle() const -> HANDLE
         {
             HANDLE result;
@@ -3499,9 +3584,9 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto Factory2::CreateSwapChainForHwnd(Details::Object const & device, // Direct3D or Dxgi Device
+        inline auto Factory2::CreateSwapChainForHwnd(Details::Object const & device,
                                                      HWND window,
-                                                     SwapChainDescription1 const & description) const -> SwapChain
+                                                     SwapChainDescription1 const & description) const -> SwapChain1
         {
             SwapChain1 result;
 
@@ -3515,9 +3600,9 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto Factory2::CreateSwapChainForCoreWindow(Details::Object const & device,  // Direct3D or Dxgi Device
+        inline auto Factory2::CreateSwapChainForCoreWindow(Details::Object const & device,
                                                            IUnknown * window,
-                                                           SwapChainDescription1 const & description) const -> SwapChain
+                                                           SwapChainDescription1 const & description) const -> SwapChain1
         {
             SwapChain1 result;
 
@@ -3531,15 +3616,28 @@ namespace KennyKerr
         }
 
         #ifdef __cplusplus_winrt
-        inline auto Factory2::CreateSwapChainForCoreWindow(Details::Object const & device,  // Direct3D or Dxgi Device
+        inline auto Factory2::CreateSwapChainForCoreWindow(Details::Object const & device,
                                                            Windows::UI::Core::CoreWindow ^ window,
-                                                           SwapChainDescription1 const & description) const -> SwapChain
+                                                           SwapChainDescription1 const & description) const -> SwapChain1
         {
             return CreateSwapChainForCoreWindow(device,
                                                 reinterpret_cast<IUnknown *>(window),
                                                 description);
         }
         #endif
+
+        inline auto Factory2::CreateSwapChainForComposition(Details::Object const & device,
+                                                            SwapChainDescription1 const & description) const -> SwapChain1
+        {
+            SwapChain1 result;
+
+            HR((*this)->CreateSwapChainForComposition(device.Unknown(),
+                                                      description.Get(),
+                                                      nullptr,
+                                                      result.GetAddressOf()));
+
+            return result;
+        }
 
         inline auto Factory2::RegisterOcclusionStatusWindow(HWND window,
                                                             unsigned const message) const -> DWORD
@@ -3572,6 +3670,18 @@ namespace KennyKerr
         {
             Adapter result;
             HR((*this)->GetAdapter(result.GetAddressOf()));
+            return result;
+        }
+
+        inline void Device1::SetMaximumFrameLatency(unsigned maxLatency) const
+        {
+            HR((*this)->SetMaximumFrameLatency(maxLatency));
+        }
+
+        inline auto Device1::GetMaximumFrameLatency() const -> unsigned
+        {
+            unsigned result;
+            HR((*this)->GetMaximumFrameLatency(&result));
             return result;
         }
 
