@@ -2028,6 +2028,25 @@ namespace KennyKerr
             auto GetValueF() const -> float;
         };
 
+        struct Timer : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Timer, Details::Object, IUIAnimationTimer)
+
+            auto GetTime() const -> double;
+        };
+
+        // SimpleTimer is a replacement for the WAM Timer object.
+        // The WAM Timer is not available on Windows Phone 8.
+        class SimpleTimer
+        {
+            LARGE_INTEGER m_frequency;
+
+        public:
+
+            SimpleTimer();
+            auto GetTime() const -> double;
+        };
+
     } // Wam
 
     namespace DirectWrite
@@ -3484,6 +3503,16 @@ namespace KennyKerr
 
             return result;
         }
+
+        inline auto CreateTimer() -> Timer
+        {
+            Timer result;
+
+            HR(CoCreateInstance(__uuidof(UIAnimationTimer),
+                                result.GetAddressOf()));
+
+            return result;
+        }
     }
 
     namespace DirectWrite
@@ -4024,6 +4053,26 @@ namespace KennyKerr
         inline auto Variable::GetValueF() const -> float
         {
             return static_cast<float>(GetValue());
+        }
+
+        inline auto Timer::GetTime() const -> double
+        {
+            double result;
+            HR((*this)->GetTime(&result));
+            return result;
+        }
+
+        inline SimpleTimer::SimpleTimer()
+        {
+            VERIFY(QueryPerformanceFrequency(&m_frequency));
+        }
+
+        inline auto SimpleTimer::GetTime() const -> double
+        {
+            LARGE_INTEGER time;
+            VERIFY(QueryPerformanceCounter(&time));
+
+            return static_cast<double>(time.QuadPart) / m_frequency.QuadPart;
         }
 
 
