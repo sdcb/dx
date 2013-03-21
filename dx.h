@@ -5365,7 +5365,7 @@ namespace KennyKerr
             return result;
         }
 
-        auto Layer::GetSize() const -> SizeF
+        inline auto Layer::GetSize() const -> SizeF
         {
             return (*this)->GetSize();
         }
@@ -5397,12 +5397,12 @@ namespace KennyKerr
             return result;
         }
 
-        void DrawingStateBlock1::GetDescription(DrawingStateDescription1 & description) const
+        inline void DrawingStateBlock1::GetDescription(DrawingStateDescription1 & description) const
         {
             (*this)->GetDescription(description.Get());
         }
 
-        void DrawingStateBlock1::SetDescription(DrawingStateDescription1 const & description) const
+        inline void DrawingStateBlock1::SetDescription(DrawingStateDescription1 const & description) const
         {
             (*this)->SetDescription(description.Get());
         }
