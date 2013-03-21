@@ -3289,7 +3289,7 @@ namespace KennyKerr
                                          DirectWrite::RenderingParams const & params) const -> DrawingStateBlock;
 
             auto CreateWicBitmapRenderTarget(Wic::Bitmap const & target,
-                                             RenderTargetProperties const & properties) const -> RenderTarget;
+                                             RenderTargetProperties const & properties = RenderTargetProperties()) const -> RenderTarget;
 
             #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
             auto CreateHwndRenderTarget(RenderTargetProperties const & renderTargetProperties,

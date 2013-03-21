@@ -11,8 +11,8 @@
 
 using namespace KennyKerr;
 
-Direct2D::Color const COLOR_WHITE(1.0f, 1.0f, 1.0f);
-Direct2D::Color const COLOR_BLUE(0.26f, 0.56f, 0.87f);
+Color const COLOR_WHITE(1.0f, 1.0f, 1.0f);
+Color const COLOR_BLUE(0.26f, 0.56f, 0.87f);
 
 static Direct2D::Factory factory;
 static Direct2D::HwndRenderTarget target;

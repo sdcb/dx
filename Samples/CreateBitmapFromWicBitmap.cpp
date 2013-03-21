@@ -13,7 +13,7 @@
 
 using namespace KennyKerr;
 
-Direct2D::Color const COLOR_WHITE(1.0f, 1.0f, 1.0f);
+Color const COLOR_WHITE(1.0f, 1.0f, 1.0f);
 
 static Direct2D::Factory factory;
 static Direct2D::HwndRenderTarget target;
