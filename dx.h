@@ -911,6 +911,20 @@ namespace KennyKerr
         float Alpha;
     };
 
+    struct PixelFormat
+    {
+        KENNYKERR_DEFINE_STRUCT(PixelFormat, D2D1_PIXEL_FORMAT)
+
+        explicit PixelFormat(Dxgi::Format const format = Dxgi::Format::Unknown,
+                             AlphaMode const mode      = AlphaMode::Unknown) :
+            Format(format),
+            AlphaMode(mode)
+        {}
+
+        Dxgi::Format Format;
+        AlphaMode AlphaMode;
+    };
+
     namespace Dxgi
     {
         struct SampleDescription
@@ -1001,6 +1015,38 @@ namespace KennyKerr
         };
 
     } // Direct3D
+
+    namespace Wic
+    {
+        struct ImageParameters
+        {
+            KENNYKERR_DEFINE_STRUCT(ImageParameters, WICImageParameters)
+
+            explicit ImageParameters(PixelFormat const & pixelFormat = KennyKerr::PixelFormat(Dxgi::Format::B8G8R8A8_UNORM, AlphaMode::Premultipled),
+                                     float dpiX                      = 96.0f,
+                                     float dpiY                      = 96.0f,
+                                     float top                       = 0.0f,
+                                     float left                      = 0.0f,
+                                     unsigned pixelWidth             = 0,
+                                     unsigned pixelHeight            = 0) :
+                PixelFormat(pixelFormat),
+                DpiX(dpiX),
+                DpiY(dpiY),
+                Top(top),
+                Left(left),
+                PixelWidth(pixelWidth),
+                PixelHeight(pixelHeight)
+            {}
+
+            PixelFormat PixelFormat;
+            float DpiX;
+            float DpiY;
+            float Top;
+            float Left;
+            unsigned PixelWidth;
+            unsigned PixelHeight;
+        };
+    }
 
     namespace Direct2D
     {
@@ -1178,20 +1224,6 @@ namespace KennyKerr
             Color Color;
         };
 
-        struct PixelFormat
-        {
-            KENNYKERR_DEFINE_STRUCT(PixelFormat, D2D1_PIXEL_FORMAT)
-
-            explicit PixelFormat(Dxgi::Format const format = Dxgi::Format::Unknown,
-                                 AlphaMode const mode      = AlphaMode::Unknown) :
-                Format(format),
-                AlphaMode(mode)
-            {}
-
-            Dxgi::Format Format;
-            AlphaMode AlphaMode;
-        };
-
         struct PrintControlProperties
         {
             KENNYKERR_DEFINE_STRUCT(PrintControlProperties, D2D1_PRINT_CONTROL_PROPERTIES)
@@ -1264,7 +1296,7 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_STRUCT(BitmapProperties, D2D1_BITMAP_PROPERTIES)
 
-            explicit BitmapProperties(PixelFormat const & format = Direct2D::PixelFormat(),
+            explicit BitmapProperties(PixelFormat const & format = KennyKerr::PixelFormat(),
                                       float const dpiX           = 96.0f,
                                       float const dpiY           = 96.0f) :
                 PixelFormat(format),
@@ -1282,7 +1314,7 @@ namespace KennyKerr
             KENNYKERR_DEFINE_STRUCT(BitmapProperties1, D2D1_BITMAP_PROPERTIES1)
 
             explicit BitmapProperties1(BitmapOptions const options   = BitmapOptions::None,
-                                       PixelFormat const & format    = Direct2D::PixelFormat(),
+                                       PixelFormat const & format    = KennyKerr::PixelFormat(),
                                        float const dpiX              = 96.0f,
                                        float const dpiY              = 96.0f,
                                        ID2D1ColorContext * context   = nullptr) :
@@ -1463,7 +1495,7 @@ namespace KennyKerr
             KENNYKERR_DEFINE_STRUCT(RenderTargetProperties, D2D1_RENDER_TARGET_PROPERTIES)
 
             explicit RenderTargetProperties(RenderTargetType const type     = RenderTargetType::Default,
-                                            PixelFormat const & pixelFormat = Direct2D::PixelFormat(),
+                                            PixelFormat const & pixelFormat = KennyKerr::PixelFormat(),
                                             float const dpiX                = 0.0f,
                                             float const dpiY                = 0.0f,
                                             RenderTargetUsage const usage   = RenderTargetUsage::None,
@@ -1979,6 +2011,13 @@ namespace KennyKerr
         struct ImageEncoder : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(ImageEncoder, Details::Object, IWICImageEncoder)
+
+            void WriteFrame(Direct2D::Image const & image,
+                            BitmapFrameEncode const & frame,
+                            ImageParameters const & parameters) const;
+
+            void WriteFrame(Direct2D::Image const & image,
+                            BitmapFrameEncode const & frame) const;
         };
 
         struct Factory2 : Factory
@@ -3987,6 +4026,23 @@ namespace KennyKerr
             Stream result;
             HR((*this)->CreateStream(result.GetAddressOf()));
             return result;
+        }
+
+        inline void ImageEncoder::WriteFrame(Direct2D::Image const & image,
+                                             BitmapFrameEncode const & frame,
+                                             ImageParameters const & parameters) const
+        {
+            HR((*this)->WriteFrame(image.Get(),
+                                   frame.Get(),
+                                   parameters.Get()));
+        }
+
+        inline void ImageEncoder::WriteFrame(Direct2D::Image const & image,
+                                             BitmapFrameEncode const & frame) const
+        {
+            HR((*this)->WriteFrame(image.Get(),
+                                   frame.Get(),
+                                   nullptr));
         }
 
         inline auto Factory2::CreateImageEncoder(Direct2D::Device const & device) const -> ImageEncoder

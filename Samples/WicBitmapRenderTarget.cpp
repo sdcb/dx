@@ -1,15 +1,14 @@
-// This sample demonstrates how to use Direct2D to render to a WIC bitmap.
-// Internally, Direct2D uses the Direct3D WARP device driver for rendering in
-// this case.
+// This sample demonstrates how to use Direct2D to render to a Windows Imaging Component (WIC) bitmap
+// on the CPU (using a Direct3D WARP device driver). The resulting WIC bitmap is then encoded to
+// produce a PNG file. 
 
+// for ShellExecute
 #ifndef UNICODE
 #define UNICODE
 #endif
+#pragma comment(lib, "shell32.lib") 
 
 #include "..\dx.h"
-
-#pragma comment(lib, "shell32.lib")
-
 using namespace KennyKerr;
 
 Color const COLOR_BLUE(0.26f, 0.56f, 0.87f);
@@ -22,50 +21,52 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 
     ComInitialize com;
 
-    // Create the WIC factory and use it to create a bitmap that Direct2D will target.
+    {
+        // Create the WIC factory and use it to create a bitmap that Direct2D will target.
 
-    auto wicFactory = Wic::CreateFactory();
-    auto wicBitmap = wicFactory.CreateBitmap(SizeU(600, 400));
+        auto wicFactory = Wic::CreateFactory();
+        auto wicBitmap = wicFactory.CreateBitmap(SizeU(600, 400));
 
-    // Create the Direct2D factory and WIC render target.
+        // Create the Direct2D factory and WIC render target.
 
-    auto factory = Direct2D::CreateFactory();
-    auto target = factory.CreateWicBitmapRenderTarget(wicBitmap);
+        auto factory = Direct2D::CreateFactory();
+        auto target = factory.CreateWicBitmapRenderTarget(wicBitmap);
 
-    // Draw a blue ellipse on a transparent background.
+        // Draw a blue ellipse on a transparent background.
 
-    auto brush = target.CreateSolidColorBrush(COLOR_BLUE);
-    target.BeginDraw();
-    target.Clear();
+        auto brush = target.CreateSolidColorBrush(COLOR_BLUE);
+        target.BeginDraw();
+        target.Clear();
 
-    target.DrawEllipse(Direct2D::Ellipse(Point2F(300.0f, 200.0f), 100.0f, 100.0f),
-                       brush,
-                       50.0f);
+        target.DrawEllipse(Direct2D::Ellipse(Point2F(300.0f, 200.0f), 100.0f, 100.0f),
+                           brush,
+                           50.0f);
 
-    HR(target.EndDraw());
+        HR(target.EndDraw());
 
-    // Create a file stream object.
+        // Create a file stream object.
 
-    auto stream = wicFactory.CreateStream();
-    HR(stream.InitializeFromFilename(FILENAME));
+        auto stream = wicFactory.CreateStream();
+        HR(stream.InitializeFromFilename(FILENAME));
 
-    // Create a PNG encoder and prepare a frame based on the WIC bitmap.
+        // Create a PNG encoder and prepare a frame based on the WIC bitmap.
 
-    auto encoder = wicFactory.CreateEncoder(GUID_ContainerFormatPng);
-    encoder.Initialize(stream);
-    auto frame = encoder.CreateNewFrame();
-    frame.SetSize(wicBitmap.GetSize());
+        auto encoder = wicFactory.CreateEncoder(GUID_ContainerFormatPng);
+        encoder.Initialize(stream);
+        auto frame = encoder.CreateNewFrame();
+        frame.SetSize(wicBitmap.GetSize());
 
-    GUID format;
-    wicBitmap.GetPixelFormat(format);
-    frame.SetPixelFormat(format);
+        GUID format;
+        wicBitmap.GetPixelFormat(format);
+        frame.SetPixelFormat(format);
 
-    frame.WriteSource(wicBitmap);
+        frame.WriteSource(wicBitmap);
 
-    // Commit the formatted results to disk.
+        // Commit the formatted results to disk.
 
-    frame.Commit();
-    encoder.Commit();
+        frame.Commit();
+        encoder.Commit();
+    }
 
     // Open the resulting file just to make sure it all worked!
 
