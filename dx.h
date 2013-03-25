@@ -1,5 +1,7 @@
 #pragma once
 
+// Created by Kenny Kerr. Get the latest version here: http://dx.codeplex.com
+
 #include <windows.h>
 #include <d2d1_1.h>
 #include <d3d11_1.h>
@@ -361,6 +363,93 @@ namespace KennyKerr
 
     namespace Wam
     {
+        enum class UpdateResult
+        {
+            NoChange         = UI_ANIMATION_UPDATE_NO_CHANGE,
+            VariablesChanged = UI_ANIMATION_UPDATE_VARIABLES_CHANGED,
+        };
+
+        enum class ManagerStatus
+        {
+            Idle = UI_ANIMATION_MANAGER_IDLE,
+            Busy = UI_ANIMATION_MANAGER_BUSY,
+        };
+
+        enum class Mode
+        {
+            Disabled      = UI_ANIMATION_MODE_DISABLED,
+            SystemDefault = UI_ANIMATION_MODE_SYSTEM_DEFAULT,
+            Enabled       = UI_ANIMATION_MODE_ENABLED,
+        };
+
+        enum class RepeatMode
+        {
+            Normal    = UI_ANIMATION_REPEAT_MODE_NORMAL,
+            Alternate = UI_ANIMATION_REPEAT_MODE_ALTERNATE,
+        };
+
+        enum class RoundingMode
+        {
+            Nearest = UI_ANIMATION_ROUNDING_NEAREST,
+            Floor   = UI_ANIMATION_ROUNDING_FLOOR,
+            Ceiling = UI_ANIMATION_ROUNDING_CEILING,
+        };
+
+        enum class StoryboardStatus
+        {
+            Building             = UI_ANIMATION_STORYBOARD_BUILDING,
+            Scheduled            = UI_ANIMATION_STORYBOARD_SCHEDULED,
+            Cancelled            = UI_ANIMATION_STORYBOARD_CANCELLED,
+            Playing              = UI_ANIMATION_STORYBOARD_PLAYING,
+            Truncated            = UI_ANIMATION_STORYBOARD_TRUNCATED,
+            Finished             = UI_ANIMATION_STORYBOARD_FINISHED,
+            Ready                = UI_ANIMATION_STORYBOARD_READY,
+            InsufficientPriority = UI_ANIMATION_STORYBOARD_INSUFFICIENT_PRIORITY,
+        };
+
+        enum class SchedulingResult
+        {
+            UnexpectedFailure    = UI_ANIMATION_SCHEDULING_UNEXPECTED_FAILURE,
+            InsufficientPriority = UI_ANIMATION_SCHEDULING_INSUFFICIENT_PRIORITY,
+            AlreadyScheduled     = UI_ANIMATION_SCHEDULING_ALREADY_SCHEDULED,
+            Succeeded            = UI_ANIMATION_SCHEDULING_SUCCEEDED,
+            Deferred             = UI_ANIMATION_SCHEDULING_DEFERRED,
+        };
+
+        enum class PriorityEffect
+        {
+            Failure = UI_ANIMATION_PRIORITY_EFFECT_FAILURE,
+            Delay   = UI_ANIMATION_PRIORITY_EFFECT_DELAY,
+        };
+
+        enum class Slope
+        {
+            increasing = UI_ANIMATION_SLOPE_INCREASING,
+            Decreasing = UI_ANIMATION_SLOPE_DECREASING,
+        };
+
+        enum class Dependencies
+        {
+            None               = UI_ANIMATION_DEPENDENCY_NONE,
+            IntermediateValues = UI_ANIMATION_DEPENDENCY_INTERMEDIATE_VALUES,
+            FinalValue         = UI_ANIMATION_DEPENDENCY_FINAL_VALUE,
+            FinalVelocity      = UI_ANIMATION_DEPENDENCY_FINAL_VELOCITY,
+            Duration           = UI_ANIMATION_DEPENDENCY_DURATION,
+        };
+        DEFINE_ENUM_FLAG_OPERATORS(Dependencies)
+
+        enum class IdleBehavior
+        {
+            Continue = UI_ANIMATION_IDLE_BEHAVIOR_CONTINUE,
+            Disable  = UI_ANIMATION_IDLE_BEHAVIOR_DISABLE,
+        };
+
+        enum class TimerClientStatus
+        {
+            Idle = UI_ANIMATION_TIMER_CLIENT_IDLE,
+            Busy = UI_ANIMATION_TIMER_CLIENT_BUSY
+        };
+
     } // Wam
 
     namespace DirectWrite
@@ -3003,6 +3092,9 @@ namespace KennyKerr
                                  RectF const & source) const;
 
             void DrawBitmap(Bitmap const & bitmap) const;
+
+            void DrawBitmap(Bitmap const & bitmap,
+                            float opacity) const;
 
             void DrawBitmap(Bitmap const & bitmap,
                             RectF const & destination) const;
@@ -6295,6 +6387,16 @@ namespace KennyKerr
             (*this)->DrawBitmap(bitmap.Get(),
                                 nullptr,
                                 1.0f,
+                                D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+                                nullptr);
+        }
+
+        inline void RenderTarget::DrawBitmap(Bitmap const & bitmap,
+                                             float opacity) const
+        {
+            (*this)->DrawBitmap(bitmap.Get(),
+                                nullptr,
+                                opacity,
                                 D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
                                 nullptr);
         }

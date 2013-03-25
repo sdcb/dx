@@ -13,7 +13,7 @@
 
 using namespace KennyKerr;
 
-Color const COLOR_WHITE(1.0f, 1.0f, 1.0f);
+Color const COLOR_NOT_WHITE(0.97f, 0.8f, 0.68f);
 
 static Direct2D::Factory factory;
 static Direct2D::HwndRenderTarget target;
@@ -45,7 +45,7 @@ static void CreateDeviceResources()
 
 static void Draw()
 {
-    target.Clear(COLOR_WHITE);
+    target.Clear(COLOR_NOT_WHITE);
     target.DrawBitmap(bitmap);
 }
 
