@@ -94,6 +94,8 @@ int __stdcall wWinMain(HINSTANCE module, HINSTANCE, PWSTR, int)
             {
                 target.Reset();
             }
+            
+            return 0;
         }
 
         if (WM_DESTROY == message)

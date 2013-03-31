@@ -8,6 +8,7 @@
 #include <dwrite_1.h>
 #include <wincodec.h>
 #include <uianimation.h>
+#include <DcompAnimation.h>
 #include <wrl.h>
 #include <memory>
 
@@ -304,6 +305,10 @@ namespace KennyKerr
         DEFINE_ENUM_FLAG_OPERATORS(ResourceMiscFlag)
 
     } // Direct3D
+    
+    namespace DirectComposition
+    {
+    } // DirectComposition
 
     namespace Wic
     {
@@ -1104,6 +1109,10 @@ namespace KennyKerr
         };
 
     } // Direct3D
+    
+    namespace DirectComposition
+    {
+    } // DirectComposition
 
     namespace Wic
     {
@@ -1135,7 +1144,19 @@ namespace KennyKerr
             unsigned PixelWidth;
             unsigned PixelHeight;
         };
-    }
+
+    } // Wic
+
+    namespace Wam
+    {
+        struct KeyFrame_
+        {
+            int _;
+        };
+
+        typedef KeyFrame_ * KeyFrame;
+
+    } // Wam
 
     namespace Direct2D
     {
@@ -1696,118 +1717,20 @@ namespace KennyKerr
 
     #pragma region Forward declarations
 
-    struct ComInitialize;
-    struct Stream;
-    struct PropertyBag2;
-
-    namespace Dxgi
-    {
-        struct Surface;
-        struct SwapChain;
-        struct SwapChain1;
-        struct Resource;
-        struct Factory2;
-        struct Adapter;
-        struct Device1;
-
-    } // Dxgi
-
-    namespace Direct3D
-    {
-        struct MultiThread;
-        struct Texture2D;
-        struct DeviceContext;
-        struct Device;
-
-    } // Direct3D
-
-    namespace Wic
-    {
-        struct Palette;
-        struct BitmapSource;
-        struct BitmapLock;
-        struct Bitmap;
-        struct BitmapFrameDecode;
-        struct ColorContext;
-        struct FormatConverter;
-        struct BitmapFrameEncode;
-        struct BitmapEncoder;
-        struct BitmapDecoder;
-        struct Stream;
-        struct Factory;
-        struct Factory2;
-
-    } // Wic
-
     namespace Wam
     {
-        struct Manager;
-        struct TransitionLibrary;
-        struct Transition;
         struct Variable;
-
-    } // Wam
-
-    namespace DirectWrite
-    {
-        struct RenderingParams;
-        struct TextFormat;
-        struct TextLayout;
-        struct Factory;
-        struct Factory1;
-
-    } // DirectWrite
+        struct Transition;
+        struct Storyboard;
+    };
 
     namespace Direct2D
     {
-        struct SimplifiedGeometrySink;
-        struct TessellationSink;
-        struct Resource;
         struct Image;
-        struct Bitmap;
-        struct ColorContext;
-        struct Bitmap1;
-        struct GradientStopCollection;
-        struct GradientStopCollection1;
-        struct Brush;
-        struct BitmapBrush;
-        struct BitmapBrush1;
-        struct SolidColorBrush;
-        struct LinearGradientBrush;
-        struct RadialGradientBrush;
-        struct StrokeStyle;
-        struct StrokeStyle1;
-        struct Geometry;
-        struct RectangleGeometry;
-        struct RoundedRectangleGeometry;
-        struct EllipseGeometry;
-        struct GeometryGroup;
-        struct TransformedGeometry;
-        struct GeometrySink;
-        struct PathGeometry;
-        struct PathGeometry1;
-        struct Properties;
-        struct Effect;
-        struct Mesh;
-        struct Layer;
-        struct DrawingStateBlock;
-        struct DrawingStateBlock1;
         struct RenderTarget;
         struct BitmapRenderTarget;
-        struct HwndRenderTarget;
-        struct GdiInteropRenderTarget;
-        struct DcRenderTarget;
-        struct GdiMetafileSink;
-        struct GdiMetafile;
-        struct CommandSink;
-        struct CommandList;
-        struct PrintControl;
-        struct ImageBrush;
-        struct DeviceContext;
         struct Device;
-        struct MultiThread;
         struct Factory;
-        struct Factory1;
 
     } // Direct2D
 
@@ -1984,6 +1907,15 @@ namespace KennyKerr
         };
 
     } // Direct3D
+    
+    namespace DirectComposition
+    {
+        struct Animation : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Animation, Details::Object, IDCompositionAnimation)
+        };
+    
+    } // DirectComposition
 
     namespace Wic
     {
@@ -2050,7 +1982,7 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_CLASS(BitmapEncoder, Details::Object, IWICBitmapEncoder)
 
-            void Initialize(Stream const & stream,
+            void Initialize(KennyKerr::Stream const & stream,
                             BitmapEncoderCacheOption cache = BitmapEncoderCacheOption::None) const;
 
             void CreateNewFrame(BitmapFrameEncode & frame,
@@ -2120,51 +2052,8 @@ namespace KennyKerr
 
     namespace Wam
     {
-        struct Manager : Details::Object
-        {
-            KENNYKERR_DEFINE_CLASS(Manager, Details::Object, IUIAnimationManager)
-
-            auto CreateAnimationVariable(double initialValue = 0.0) const -> Variable;
-
-            void ScheduleTransition(Variable const & variable,
-                                    Transition const & transition,
-                                    double time) const;
-
-            void Update(double time) const;
-        };
-
-        struct TransitionLibrary : Details::Object
-        {
-            KENNYKERR_DEFINE_CLASS(TransitionLibrary, Details::Object, IUIAnimationTransitionLibrary)
-
-            auto CreateAccelerateDecelerateTransition(double duration,
-                                                      double finalValue,
-                                                      double accelerationRatio,
-                                                      double decelerationRatio) const -> Transition;
-        };
-
-        struct Transition : Details::Object
-        {
-            KENNYKERR_DEFINE_CLASS(Transition, Details::Object, IUIAnimationTransition)
-        };
-
-        struct Variable : Details::Object
-        {
-            KENNYKERR_DEFINE_CLASS(Variable, Details::Object, IUIAnimationVariable)
-
-            auto GetValue() const -> double;
-            auto GetValueF() const -> float;
-        };
-
-        struct Timer : Details::Object
-        {
-            KENNYKERR_DEFINE_CLASS(Timer, Details::Object, IUIAnimationTimer)
-
-            auto GetTime() const -> double;
-        };
-
-        // SimpleTimer is a replacement for the WAM Timer object.
-        // The WAM Timer is not available on Windows Phone 8.
+        // SimpleTimer is a replacement for the WAM Timer object (see below).
+        // The WAM Timer is not available on Windows Phone 8 at the moment.
         class SimpleTimer
         {
             LARGE_INTEGER m_frequency;
@@ -2174,6 +2063,410 @@ namespace KennyKerr
             SimpleTimer();
             auto GetTime() const -> double;
         };
+
+        struct TimerClientEventHandler : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(TimerClientEventHandler, Details::Object, IUIAnimationTimerClientEventHandler)
+
+            auto OnTimerClientStatusChanged(TimerClientStatus newStatus,
+                                            TimerClientStatus prevStatus) const -> void;
+        };
+
+        struct TimerUpdateHandler : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(TimerUpdateHandler, Details::Object, IUIAnimationTimerUpdateHandler)
+
+            auto OnUpdate(double time) const -> UpdateResult;
+            auto SetTimerClientEventHandler(TimerClientEventHandler const & handler) const -> void;
+            auto ClearTimerClientEventHandler() const -> void;
+        };
+
+        struct TimerEventHandler : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(TimerEventHandler, Details::Object, IUIAnimationTimerEventHandler)
+
+            auto OnPreUpdate() const -> void;
+            auto OnPostUpdate() const -> void;
+            auto OnRenderingTooSlow(unsigned framesPerSecond) const -> void;
+        };
+
+        struct Timer : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Timer, Details::Object, IUIAnimationTimer)
+
+            auto SetTimerUpdateHandler(TimerUpdateHandler const & handler,
+                                       IdleBehavior behavior = IdleBehavior::Continue) const -> void;
+
+            auto SetTimerEventHandler(TimerEventHandler const & handler) const -> void;
+            auto Enable() const -> void;
+            auto Disable() const -> void;
+            auto IsEnabled() const -> bool;
+            auto GetTime() const -> double;
+            auto SetFrameRateThreshold(unsigned) const -> void;
+        };
+
+        struct LoopIterationChangeHandler : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(LoopIterationChangeHandler, Details::Object, IUIAnimationLoopIterationChangeHandler2)
+
+            auto OnLoopIterationChanged(Storyboard const & storyboard,
+                                        UINT_PTR id,
+                                        unsigned newIterationCount,
+                                        unsigned oldIterationCount) const -> void;
+        };
+
+        struct StoryboardEventHandler : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(StoryboardEventHandler, Details::Object, IUIAnimationStoryboardEventHandler2)
+
+            auto OnStoryboardStatusChanged(Storyboard const & storyboard,
+                                           StoryboardStatus newStatus,
+                                           StoryboardStatus prevStatus) const -> void;
+
+            auto OnStoryboardUpdated(Storyboard const & storyboard) const -> void;
+        };
+
+        struct Storyboard : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Storyboard, Details::Object, IUIAnimationStoryboard2)
+
+            auto AddTransition(Variable const & variable,
+                               Transition const & transition) const -> void;
+
+            auto AddKeyframeAtOffset(KeyFrame existingKeyFrame,
+                                     double offset) const -> KeyFrame;
+
+            auto AddKeyframeAfterTransition(Transition const & transition) const -> KeyFrame;
+
+            auto AddTransitionAtKeyFrame(Variable const & variable,
+                                         Transition const & transition,
+                                         KeyFrame startKeyFrame) const -> void;
+
+            auto AddTransitionBetweenKeyFrames(Variable const & variable,
+                                               Transition const & transition,
+                                               KeyFrame startKeyFrame,
+                                               KeyFrame endKeyFrame) const -> void;
+
+            auto RepeatBetweenKeyFrames(KeyFrame startKeyFrame,
+                                        KeyFrame endKeyFrame,
+                                        double repetition,
+                                        RepeatMode repeatMode,
+                                        UINT_PTR id = 0,
+                                        bool registerForNextAnimationEvent = false) const -> void;
+
+            auto RepeatBetweenKeyFrames(KeyFrame startKeyFrame,
+                                        KeyFrame endKeyFrame,
+                                        double repetition,
+                                        RepeatMode repeatMode,
+                                        LoopIterationChangeHandler const & handler,
+                                        UINT_PTR id = 0,
+                                        bool registerForNextAnimationEvent = false) const -> void;
+
+            auto HoldVariable(Variable const & variable) const -> void;
+            auto SetLongestAcceptableDelay(double delay) const -> void;
+            auto SetSkipDuration(double secondsDuration) const -> void;
+            auto Schedule(double timeNow) const -> SchedulingResult;
+            auto Conclude() const -> void;
+            auto Finish(double completionDeadline) const -> void;
+            auto Abandon() const -> void;
+            auto SetTag(unsigned id) const -> void;
+
+            auto SetTag(Details::Object const & object,
+                        unsigned id) const -> void;
+
+            auto GetTag() const -> unsigned;
+            // TODO: GetTag with object
+            auto GetStatus() const -> StoryboardStatus;
+            auto GetElapsedTime() const -> double;
+            auto SetStoryboardEventHandler() const -> void;
+
+            auto SetStoryboardEventHandler(StoryboardEventHandler const & handler,
+                                           bool registerStatusChangeForNextAnimationEvent = false,
+                                           bool registerUpdateForNextAnimationEvent = false) const -> void;
+        };
+
+        struct VariableChangeHandler : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(VariableChangeHandler, Details::Object, IUIAnimationVariableChangeHandler2)
+
+            auto OnValueChanged(Storyboard const & storyboard, Variable const & variable, double * newValues, double * prevValues, unsigned count) const -> void;
+        };
+
+        struct VariableIntegerChangeHandler : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(VariableIntegerChangeHandler, Details::Object, IUIAnimationVariableIntegerChangeHandler2)
+
+            auto OnIntegerValueChanged(Storyboard const & storyboard, Variable const & variable, int * newValues, int * prevValues, unsigned count) const -> void;
+        };
+
+        struct VariableCurveChangeHandler : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(VariableCurveChangeHandler, Details::Object, IUIAnimationVariableCurveChangeHandler2)
+
+            auto OnCurveChanged(Variable const & variable) const -> void;
+        };
+
+        struct Variable : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Variable, Details::Object, IUIAnimationVariable2)
+            
+            auto GetDimension() const -> unsigned;
+            auto GetValue() const -> double;
+            auto GetVectorValue(double * values, unsigned count) const -> void;
+            auto GetCurve(DirectComposition::Animation const & animation) const -> void;
+            // TODO: GetVectorCurve
+            auto GetFinalValue() const -> double;
+            auto GetFinalVectorValue(double * values, unsigned count) const -> void;
+            auto GetPreviousValue() const -> double;
+            auto GetPreviousVectorValue(double * values, unsigned count) const -> void;
+            auto GetIntegerValue() const -> int;
+            auto GetIntegerVectorValue(int * values, unsigned count) const -> void;
+            auto GetFinalIntegerValue() const -> int;
+            auto GetFinalIntegerVectorValue(int * values, unsigned count) const -> void;
+            auto GetPreviousIntegerValue() const -> int;
+            auto GetPreviousIntegerVectorValue(int * values, unsigned count) const -> void;
+            auto GetCurrentStoryboard() const -> Storyboard;
+            auto SetLowerBound(double bound) const -> void;
+            auto SetLowerBoundVector(double const * bounds,  unsigned count) const -> void;
+            auto SetUpperBound(double bound) const -> void;
+            auto SetUpperBoundVector(double const * bounds,  unsigned count) const -> void;
+            auto SetRoundingMode(RoundingMode mode) const -> void;
+            auto SetTag(unsigned id) const -> void;
+            auto SetTag(Details::Object const & object, unsigned id) const -> void;
+            auto GetTag() const -> unsigned;
+            // TODO: GetTag with object
+            auto SetVariableChangeHandler() const -> void;
+            auto SetVariableChangeHandler(VariableChangeHandler const & handler, bool registerForNextAnimationEvent = false) const -> void;
+            auto SetVariableIntegerChangeHandler() const -> void;
+            auto SetVariableIntegerChangeHandler(VariableIntegerChangeHandler const & handler, bool registerForNextAnimationEvent = false) const -> void;
+            auto SetVariableCurveChangeHandler() const -> void;
+            auto SetVariableCurveChangeHandler(VariableCurveChangeHandler const & handler) const -> void;
+
+            template <size_t Count>
+            auto GetVectorValue(double (&values)[Count]) const -> void
+            {
+                GetVectorValue(values, Count);
+            }
+
+            template <size_t Count>
+            auto GetFinalVectorValue(double (&values)[Count]) const -> void
+            {
+                GetFinalVectorValue(values, Count);
+            }
+
+            template <size_t Count>
+            auto GetPreviousVectorValue(double (&values)[Count]) const -> void
+            {
+                GetPreviousVectorValue(values, Count);
+            }
+
+            template <size_t Count>
+            auto GetIntegerVectorValue(int (&values)[Count]) const -> void
+            {
+                GetIntegerVectorValue(values, Count);
+            }
+
+            template <size_t Count>
+            auto GetFinalIntegerVectorValue(int (&values)[Count]) const -> void
+            {
+                GetFinalIntegerVectorValue(values, Count);
+            }
+
+            template <size_t Count>
+            auto GetPreviousIntegerVectorValue(int (&values)[Count]) const -> void
+            {
+                GetPreviousIntegerVectorValue(values, Count);
+            }
+
+            template <size_t Count>
+            auto SetLowerBoundVector(double const (&bounds)[Count]) const -> void
+            {
+                SetLowerBoundVector(bounds, Count);
+            }
+        };
+
+        struct Transition : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Transition, Details::Object, IUIAnimationTransition2)
+
+            auto GetDimension() const -> unsigned;
+            auto SetInitialValue(double value) const -> unsigned;
+            auto SetInitialVectorValue(double const * values, unsigned count) const -> void;
+            auto SetInitialVelocity(double velocity) const -> void;
+            auto SetInitialVectorVelocity(double const * values, unsigned count) const -> void;
+            auto IsDurationKnown() const -> bool;
+            auto GetDuration() const -> double;
+
+            template <size_t Count>
+            auto SetInitialVectorValue(double const (&values)[Count]) const -> void
+            {
+                SetInitialVectorValue(values, Count);
+            }
+
+            template <size_t Count>
+            auto SetInitialVectorVelocity(double const (&values)[Count]) const -> void
+            {
+                SetInitialVectorVelocity(values, Count);
+            }
+        };
+
+        struct ManagerEventHandler : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(ManagerEventHandler, Details::Object, IUIAnimationManagerEventHandler2)
+
+            auto OnManagerStatusChanged(ManagerStatus newStatus, ManagerStatus prevStatus) const -> void;
+        };
+
+
+        struct PriorityComparison : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(PriorityComparison, Details::Object, IUIAnimationPriorityComparison2)
+
+            auto HasPriority(Storyboard const & scheduledStoryboard, Storyboard const & newStoryboard, PriorityEffect priorityEffect) const -> void;
+        };
+
+        struct Manager : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Manager, Details::Object, IUIAnimationManager2)
+
+            auto CreateAnimationVectorVariable(double const * initialValues, unsigned count) const -> Variable;
+            auto CreateAnimationVariable(double initialValue) const -> Variable;
+            auto ScheduleTransition(Variable const & variable, Transition const & transition, double timeNow) const -> void;
+            auto CreateStoryboard() const -> Storyboard;
+            auto FinishAllStoryboards(double completionDeadline) const -> void;
+            auto AbandonAllStoryboards() const -> void;
+            auto Update(double timeNow) const -> UpdateResult;
+            auto GetVariableFromTag(unsigned id) const -> Variable;
+            auto GetVariableFromTag(Details::Object const & object, unsigned id) const -> Variable;
+            auto GetStoryboardFromTag(unsigned id) const -> Storyboard;
+            auto GetStoryboardFromTag(Details::Object const & object, unsigned id) const -> Storyboard;
+            auto EstimateNextEventTime() const -> double;
+            auto GetStatus() const -> ManagerStatus;
+            auto SetAnimationMode(Mode mode) const -> void;
+            auto Pause() const -> void;
+            auto Resume() const -> void;
+            auto SetManagerEventHandler() const -> void;
+            auto SetManagerEventHandler(ManagerEventHandler const & handler, bool registerForNextAnimationEvent = false) const -> void;
+            auto SetCancelPriorityComparison() const -> void;
+            auto SetCancelPriorityComparison(PriorityComparison const & comparison) const -> void;
+            auto SetTrimPriorityComparison() const -> void;
+            auto SetTrimPriorityComparison(PriorityComparison const & comparison) const -> void;
+            auto SetCompressPriorityComparison() const -> void;
+            auto SetCompressPriorityComparison(PriorityComparison const & comparison) const -> void;
+            auto SetConcludePriorityComparison() const -> void;
+            auto SetConcludePriorityComparison(PriorityComparison const & comparison) const -> void;
+            auto SetDefaultLongestAcceptableDelay(double delay) const -> void;
+            auto Shutdown() const -> void;
+
+            template <size_t Count>
+            auto CreateAnimationVectorVariable(double const (&initialValues)[Count]) const -> Variable
+            {
+                return CreateAnimationVectorVariable(initialValues, Count);
+            }
+        };
+
+        struct TransitionLibrary : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(TransitionLibrary, Details::Object, IUIAnimationTransitionLibrary2)
+
+            auto CreateInstantaneousTransition(double finalValue) const -> Transition;
+            auto CreateInstantaneousVectorTransition(double const * finalValues, unsigned count) const -> Transition;
+            auto CreateConstantTransition(double duration) const -> Transition;
+            auto CreateDiscreteTransition(double delay, double finalValue, double hold) const -> Transition;
+            auto CreateDiscreteVectorTransition(double delay, double const * finalValues, unsigned count, double hold) const -> Transition;
+            auto CreateLinearTransition(double duration, double finalValue) const -> Transition;
+            auto CreateLinearVectorTransition(double duration, double const * finalValues, unsigned count) const -> Transition;
+            auto CreateLinearTransitionFromSpeed(double speed, double finalValue) const -> Transition;
+            auto CreateLinearVectorTransitionFromSpeed(double speed, double const * finalValues, unsigned count) const -> Transition;
+            auto CreateSinusoidalTransitionFromVelocity(double duration, double period) const -> Transition;
+            auto CreateSinusoidalTransitionFromRange(double duration, double minValue, double maxValue, double period, Slope slope) const -> Transition;
+            auto CreateAccelerateDecelerateTransition(double duration, double finalValue, double accelerationRatio, double decelerationRatio) const -> Transition;
+            auto CreateReversalTransition(double duration) const -> Transition;
+            auto CreateCubicTransition(double duration, double finalValue, double finalVelocity) const -> Transition;
+            auto CreateCubicVectorTransition(double duration, double const * finalValues, double const * finalVelocities, unsigned count) const -> Transition;
+            auto CreateSmoothStopTransition(double maxDuration, double finalValue) const -> Transition;
+            auto CreateParabolicTransitionFromAcceleration(double finalValue, double finalVelocity, double acceleration) const -> Transition;
+            auto CreateCubicBezierLinearTransition(double duration, double finalValue, double x1, double y1, double x2, double y2) const -> Transition;
+            auto CreateCubicBezierLinearVectorTransition(double duration, double const * finalValues, unsigned count, double x1, double y1, double x2, double y2) const -> Transition;
+
+            template <size_t Count>
+            auto CreateInstantaneousVectorTransition(double const (&finalValues)[Count]) const -> Transition
+            {
+                return CreateInstantaneousVectorTransition(finalValues, Count);
+            }
+
+            template <size_t Count>
+            auto CreateDiscreteVectorTransition(double delay, double const (&finalValues)[Count], double hold) const -> Transition
+            {
+                return CreateDiscreteVectorTransition(finalValues, Count);
+            }
+
+            template <size_t Count>
+            auto CreateLinearVectorTransition(double duration, double const (&finalValues)[Count]) const -> Transition
+            {
+                return CreateLinearVectorTransition(duration, finalValues, Count);
+            }
+
+            template <size_t Count>
+            auto CreateLinearVectorTransitionFromSpeed(double speed, double const (&finalValues)[Count]) const -> Transition
+            {
+                return CreateLinearVectorTransitionFromSpeed(speed, finalValues, Count);
+            }
+
+            template <size_t Count>
+            auto CreateCubicBezierLinearVectorTransition(double duration, double const (&finalValues)[Count], double x1, double y1, double x2, double y2) const -> Transition
+            {
+            }
+        };
+
+        struct PrimitiveInterpolation : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(PrimitiveInterpolation, Details::Object, IUIAnimationPrimitiveInterpolation)
+
+            auto AddCubic(unsigned dimension, double beginOffset, float constantCoefficient, float linearCoefficient, float quadraticCoefficient, float cubicCoefficient) const -> void;
+            auto AddSinusoidal(unsigned dimension, double beginOffset, float bias, float amplitude, float frequency, float phase) const -> void;
+        };
+
+        struct Interpolator : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Interpolator, Details::Object, IUIAnimationInterpolator2)
+
+            auto GetDimension() const -> unsigned;
+            auto SetInitialValueAndVelocity(double * initialValues, double * initialVelocities, unsigned count) const -> void;
+            auto SetDuration(double duration) const -> void;
+            auto GetDuration() const -> double;
+            auto GetFinalValue(double * values, unsigned count) const -> void;
+            auto InterpolateValue(double offset, double * values, unsigned count) const -> void;
+            auto InterpolateVelocity(double offset, double * velocities, unsigned count) const -> void;
+            auto GetPrimitiveInterpolation(PrimitiveInterpolation const & interpolation, unsigned dimension) const -> void;
+            auto GetDependencies(Dependencies & initialValueDependencies, Dependencies & initialVelocityDependencies, Dependencies & durationDependencies) const -> void;
+
+            template <size_t Count>
+            auto GetFinalValue(double (&values)[Count]) const -> void
+            {
+                GetFinalValue(values, Count);
+            }
+
+            template <size_t Count>
+            auto InterpolateValue(double offset, double (&values)[Count]) const -> void
+            {
+                InterpolateValue(offset, values, Count);
+            }
+
+            template <size_t Count>
+            auto InterpolateVelocity(double offset, double (&velocities)[Count]) const -> void
+            {
+                InterpolateVelocity(offset, velocities, Count);
+            }
+        };
+
+        struct TransitionFactory : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(TransitionFactory, Details::Object, IUIAnimationTransitionFactory2)
+
+            auto CreateTransition(Interpolator const & interpolator) const -> Transition;
+        };
+
 
     } // Wam
 
@@ -3615,11 +3908,14 @@ namespace KennyKerr
 
     namespace Wam
     {
+        // TODO: add creation helper functions for building the "handlers" from lambdas
+        // Create an object with WRL RuntimeObject and return one of the normal ref count wrappers
+
         inline auto CreateManager() -> Manager
         {
             Manager result;
 
-            HR(CoCreateInstance(__uuidof(UIAnimationManager),
+            HR(CoCreateInstance(__uuidof(UIAnimationManager2),
                                 result.GetAddressOf()));
 
             return result;
@@ -3629,7 +3925,17 @@ namespace KennyKerr
         {
             TransitionLibrary result;
 
-            HR(CoCreateInstance(__uuidof(UIAnimationTransitionLibrary),
+            HR(CoCreateInstance(__uuidof(UIAnimationTransitionLibrary2),
+                                result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto CreateTransitionFactory() -> TransitionFactory
+        {
+            TransitionFactory result;
+
+            HR(CoCreateInstance(__uuidof(UIAnimationTransitionFactory2),
                                 result.GetAddressOf()));
 
             return result;
@@ -4005,7 +4311,7 @@ namespace KennyKerr
             HR((*this)->Commit());
         }
 
-        inline void BitmapEncoder::Initialize(Stream const & stream,
+        inline void BitmapEncoder::Initialize(KennyKerr::Stream const & stream,
                                               BitmapEncoderCacheOption cache) const
         {
             HR((*this)->Initialize(stream.Get(),
@@ -4151,65 +4457,6 @@ namespace KennyKerr
 
     namespace Wam
     {
-        inline auto Manager::CreateAnimationVariable(double initialValue) const -> Variable
-        {
-            Variable result;
-
-            HR((*this)->CreateAnimationVariable(initialValue,
-                                                result.GetAddressOf()));
-
-            return result;
-        };
-
-        inline void Manager::ScheduleTransition(Variable const & variable,
-                                                Transition const & transition,
-                                                double time) const
-        {
-            HR((*this)->ScheduleTransition(variable.Get(),
-                                           transition.Get(),
-                                           time));
-        }
-
-        inline void Manager::Update(double time) const
-        {
-            HR((*this)->Update(time));
-        }
-
-        inline auto TransitionLibrary::CreateAccelerateDecelerateTransition(double duration,
-                                                                            double finalValue,
-                                                                            double accelerationRatio,
-                                                                            double decelerationRatio) const -> Transition
-        {
-            Transition result;
-
-            HR((*this)->CreateAccelerateDecelerateTransition(duration,
-                                                             finalValue,
-                                                             accelerationRatio,
-                                                             decelerationRatio,
-                                                             result.GetAddressOf()));
-
-            return result;
-        }
-
-        inline auto Variable::GetValue() const -> double
-        {
-            double value;
-            HR((*this)->GetValue(&value));
-            return value;
-        }
-
-        inline auto Variable::GetValueF() const -> float
-        {
-            return static_cast<float>(GetValue());
-        }
-
-        inline auto Timer::GetTime() const -> double
-        {
-            double result;
-            HR((*this)->GetTime(&result));
-            return result;
-        }
-
         inline SimpleTimer::SimpleTimer()
         {
             VERIFY(QueryPerformanceFrequency(&m_frequency));
@@ -4221,6 +4468,13 @@ namespace KennyKerr
             VERIFY(QueryPerformanceCounter(&time));
 
             return static_cast<double>(time.QuadPart) / m_frequency.QuadPart;
+        }
+
+        inline auto TimerClientEventHandler::OnTimerClientStatusChanged(TimerClientStatus newStatus,
+                                                                        TimerClientStatus prevStatus) const -> void
+        {
+            HR((*this)->OnTimerClientStatusChanged(static_cast<UI_ANIMATION_TIMER_CLIENT_STATUS>(newStatus),
+                                                   static_cast<UI_ANIMATION_TIMER_CLIENT_STATUS>(prevStatus)));
         }
 
 

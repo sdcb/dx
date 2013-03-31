@@ -138,11 +138,14 @@ int __stdcall wWinMain(HINSTANCE module, HINSTANCE, PWSTR, int)
                 ResizeSwapChainBitmap();
                 Render(window);
             }
+            
+            return 0;
         }
 
         if (WM_DISPLAYCHANGE == message)
         {
             Render(window);
+            return 0;
         }
 
         if (WM_DESTROY == message)
