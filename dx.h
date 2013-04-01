@@ -2290,11 +2290,11 @@ namespace KennyKerr
             KENNYKERR_DEFINE_CLASS(Transition, Details::Object, IUIAnimationTransition2)
 
             auto GetDimension() const -> unsigned;
-            auto SetInitialValue(double value) const -> unsigned;
+            auto SetInitialValue(double value) const -> void;
             auto SetInitialVectorValue(double const * values, unsigned count) const -> void;
             auto SetInitialVelocity(double velocity) const -> void;
             auto SetInitialVectorVelocity(double const * values, unsigned count) const -> void;
-            auto IsDurationKnown() const -> bool;
+            auto IsDurationKnown() const -> HRESULT;
             auto GetDuration() const -> double;
 
             template <size_t Count>
@@ -4477,6 +4477,1043 @@ namespace KennyKerr
                                                    static_cast<UI_ANIMATION_TIMER_CLIENT_STATUS>(prevStatus)));
         }
 
+        inline auto TimerUpdateHandler::OnUpdate(double time) const -> UpdateResult
+        {
+            UpdateResult result;
+
+            HR((*this)->OnUpdate(time,
+                                 reinterpret_cast<UI_ANIMATION_UPDATE_RESULT *>(&result)));
+
+            return result;
+        }
+
+        inline auto TimerUpdateHandler::SetTimerClientEventHandler(TimerClientEventHandler const & handler) const -> void
+        {
+            HR((*this)->SetTimerClientEventHandler(handler.Get()));
+        }
+
+        inline auto TimerUpdateHandler::ClearTimerClientEventHandler() const -> void
+        {
+            HR((*this)->ClearTimerClientEventHandler());
+        }
+
+        inline auto TimerEventHandler::OnPreUpdate() const -> void
+        {
+            HR((*this)->OnPreUpdate());
+        }
+
+        inline auto TimerEventHandler::OnPostUpdate() const -> void
+        {
+            HR((*this)->OnPreUpdate());
+        }
+
+        inline auto TimerEventHandler::OnRenderingTooSlow(unsigned framesPerSecond) const -> void
+        {
+            HR((*this)->OnRenderingTooSlow(framesPerSecond));
+        }
+
+        inline auto Timer::SetTimerUpdateHandler(TimerUpdateHandler const & handler,
+                                                 IdleBehavior behavior) const -> void
+        {
+            HR((*this)->SetTimerUpdateHandler(handler.Get(),
+                                              static_cast<UI_ANIMATION_IDLE_BEHAVIOR>(behavior)));
+        }
+
+        inline auto Timer::SetTimerEventHandler(TimerEventHandler const & handler) const -> void
+        {
+            HR((*this)->SetTimerEventHandler(handler.Get()));
+        }
+
+        inline auto Timer::Enable() const -> void
+        {
+            HR((*this)->Enable());
+        }
+
+        inline auto Timer::Disable() const -> void
+        {
+            HR((*this)->Disable());
+        }
+
+        inline auto Timer::IsEnabled() const -> bool
+        {
+            HR((*this)->IsEnabled());
+        }
+
+        inline auto Timer::GetTime() const -> double
+        {
+            double result;
+            HR((*this)->GetTime(&result));
+            return result;
+        }
+
+        inline auto Timer::SetFrameRateThreshold(unsigned framesPerSecond) const -> void
+        {
+            HR((*this)->SetFrameRateThreshold(framesPerSecond));
+        }
+
+        inline auto LoopIterationChangeHandler::OnLoopIterationChanged(Storyboard const & storyboard,
+                                                                       UINT_PTR id,
+                                                                       unsigned newIterationCount,
+                                                                       unsigned oldIterationCount) const -> void
+        {
+            HR((*this)->OnLoopIterationChanged(storyboard.Get(),
+                                               id,
+                                               newIterationCount,
+                                               oldIterationCount));
+        }
+
+        inline auto StoryboardEventHandler::OnStoryboardStatusChanged(Storyboard const & storyboard,
+                                                                      StoryboardStatus newStatus,
+                                                                      StoryboardStatus prevStatus) const -> void
+        {
+            HR((*this)->OnStoryboardStatusChanged(storyboard.Get(),
+                                                  static_cast<UI_ANIMATION_STORYBOARD_STATUS>(newStatus),
+                                                  static_cast<UI_ANIMATION_STORYBOARD_STATUS>(prevStatus)));
+        }
+
+        inline auto StoryboardEventHandler::OnStoryboardUpdated(Storyboard const & storyboard) const -> void
+        {
+            HR((*this)->OnStoryboardUpdated(storyboard.Get()));
+        }
+
+        inline auto Storyboard::AddTransition(Variable const & variable,
+                                              Transition const & transition) const -> void
+        {
+            HR((*this)->AddTransition(variable.Get(),
+                                      transition.Get()));
+        }
+
+        inline auto Storyboard::AddKeyframeAtOffset(KeyFrame existingKeyFrame,
+                                                    double offset) const -> KeyFrame
+        {
+            KeyFrame result;
+
+            HR((*this)->AddKeyframeAtOffset(reinterpret_cast<UI_ANIMATION_KEYFRAME>(existingKeyFrame),
+                                            offset,
+                                            reinterpret_cast<UI_ANIMATION_KEYFRAME *>(&result)));
+
+            return result;
+        }
+
+        inline auto Storyboard::AddKeyframeAfterTransition(Transition const & transition) const -> KeyFrame
+        {
+            KeyFrame result;
+
+            HR((*this)->AddKeyframeAfterTransition(transition.Get(),
+                                                   reinterpret_cast<UI_ANIMATION_KEYFRAME *>(&result)));
+
+            return result;
+        }
+
+        inline auto Storyboard::AddTransitionAtKeyFrame(Variable const & variable,
+                                                        Transition const & transition,
+                                                        KeyFrame startKeyFrame) const -> void
+        {
+            HR((*this)->AddTransitionAtKeyframe(variable.Get(),
+                                                transition.Get(),
+                                                reinterpret_cast<UI_ANIMATION_KEYFRAME>(startKeyFrame)));
+        }
+
+        inline auto Storyboard::AddTransitionBetweenKeyFrames(Variable const & variable,
+                                                              Transition const & transition,
+                                                              KeyFrame startKeyFrame,
+                                                              KeyFrame endKeyFrame) const -> void
+        {
+            HR((*this)->AddTransitionBetweenKeyframes(variable.Get(),
+                                                      transition.Get(),
+                                                      reinterpret_cast<UI_ANIMATION_KEYFRAME>(startKeyFrame),
+                                                      reinterpret_cast<UI_ANIMATION_KEYFRAME>(endKeyFrame)));
+        }
+
+        inline auto Storyboard::RepeatBetweenKeyFrames(KeyFrame startKeyFrame,
+                                                       KeyFrame endKeyFrame,
+                                                       double repetition,
+                                                       RepeatMode repeatMode,
+                                                       UINT_PTR id,
+                                                       bool registerForNextAnimationEvent) const -> void
+        {
+            HR((*this)->RepeatBetweenKeyframes(reinterpret_cast<UI_ANIMATION_KEYFRAME>(startKeyFrame),
+                                               reinterpret_cast<UI_ANIMATION_KEYFRAME>(endKeyFrame),
+                                               repetition,
+                                               static_cast<UI_ANIMATION_REPEAT_MODE>(repeatMode),
+                                               nullptr,
+                                               id,
+                                               registerForNextAnimationEvent));
+        }
+
+        inline auto Storyboard::RepeatBetweenKeyFrames(KeyFrame startKeyFrame,
+                                                       KeyFrame endKeyFrame,
+                                                       double repetition,
+                                                       RepeatMode repeatMode,
+                                                       LoopIterationChangeHandler const & handler,
+                                                       UINT_PTR id,
+                                                       bool registerForNextAnimationEvent) const -> void
+        {
+            HR((*this)->RepeatBetweenKeyframes(reinterpret_cast<UI_ANIMATION_KEYFRAME>(startKeyFrame),
+                                               reinterpret_cast<UI_ANIMATION_KEYFRAME>(endKeyFrame),
+                                               repetition,
+                                               static_cast<UI_ANIMATION_REPEAT_MODE>(repeatMode),
+                                               handler.Get(),
+                                               id,
+                                               registerForNextAnimationEvent));
+        }
+
+        inline auto Storyboard::HoldVariable(Variable const & variable) const -> void
+        {
+            HR((*this)->HoldVariable(variable.Get()));
+        }
+
+        inline auto Storyboard::SetLongestAcceptableDelay(double delay) const -> void
+        {
+            HR((*this)->SetLongestAcceptableDelay(delay));
+        }
+
+        inline auto Storyboard::SetSkipDuration(double secondsDuration) const -> void
+        {
+            HR((*this)->SetSkipDuration(secondsDuration));
+        }
+
+        inline auto Storyboard::Schedule(double timeNow) const -> SchedulingResult
+        {
+            HR((*this)->Schedule(timeNow));
+        }
+
+        inline auto Storyboard::Conclude() const -> void
+        {
+            HR((*this)->Conclude());
+        }
+
+        inline auto Storyboard::Finish(double completionDeadline) const -> void
+        {
+            HR((*this)->Finish(completionDeadline));
+        }
+
+        inline auto Storyboard::Abandon() const -> void
+        {
+            HR((*this)->Abandon());
+        }
+
+        inline auto Storyboard::SetTag(unsigned id) const -> void
+        {
+            HR((*this)->SetTag(nullptr,
+                               id));
+        }
+
+        inline auto Storyboard::SetTag(Details::Object const & object,
+                                       unsigned id) const -> void
+        {
+            HR((*this)->SetTag(object.Unknown(),
+                               id));
+        }
+
+        inline auto Storyboard::GetTag() const -> unsigned
+        {
+            unsigned result;
+
+            HR((*this)->GetTag(nullptr,
+                               &result));
+
+            return result;
+        }
+
+        inline auto Storyboard::GetStatus() const -> StoryboardStatus
+        {
+            StoryboardStatus result;
+            HR((*this)->GetStatus(reinterpret_cast<UI_ANIMATION_STORYBOARD_STATUS *>(result)));
+            return result;
+        }
+
+        inline auto Storyboard::GetElapsedTime() const -> double
+        {
+            double result;
+            HR((*this)->GetElapsedTime(&result));
+            return result;
+        }
+
+        inline auto Storyboard::SetStoryboardEventHandler() const -> void
+        {
+            HR((*this)->SetStoryboardEventHandler(nullptr,
+                                                  false,
+                                                  false));
+        }
+
+        inline auto Storyboard::SetStoryboardEventHandler(StoryboardEventHandler const & handler,
+                                                          bool registerStatusChangeForNextAnimationEvent,
+                                                          bool registerUpdateForNextAnimationEvent) const -> void
+        {
+            HR((*this)->SetStoryboardEventHandler(handler.Get(),
+                                                  registerStatusChangeForNextAnimationEvent,
+                                                  registerUpdateForNextAnimationEvent));
+        }
+
+        inline auto VariableChangeHandler::OnValueChanged(Storyboard const & storyboard,
+                                                          Variable const & variable,
+                                                          double * newValues,
+                                                          double * prevValues,
+                                                          unsigned count) const -> void
+        {
+            HR((*this)->OnValueChanged(storyboard.Get(),
+                                       variable.Get(),
+                                       newValues,
+                                       prevValues,
+                                       count));
+        }
+
+        inline auto VariableIntegerChangeHandler::OnIntegerValueChanged(Storyboard const & storyboard,
+                                                                        Variable const & variable,
+                                                                        int * newValues,
+                                                                        int * prevValues,
+                                                                        unsigned count) const -> void
+        {
+            HR((*this)->OnIntegerValueChanged(storyboard.Get(),
+                                              variable.Get(),
+                                              newValues,
+                                              prevValues,
+                                              count));
+        }
+
+        inline auto VariableCurveChangeHandler::OnCurveChanged(Variable const & variable) const -> void
+        {
+            HR((*this)->OnCurveChanged(variable.Get()));
+        }
+
+        inline auto Variable::GetDimension() const -> unsigned
+        {
+            unsigned result;
+            HR((*this)->GetDimension(&result));
+            return result;
+        }
+
+        inline auto Variable::GetValue() const -> double
+        {
+            double result;
+            HR((*this)->GetValue(&result));
+            return result;
+        }
+
+        inline auto Variable::GetVectorValue(double * values, unsigned count) const -> void
+        {
+            HR((*this)->GetVectorValue(values, count));
+        }
+
+        inline auto Variable::GetCurve(DirectComposition::Animation const & animation) const -> void
+        {
+            HR((*this)->GetCurve(animation.Get()));
+        }
+
+        inline auto Variable::GetFinalValue() const -> double
+        {
+            double result;
+            HR((*this)->GetFinalValue(&result));
+            return result;
+        }
+
+        inline auto Variable::GetFinalVectorValue(double * values, unsigned count) const -> void
+        {
+            HR((*this)->GetFinalVectorValue(values, count));
+        }
+
+        inline auto Variable::GetPreviousValue() const -> double
+        {
+            double result;
+            HR((*this)->GetPreviousValue(&result));
+            return result;
+        }
+
+        inline auto Variable::GetPreviousVectorValue(double * values, unsigned count) const -> void
+        {
+            HR((*this)->GetPreviousVectorValue(values, count));
+        }
+
+        inline auto Variable::GetIntegerValue() const -> int
+        {
+            int result;
+            HR((*this)->GetIntegerValue(&result));
+            return result;
+        }
+
+        inline auto Variable::GetIntegerVectorValue(int * values, unsigned count) const -> void
+        {
+            HR((*this)->GetIntegerVectorValue(values, count));
+        }
+
+        inline auto Variable::GetFinalIntegerValue() const -> int
+        {
+            int result;
+            HR((*this)->GetFinalIntegerValue(&result));
+            return result;
+        }
+
+        inline auto Variable::GetFinalIntegerVectorValue(int * values, unsigned count) const -> void
+        {
+            HR((*this)->GetFinalIntegerVectorValue(values, count));
+        }
+
+        inline auto Variable::GetPreviousIntegerValue() const -> int
+        {
+            int result;
+            HR((*this)->GetPreviousIntegerValue(&result));
+            return result;
+        }
+
+        inline auto Variable::GetPreviousIntegerVectorValue(int * values, unsigned count) const -> void
+        {
+            HR((*this)->GetPreviousIntegerVectorValue(values, count));
+        }
+
+        inline auto Variable::GetCurrentStoryboard() const -> Storyboard
+        {
+            Storyboard result;
+            HR((*this)->GetCurrentStoryboard(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto Variable::SetLowerBound(double bound) const -> void
+        {
+            HR((*this)->SetLowerBound(bound));
+        }
+
+        inline auto Variable::SetLowerBoundVector(double const * bounds,  unsigned count) const -> void
+        {
+            HR((*this)->SetLowerBoundVector(bounds, count));
+        }
+
+        inline auto Variable::SetUpperBound(double bound) const -> void
+        {
+            HR((*this)->SetUpperBound(bound));
+        }
+
+        inline auto Variable::SetUpperBoundVector(double const * bounds,  unsigned count) const -> void
+        {
+            HR((*this)->SetUpperBoundVector(bounds, count));
+        }
+
+        inline auto Variable::SetRoundingMode(RoundingMode mode) const -> void
+        {
+            HR((*this)->SetRoundingMode(static_cast<UI_ANIMATION_ROUNDING_MODE>(mode)));
+        }
+
+        inline auto Variable::SetTag(unsigned id) const -> void
+        {
+            HR((*this)->SetTag(nullptr,
+                               id));
+        }
+
+        inline auto Variable::SetTag(Details::Object const & object, unsigned id) const -> void
+        {
+            HR((*this)->SetTag(object.Unknown(),
+                               id));
+        }
+
+        inline auto Variable::GetTag() const -> unsigned
+        {
+            unsigned result;
+
+            HR((*this)->GetTag(nullptr,
+                               &result));
+
+            return result;
+        }
+
+        inline auto Variable::SetVariableChangeHandler() const -> void
+        {
+            HR((*this)->SetVariableChangeHandler(nullptr,
+                                                 false));
+        }
+
+        inline auto Variable::SetVariableChangeHandler(VariableChangeHandler const & handler, bool registerForNextAnimationEvent) const -> void
+        {
+            HR((*this)->SetVariableChangeHandler(handler.Get(),
+                                                 registerForNextAnimationEvent));
+        }
+
+        inline auto Variable::SetVariableIntegerChangeHandler() const -> void
+        {
+            HR((*this)->SetVariableIntegerChangeHandler(nullptr,
+                                                        false));
+        }
+
+        inline auto Variable::SetVariableIntegerChangeHandler(VariableIntegerChangeHandler const & handler, bool registerForNextAnimationEvent) const -> void
+        {
+            HR((*this)->SetVariableIntegerChangeHandler(handler.Get(),
+                                                        registerForNextAnimationEvent));
+        }
+
+        inline auto Variable::SetVariableCurveChangeHandler() const -> void
+        {
+            HR((*this)->SetVariableCurveChangeHandler(nullptr));
+        }
+
+        inline auto Variable::SetVariableCurveChangeHandler(VariableCurveChangeHandler const & handler) const -> void
+        {
+            HR((*this)->SetVariableCurveChangeHandler(handler.Get()));
+        }
+
+        inline auto Transition::GetDimension() const -> unsigned
+        {
+            unsigned result;
+            HR((*this)->GetDimension(&result));
+            return result;
+        }
+
+        inline auto Transition::SetInitialValue(double value) const -> void
+        {
+            HR((*this)->SetInitialValue(value));
+        }
+
+        inline auto Transition::SetInitialVectorValue(double const * values, unsigned count) const -> void
+        {
+            HR((*this)->SetInitialVectorValue(values,
+                                              count));
+        }
+
+        inline auto Transition::SetInitialVelocity(double velocity) const -> void
+        {
+            HR((*this)->SetInitialVelocity(velocity));
+        }
+
+        inline auto Transition::SetInitialVectorVelocity(double const * values, unsigned count) const -> void
+        {
+            HR((*this)->SetInitialVectorVelocity(values,
+                                                 count));
+        }
+
+        inline auto Transition::IsDurationKnown() const -> HRESULT
+        {
+            return (*this)->IsDurationKnown();
+        }
+
+        inline auto Transition::GetDuration() const -> double
+        {
+            double result;
+            HR((*this)->GetDuration(&result));
+            return result;
+        }
+
+        inline auto ManagerEventHandler::OnManagerStatusChanged(ManagerStatus newStatus,
+                                                                ManagerStatus prevStatus) const -> void
+        {
+            HR((*this)->OnManagerStatusChanged(static_cast<UI_ANIMATION_MANAGER_STATUS>(newStatus),
+                                               static_cast<UI_ANIMATION_MANAGER_STATUS>(prevStatus)));
+        }
+
+        inline auto PriorityComparison::HasPriority(Storyboard const & scheduledStoryboard,
+                                                    Storyboard const & newStoryboard,
+                                                    PriorityEffect priorityEffect) const -> void
+        {
+            HR((*this)->HasPriority(scheduledStoryboard.Get(),
+                                    newStoryboard.Get(),
+                                    static_cast<UI_ANIMATION_PRIORITY_EFFECT>(priorityEffect)));
+        }
+
+        inline auto Manager::CreateAnimationVectorVariable(double const * initialValues, unsigned count) const -> Variable
+        {
+            Variable result;
+
+            HR((*this)->CreateAnimationVectorVariable(initialValues,
+                                                      count,
+                                                      result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Manager::CreateAnimationVariable(double initialValue) const -> Variable
+        {
+            Variable result;
+
+            HR((*this)->CreateAnimationVariable(initialValue,
+                                                result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Manager::ScheduleTransition(Variable const & variable, Transition const & transition, double timeNow) const -> void
+        {
+            HR((*this)->ScheduleTransition(variable.Get(),
+                                           transition.Get(),
+                                           timeNow));
+        }
+
+        inline auto Manager::CreateStoryboard() const -> Storyboard
+        {
+            Storyboard result;
+            HR((*this)->CreateStoryboard(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto Manager::FinishAllStoryboards(double completionDeadline) const -> void
+        {
+            HR((*this)->FinishAllStoryboards(completionDeadline));
+        }
+
+        inline auto Manager::AbandonAllStoryboards() const -> void
+        {
+            HR((*this)->AbandonAllStoryboards());
+        }
+
+        inline auto Manager::Update(double timeNow) const -> UpdateResult
+        {
+            UpdateResult result;
+
+            HR((*this)->Update(timeNow,
+                               reinterpret_cast<UI_ANIMATION_UPDATE_RESULT *>(&result)));
+
+            return result;
+        }
+
+        inline auto Manager::GetVariableFromTag(unsigned id) const -> Variable
+        {
+            Variable result;
+
+            HR((*this)->GetVariableFromTag(nullptr,
+                                           id,
+                                           result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Manager::GetVariableFromTag(Details::Object const & object, unsigned id) const -> Variable
+        {
+            Variable result;
+
+            HR((*this)->GetVariableFromTag(object.Unknown(),
+                                           id,
+                                           result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Manager::GetStoryboardFromTag(unsigned id) const -> Storyboard
+        {
+            Storyboard result;
+
+            HR((*this)->GetStoryboardFromTag(nullptr,
+                                             id,
+                                             result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Manager::GetStoryboardFromTag(Details::Object const & object, unsigned id) const -> Storyboard
+        {
+            Storyboard result;
+
+            HR((*this)->GetStoryboardFromTag(object.Unknown(),
+                                             id,
+                                             result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Manager::EstimateNextEventTime() const -> double
+        {
+            double result;
+            HR((*this)->EstimateNextEventTime(&result));
+            return result;
+        }
+
+        inline auto Manager::GetStatus() const -> ManagerStatus
+        {
+            ManagerStatus result;
+            HR((*this)->GetStatus(reinterpret_cast<UI_ANIMATION_MANAGER_STATUS *>(&result)));
+            return result;
+        }
+
+        inline auto Manager::SetAnimationMode(Mode mode) const -> void
+        {
+            HR((*this)->SetAnimationMode(static_cast<UI_ANIMATION_MODE>(mode)));
+        }
+
+        inline auto Manager::Pause() const -> void
+        {
+            HR((*this)->Pause());
+        }
+
+        inline auto Manager::Resume() const -> void
+        {
+            HR((*this)->Resume());
+        }
+
+        inline auto Manager::SetManagerEventHandler() const -> void
+        {
+            HR((*this)->SetManagerEventHandler(nullptr,
+                                               false));
+        }
+
+        inline auto Manager::SetManagerEventHandler(ManagerEventHandler const & handler,
+                                                    bool registerForNextAnimationEvent) const -> void
+        {
+            HR((*this)->SetManagerEventHandler(handler.Get(),
+                                               registerForNextAnimationEvent));
+        }
+
+        inline auto Manager::SetCancelPriorityComparison() const -> void
+        {
+            HR((*this)->SetCancelPriorityComparison(nullptr));
+        }
+
+        inline auto Manager::SetCancelPriorityComparison(PriorityComparison const & comparison) const -> void
+        {
+            HR((*this)->SetCancelPriorityComparison(comparison.Get()));
+        }
+
+        inline auto Manager::SetTrimPriorityComparison() const -> void
+        {
+            HR((*this)->SetTrimPriorityComparison(nullptr));
+        }
+
+        inline auto Manager::SetTrimPriorityComparison(PriorityComparison const & comparison) const -> void
+        {
+            HR((*this)->SetTrimPriorityComparison(comparison.Get()));
+        }
+
+        inline auto Manager::SetCompressPriorityComparison() const -> void
+        {
+            HR((*this)->SetCompressPriorityComparison(nullptr));
+        }
+
+        inline auto Manager::SetCompressPriorityComparison(PriorityComparison const & comparison) const -> void
+        {
+            HR((*this)->SetCompressPriorityComparison(comparison.Get()));
+        }
+
+        inline auto Manager::SetConcludePriorityComparison() const -> void
+        {
+            HR((*this)->SetConcludePriorityComparison(nullptr));
+        }
+
+        inline auto Manager::SetConcludePriorityComparison(PriorityComparison const & comparison) const -> void
+        {
+            HR((*this)->SetConcludePriorityComparison(comparison.Get()));
+        }
+
+        inline auto Manager::SetDefaultLongestAcceptableDelay(double delay) const -> void
+        {
+            HR((*this)->SetDefaultLongestAcceptableDelay(delay));
+        }
+
+        inline auto Manager::Shutdown() const -> void
+        {
+            HR((*this)->Shutdown());
+        }
+
+        inline auto TransitionLibrary::CreateInstantaneousTransition(double finalValue) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateInstantaneousTransition(finalValue,
+                                                      result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateInstantaneousVectorTransition(double const * finalValues, unsigned count) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateInstantaneousVectorTransition(finalValues,
+                                                            count,
+                                                            result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateConstantTransition(double duration) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateConstantTransition(duration,
+                                                 result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateDiscreteTransition(double delay, double finalValue, double hold) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateDiscreteTransition(delay,
+                                                 finalValue,
+                                                 hold,
+                                                 result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateDiscreteVectorTransition(double delay, double const * finalValues, unsigned count, double hold) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateDiscreteVectorTransition(delay,
+                                                       finalValues,
+                                                       count,
+                                                       hold,
+                                                       result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateLinearTransition(double duration, double finalValue) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateLinearTransition(duration,
+                                               finalValue,
+                                               result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateLinearVectorTransition(double duration, double const * finalValues, unsigned count) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateLinearVectorTransition(duration,
+                                                     finalValues,
+                                                     count,
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateLinearTransitionFromSpeed(double speed, double finalValue) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateLinearTransitionFromSpeed(speed,
+                                                        finalValue,
+                                                        result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateLinearVectorTransitionFromSpeed(double speed, double const * finalValues, unsigned count) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateLinearVectorTransitionFromSpeed(speed,
+                                                              finalValues,
+                                                              count,
+                                                              result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateSinusoidalTransitionFromVelocity(double duration, double period) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateSinusoidalTransitionFromVelocity(duration,
+                                                               period,
+                                                               result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateSinusoidalTransitionFromRange(double duration, double minValue, double maxValue, double period, Slope slope) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateSinusoidalTransitionFromRange(duration,
+                                                            minValue,
+                                                            maxValue,
+                                                            period,
+                                                            static_cast<UI_ANIMATION_SLOPE>(slope),
+                                                            result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateAccelerateDecelerateTransition(double duration, double finalValue, double accelerationRatio, double decelerationRatio) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateAccelerateDecelerateTransition(duration,
+                                                             finalValue,
+                                                             accelerationRatio,
+                                                             decelerationRatio,
+                                                             result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateReversalTransition(double duration) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateReversalTransition(duration,
+                                                 result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateCubicTransition(double duration, double finalValue, double finalVelocity) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateCubicTransition(duration,
+                                              finalValue,
+                                              finalVelocity,
+                                              result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateCubicVectorTransition(double duration, double const * finalValues, double const * finalVelocities, unsigned count) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateCubicVectorTransition(duration,
+                                                    finalValues,
+                                                    finalVelocities,
+                                                    count,
+                                                    result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateSmoothStopTransition(double maxDuration, double finalValue) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateSmoothStopTransition(maxDuration,
+                                                   finalValue,
+                                                   result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateParabolicTransitionFromAcceleration(double finalValue, double finalVelocity, double acceleration) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateParabolicTransitionFromAcceleration(finalValue,
+                                                                  finalVelocity,
+                                                                  acceleration,
+                                                                  result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateCubicBezierLinearTransition(double duration, double finalValue, double x1, double y1, double x2, double y2) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateCubicBezierLinearTransition(duration,
+                                                          finalValue,
+                                                          x1,
+                                                          y1,
+                                                          x2,
+                                                          y2,
+                                                          result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto TransitionLibrary::CreateCubicBezierLinearVectorTransition(double duration, double const * finalValues, unsigned count, double x1, double y1, double x2, double y2) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateCubicBezierLinearVectorTransition(duration,
+                                                                finalValues,
+                                                                count,
+                                                                x1,
+                                                                y1,
+                                                                x2,
+                                                                y2,
+                                                                result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto PrimitiveInterpolation::AddCubic(unsigned dimension, double beginOffset, float constantCoefficient, float linearCoefficient, float quadraticCoefficient, float cubicCoefficient) const -> void
+        {
+            HR((*this)->AddCubic(dimension,
+                                 beginOffset,
+                                 constantCoefficient,
+                                 linearCoefficient,
+                                 quadraticCoefficient,
+                                 cubicCoefficient));
+        }
+
+        inline auto PrimitiveInterpolation::AddSinusoidal(unsigned dimension, double beginOffset, float bias, float amplitude, float frequency, float phase) const -> void
+        {
+            HR((*this)->AddSinusoidal(dimension,
+                                      beginOffset,
+                                      bias,
+                                      amplitude,
+                                      frequency,
+                                      phase));
+        }
+
+        inline auto Interpolator::GetDimension() const -> unsigned
+        {
+            unsigned result;
+            HR((*this)->GetDimension(&result));
+            return result;
+        }
+
+        inline auto Interpolator::SetInitialValueAndVelocity(double * initialValues, double * initialVelocities, unsigned count) const -> void
+        {
+            HR((*this)->SetInitialValueAndVelocity(initialValues,
+                                                   initialVelocities,
+                                                   count));
+        }
+
+        inline auto Interpolator::SetDuration(double duration) const -> void
+        {
+            HR((*this)->SetDuration(duration));
+        }
+
+        inline auto Interpolator::GetDuration() const -> double
+        {
+            double result;
+            HR((*this)->GetDuration(&result));
+            return result;
+        }
+
+        inline auto Interpolator::GetFinalValue(double * values, unsigned count) const -> void
+        {
+            HR((*this)->GetFinalValue(values,
+                                      count));
+        }
+
+        inline auto Interpolator::InterpolateValue(double offset, double * values, unsigned count) const -> void
+        {
+            HR((*this)->InterpolateValue(offset,
+                                         values,
+                                         count));
+        }
+
+        inline auto Interpolator::InterpolateVelocity(double offset, double * velocities, unsigned count) const -> void
+        {
+            HR((*this)->InterpolateVelocity(offset,
+                                            velocities,
+                                            count));
+        }
+
+        inline auto Interpolator::GetPrimitiveInterpolation(PrimitiveInterpolation const & interpolation, unsigned dimension) const -> void
+        {
+            HR((*this)->GetPrimitiveInterpolation(interpolation.Get(),
+                                                  dimension));
+        }
+
+        inline auto Interpolator::GetDependencies(Dependencies & initialValueDependencies, Dependencies & initialVelocityDependencies, Dependencies & durationDependencies) const -> void
+        {
+            HR((*this)->GetDependencies(reinterpret_cast<UI_ANIMATION_DEPENDENCIES *>(&initialValueDependencies),
+                                        reinterpret_cast<UI_ANIMATION_DEPENDENCIES *>(initialVelocityDependencies),
+                                        reinterpret_cast<UI_ANIMATION_DEPENDENCIES *>(durationDependencies)));
+        }
+
+        inline auto TransitionFactory::CreateTransition(Interpolator const & interpolator) const -> Transition
+        {
+            Transition result;
+
+            HR((*this)->CreateTransition(interpolator.Get(),
+                                         result.GetAddressOf()));
+
+            return result;
+        }
 
     } // Wam
 
