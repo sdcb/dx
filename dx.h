@@ -1910,10 +1910,12 @@ namespace KennyKerr
     
     namespace DirectComposition
     {
+        #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
         struct Animation : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Animation, Details::Object, IDCompositionAnimation)
         };
+        #endif
     
     } // DirectComposition
 
@@ -2213,7 +2215,11 @@ namespace KennyKerr
             auto GetDimension() const -> unsigned;
             auto GetValue() const -> double;
             auto GetVectorValue(double * values, unsigned count) const -> void;
+
+            #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
             auto GetCurve(DirectComposition::Animation const & animation) const -> void;
+            #endif
+
             // TODO: GetVectorCurve
             auto GetFinalValue() const -> double;
             auto GetFinalVectorValue(double * values, unsigned count) const -> void;
@@ -4796,10 +4802,12 @@ namespace KennyKerr
             HR((*this)->GetVectorValue(values, count));
         }
 
+        #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
         inline auto Variable::GetCurve(DirectComposition::Animation const & animation) const -> void
         {
             HR((*this)->GetCurve(animation.Get()));
         }
+        #endif
 
         inline auto Variable::GetFinalValue() const -> double
         {
