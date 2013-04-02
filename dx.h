@@ -490,6 +490,259 @@ namespace KennyKerr
             GdiNatural = DWRITE_MEASURING_MODE_GDI_NATURAL,
         };
 
+        enum class FontFileType
+        {
+            Unknown            = DWRITE_FONT_FILE_TYPE_UNKNOWN,
+            Cff                = DWRITE_FONT_FILE_TYPE_CFF,
+            TrueType           = DWRITE_FONT_FILE_TYPE_TRUETYPE,
+            TrueTypeCollection = DWRITE_FONT_FILE_TYPE_TRUETYPE_COLLECTION,
+            Type1Pfm           = DWRITE_FONT_FILE_TYPE_TYPE1_PFM,
+            Type1Pfb           = DWRITE_FONT_FILE_TYPE_TYPE1_PFB,
+            Vector             = DWRITE_FONT_FILE_TYPE_VECTOR,
+            Bitmap             = DWRITE_FONT_FILE_TYPE_BITMAP
+        };
+
+        enum class FontFaceType
+        {
+            Cff                = DWRITE_FONT_FACE_TYPE_CFF,
+            TrueType           = DWRITE_FONT_FACE_TYPE_TRUETYPE,
+            TrueTypeCollection = DWRITE_FONT_FACE_TYPE_TRUETYPE_COLLECTION,
+            Type1              = DWRITE_FONT_FACE_TYPE_TYPE1,
+            Vector             = DWRITE_FONT_FACE_TYPE_VECTOR,
+            Bitmap             = DWRITE_FONT_FACE_TYPE_BITMAP,
+            Unknown            = DWRITE_FONT_FACE_TYPE_UNKNOWN,
+            RawCff             = DWRITE_FONT_FACE_TYPE_RAW_CFF
+        };
+
+        enum class FontSimulations
+        {
+            None    = DWRITE_FONT_SIMULATIONS_NONE,
+            Bold    = DWRITE_FONT_SIMULATIONS_BOLD,
+            Oblique = DWRITE_FONT_SIMULATIONS_OBLIQUE,
+        };
+        DEFINE_ENUM_FLAG_OPERATORS(FontSimulations)
+
+        enum class FontWeight
+        {
+            Thin       = DWRITE_FONT_WEIGHT_THIN,
+            ExtraLight = DWRITE_FONT_WEIGHT_EXTRA_LIGHT,
+            UltraLight = DWRITE_FONT_WEIGHT_ULTRA_LIGHT,
+            Light      = DWRITE_FONT_WEIGHT_LIGHT,
+            SemiLight  = DWRITE_FONT_WEIGHT_SEMI_LIGHT,
+            Normal     = DWRITE_FONT_WEIGHT_NORMAL,
+            Regular    = DWRITE_FONT_WEIGHT_REGULAR,
+            Medium     = DWRITE_FONT_WEIGHT_MEDIUM,
+            DemiBold   = DWRITE_FONT_WEIGHT_DEMI_BOLD,
+            SemiBold   = DWRITE_FONT_WEIGHT_SEMI_BOLD,
+            Bold       = DWRITE_FONT_WEIGHT_BOLD,
+            ExtraBold  = DWRITE_FONT_WEIGHT_EXTRA_BOLD,
+            UltraBold  = DWRITE_FONT_WEIGHT_ULTRA_BOLD,
+            Black      = DWRITE_FONT_WEIGHT_BLACK,
+            Heavy      = DWRITE_FONT_WEIGHT_HEAVY,
+            ExtraBlack = DWRITE_FONT_WEIGHT_EXTRA_BLACK,
+            UltraBlack = DWRITE_FONT_WEIGHT_ULTRA_BLACK,
+        };
+
+        enum class FontStretch
+        {
+            Undefined      = DWRITE_FONT_STRETCH_UNDEFINED,
+            UltraCondensed = DWRITE_FONT_STRETCH_ULTRA_CONDENSED,
+            ExtraCondensed = DWRITE_FONT_STRETCH_EXTRA_CONDENSED,
+            Condensed      = DWRITE_FONT_STRETCH_CONDENSED,
+            SemiCondensed  = DWRITE_FONT_STRETCH_SEMI_CONDENSED,
+            Normal         = DWRITE_FONT_STRETCH_NORMAL,
+            Medium         = DWRITE_FONT_STRETCH_MEDIUM,
+            SemiExpanded   = DWRITE_FONT_STRETCH_SEMI_EXPANDED,
+            Expanded       = DWRITE_FONT_STRETCH_EXPANDED,
+            ExtraExpanded  = DWRITE_FONT_STRETCH_EXTRA_EXPANDED,
+            UltraExpanded  = DWRITE_FONT_STRETCH_ULTRA_EXPANDED,
+        };
+
+        enum class FontStyle
+        {
+            Normal  = DWRITE_FONT_STYLE_NORMAL,
+            Oblique = DWRITE_FONT_STYLE_OBLIQUE,
+            Italic  = DWRITE_FONT_STYLE_ITALIC,
+        };
+
+        enum class InformationalString
+        {
+            None                    = DWRITE_INFORMATIONAL_STRING_NONE,
+            CopyrightNotice         = DWRITE_INFORMATIONAL_STRING_COPYRIGHT_NOTICE,
+            VersionStrings          = DWRITE_INFORMATIONAL_STRING_VERSION_STRINGS,
+            Trademark               = DWRITE_INFORMATIONAL_STRING_TRADEMARK,
+            Manufacturer            = DWRITE_INFORMATIONAL_STRING_MANUFACTURER,
+            Designer                = DWRITE_INFORMATIONAL_STRING_DESIGNER,
+            DesignerUrl             = DWRITE_INFORMATIONAL_STRING_DESIGNER_URL,
+            Description             = DWRITE_INFORMATIONAL_STRING_DESCRIPTION,
+            FontVendorUrl           = DWRITE_INFORMATIONAL_STRING_FONT_VENDOR_URL,
+            LicenseDescription      = DWRITE_INFORMATIONAL_STRING_LICENSE_DESCRIPTION,
+            LicenseInfoUrl          = DWRITE_INFORMATIONAL_STRING_LICENSE_INFO_URL,
+            Win32FamilyNames        = DWRITE_INFORMATIONAL_STRING_WIN32_FAMILY_NAMES,
+            Win32SubFamilyNames     = DWRITE_INFORMATIONAL_STRING_WIN32_SUBFAMILY_NAMES,
+            PreferredFamilyNames    = DWRITE_INFORMATIONAL_STRING_PREFERRED_FAMILY_NAMES,
+            PreferredSubFamilyNames = DWRITE_INFORMATIONAL_STRING_PREFERRED_SUBFAMILY_NAMES,
+            SampleText              = DWRITE_INFORMATIONAL_STRING_SAMPLE_TEXT,
+            Full_name               = DWRITE_INFORMATIONAL_STRING_FULL_NAME,
+            PostScriptName          = DWRITE_INFORMATIONAL_STRING_POSTSCRIPT_NAME,
+            PostScriptCidName       = DWRITE_INFORMATIONAL_STRING_POSTSCRIPT_CID_NAME
+        };
+
+        enum class ReadingDirection
+        {
+            LeftToRight = DWRITE_READING_DIRECTION_LEFT_TO_RIGHT,
+            RightToLeft = DWRITE_READING_DIRECTION_RIGHT_TO_LEFT,
+        };
+
+        enum class TextAlignment
+        {
+            Leading   = DWRITE_TEXT_ALIGNMENT_LEADING,
+            Trailing  = DWRITE_TEXT_ALIGNMENT_TRAILING,
+            Center    = DWRITE_TEXT_ALIGNMENT_CENTER,
+            Justified = DWRITE_TEXT_ALIGNMENT_JUSTIFIED
+        };
+
+        enum class ParagraphAlignment
+        {
+            Near   = DWRITE_PARAGRAPH_ALIGNMENT_NEAR,
+            Far    = DWRITE_PARAGRAPH_ALIGNMENT_FAR,
+            Center = DWRITE_PARAGRAPH_ALIGNMENT_CENTER
+        };
+
+        enum class WordWrapping
+        {
+            Wrap   = DWRITE_WORD_WRAPPING_WRAP,
+            NoWrap = DWRITE_WORD_WRAPPING_NO_WRAP,
+        };
+
+        enum class LineSpacingMethod
+        {
+            Default = DWRITE_LINE_SPACING_METHOD_DEFAULT,
+            Uniform = DWRITE_LINE_SPACING_METHOD_UNIFORM
+        };
+
+        enum class TrimmingGranularity
+        {
+            None      = DWRITE_TRIMMING_GRANULARITY_NONE,
+            Character = DWRITE_TRIMMING_GRANULARITY_CHARACTER,
+            Word      = DWRITE_TRIMMING_GRANULARITY_WORD
+        };
+
+        enum class FontFeatureTag
+        {
+            AlternativeFractions          = DWRITE_FONT_FEATURE_TAG_ALTERNATIVE_FRACTIONS,
+            PetiteCapitalsFromCapitals    = DWRITE_FONT_FEATURE_TAG_PETITE_CAPITALS_FROM_CAPITALS,
+            SmallCapitalsFromCapitals     = DWRITE_FONT_FEATURE_TAG_SMALL_CAPITALS_FROM_CAPITALS,
+            ContextualAlternates          = DWRITE_FONT_FEATURE_TAG_CONTEXTUAL_ALTERNATES,
+            CaseSensitiveForms            = DWRITE_FONT_FEATURE_TAG_CASE_SENSITIVE_FORMS,
+            GlyphCompositionDecomposition = DWRITE_FONT_FEATURE_TAG_GLYPH_COMPOSITION_DECOMPOSITION,
+            ContextualLigatures           = DWRITE_FONT_FEATURE_TAG_CONTEXTUAL_LIGATURES,
+            CapitalSpacing                = DWRITE_FONT_FEATURE_TAG_CAPITAL_SPACING,
+            ContextualSwash               = DWRITE_FONT_FEATURE_TAG_CONTEXTUAL_SWASH,
+            CursivePositioning            = DWRITE_FONT_FEATURE_TAG_CURSIVE_POSITIONING,
+            Default                       = DWRITE_FONT_FEATURE_TAG_DEFAULT,
+            DiscretionaryLigatures        = DWRITE_FONT_FEATURE_TAG_DISCRETIONARY_LIGATURES,
+            ExpertForms                   = DWRITE_FONT_FEATURE_TAG_EXPERT_FORMS,
+            Fractions                     = DWRITE_FONT_FEATURE_TAG_FRACTIONS,
+            FullWidth                     = DWRITE_FONT_FEATURE_TAG_FULL_WIDTH,
+            HalfForms                     = DWRITE_FONT_FEATURE_TAG_HALF_FORMS,
+            HalantForms                   = DWRITE_FONT_FEATURE_TAG_HALANT_FORMS,
+            AlternateHalfWidth            = DWRITE_FONT_FEATURE_TAG_ALTERNATE_HALF_WIDTH,
+            HistoricalForms               = DWRITE_FONT_FEATURE_TAG_HISTORICAL_FORMS,
+            HorizontalKanaAlternates      = DWRITE_FONT_FEATURE_TAG_HORIZONTAL_KANA_ALTERNATES,
+            HistoricalLigatures           = DWRITE_FONT_FEATURE_TAG_HISTORICAL_LIGATURES,
+            HalfWidth                     = DWRITE_FONT_FEATURE_TAG_HALF_WIDTH,
+            HojoKanjiForms                = DWRITE_FONT_FEATURE_TAG_HOJO_KANJI_FORMS,
+            Jis04Forms                    = DWRITE_FONT_FEATURE_TAG_JIS04_FORMS,
+            Jis78Forms                    = DWRITE_FONT_FEATURE_TAG_JIS78_FORMS,
+            Jis83Forms                    = DWRITE_FONT_FEATURE_TAG_JIS83_FORMS,
+            Jis90Forms                    = DWRITE_FONT_FEATURE_TAG_JIS90_FORMS,
+            Kerning                       = DWRITE_FONT_FEATURE_TAG_KERNING,
+            StandardLigatures             = DWRITE_FONT_FEATURE_TAG_STANDARD_LIGATURES,
+            LiningFigures                 = DWRITE_FONT_FEATURE_TAG_LINING_FIGURES,
+            LocalizedForms                = DWRITE_FONT_FEATURE_TAG_LOCALIZED_FORMS,
+            MarkPositioning               = DWRITE_FONT_FEATURE_TAG_MARK_POSITIONING,
+            MathematicalGreek             = DWRITE_FONT_FEATURE_TAG_MATHEMATICAL_GREEK,
+            MarkToMarkPositioning         = DWRITE_FONT_FEATURE_TAG_MARK_TO_MARK_POSITIONING,
+            AlternateAnnotationForms      = DWRITE_FONT_FEATURE_TAG_ALTERNATE_ANNOTATION_FORMS,
+            NlcKanjiForms                 = DWRITE_FONT_FEATURE_TAG_NLC_KANJI_FORMS,
+            OldStyleFigures               = DWRITE_FONT_FEATURE_TAG_OLD_STYLE_FIGURES,
+            Ordinals                      = DWRITE_FONT_FEATURE_TAG_ORDINALS,
+            ProportionalAlternateWidth    = DWRITE_FONT_FEATURE_TAG_PROPORTIONAL_ALTERNATE_WIDTH,
+            PetiteCapitals                = DWRITE_FONT_FEATURE_TAG_PETITE_CAPITALS,
+            ProportionalFigures           = DWRITE_FONT_FEATURE_TAG_PROPORTIONAL_FIGURES,
+            ProportionalWidths            = DWRITE_FONT_FEATURE_TAG_PROPORTIONAL_WIDTHS,
+            QuarterWidths                 = DWRITE_FONT_FEATURE_TAG_QUARTER_WIDTHS,
+            RequiredLigatures             = DWRITE_FONT_FEATURE_TAG_REQUIRED_LIGATURES,
+            RubyNotationForms             = DWRITE_FONT_FEATURE_TAG_RUBY_NOTATION_FORMS,
+            StylisticAlternates           = DWRITE_FONT_FEATURE_TAG_STYLISTIC_ALTERNATES,
+            ScientificInferiors           = DWRITE_FONT_FEATURE_TAG_SCIENTIFIC_INFERIORS,
+            SmallCapitals                 = DWRITE_FONT_FEATURE_TAG_SMALL_CAPITALS,
+            SimplifiedForms               = DWRITE_FONT_FEATURE_TAG_SIMPLIFIED_FORMS,
+            StylisticSet1                 = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_1,
+            StylisticSet2                 = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_2,
+            StylisticSet3                 = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_3,
+            StylisticSet4                 = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_4,
+            StylisticSet5                 = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_5,
+            StylisticSet6                 = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_6,
+            StylisticSet7                 = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_7,
+            StylisticSet8                 = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_8,
+            StylisticSet9                 = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_9,
+            StylisticSet10                = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_10,
+            StylisticSet11                = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_11,
+            StylisticSet12                = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_12,
+            StylisticSet13                = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_13,
+            StylisticSet14                = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_14,
+            StylisticSet15                = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_15,
+            StylisticSet16                = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_16,
+            StylisticSet17                = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_17,
+            StylisticSet18                = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_18,
+            StylisticSet19                = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_19,
+            StylisticSet20                = DWRITE_FONT_FEATURE_TAG_STYLISTIC_SET_20,
+            SubScript                     = DWRITE_FONT_FEATURE_TAG_SUBSCRIPT,
+            SuperScript                   = DWRITE_FONT_FEATURE_TAG_SUPERSCRIPT,
+            Swash                         = DWRITE_FONT_FEATURE_TAG_SWASH,
+            Titling                       = DWRITE_FONT_FEATURE_TAG_TITLING,
+            TraditionalNameForms          = DWRITE_FONT_FEATURE_TAG_TRADITIONAL_NAME_FORMS,
+            TabularFigures                = DWRITE_FONT_FEATURE_TAG_TABULAR_FIGURES,
+            TraditionalForms              = DWRITE_FONT_FEATURE_TAG_TRADITIONAL_FORMS,
+            ThirdWidths                   = DWRITE_FONT_FEATURE_TAG_THIRD_WIDTHS,
+            Unicase                       = DWRITE_FONT_FEATURE_TAG_UNICASE,
+            VerticalWriting               = DWRITE_FONT_FEATURE_TAG_VERTICAL_WRITING,
+            VerticalAlternatesAndRotation = DWRITE_FONT_FEATURE_TAG_VERTICAL_ALTERNATES_AND_ROTATION,
+            SlashedZero                   = DWRITE_FONT_FEATURE_TAG_SLASHED_ZERO,
+        };
+
+        enum class ScriptShapes
+        {
+            Default  = DWRITE_SCRIPT_SHAPES_DEFAULT,
+            NoVisual = DWRITE_SCRIPT_SHAPES_NO_VISUAL,
+        };
+        DEFINE_ENUM_FLAG_OPERATORS(ScriptShapes)
+
+        enum class BreakCondition
+        {
+            Neutral     = DWRITE_BREAK_CONDITION_NEUTRAL,
+            CanBreak    = DWRITE_BREAK_CONDITION_CAN_BREAK,
+            MayNotBreak = DWRITE_BREAK_CONDITION_MAY_NOT_BREAK,
+            MustBreak   = DWRITE_BREAK_CONDITION_MUST_BREAK
+        };
+
+        enum class NumberSubstitutionMethod
+        {
+            FromCulture = DWRITE_NUMBER_SUBSTITUTION_METHOD_FROM_CULTURE,
+            Contextual  = DWRITE_NUMBER_SUBSTITUTION_METHOD_CONTEXTUAL,
+            None        = DWRITE_NUMBER_SUBSTITUTION_METHOD_NONE,
+            National    = DWRITE_NUMBER_SUBSTITUTION_METHOD_NATIONAL,
+            Traditional = DWRITE_NUMBER_SUBSTITUTION_METHOD_TRADITIONAL
+        };
+
+        enum class TEXTURE_TYPE
+        {
+            Aliased1x1   = DWRITE_TEXTURE_ALIASED_1x1,
+            Cleartype3x1 = DWRITE_TEXTURE_CLEARTYPE_3x1,
+        };
+
     } // DirectWrite
 
     namespace Direct2D
@@ -1157,6 +1410,436 @@ namespace KennyKerr
         typedef KeyFrame_ * KeyFrame;
 
     } // Wam
+
+    namespace DirectWrite
+    {
+        struct FontMetrics
+        {
+            KENNYKERR_DEFINE_STRUCT(FontMetrics, DWRITE_FONT_METRICS)
+
+            FontMetrics() :
+                DesignUnitsPerEm(),
+                Ascent(),
+                Descent(),
+                LineGap(),
+                CapHeight(),
+                xHeight(),
+                UnderlinePosition(),
+                UnderlineThickness(),
+                StrikethroughPosition(),
+                StrikethroughThickness()
+            {}
+
+            unsigned short DesignUnitsPerEm;
+            unsigned short Ascent;
+            unsigned short Descent;
+            short LineGap;
+            unsigned short CapHeight;
+            unsigned short xHeight;
+            short UnderlinePosition;
+            unsigned short UnderlineThickness;
+            short StrikethroughPosition;
+            unsigned short StrikethroughThickness;
+        };
+
+        struct GlyphMetrics
+        {
+            KENNYKERR_DEFINE_STRUCT(GlyphMetrics, DWRITE_GLYPH_METRICS)
+
+            GlyphMetrics() :
+                LeftSideBearing(),
+                AdvanceWidth(),
+                RightSideBearing(),
+                TopSideBearing(),
+                AdvanceHeight(),
+                BottomSideBearing(),
+                VerticalOriginY()
+            {}
+
+            int LeftSideBearing;
+            unsigned AdvanceWidth;
+            int RightSideBearing;
+            int TopSideBearing;
+            unsigned AdvanceHeight;
+            int BottomSideBearing;
+            int VerticalOriginY;
+        };
+
+        struct GlyphOffset
+        {
+            KENNYKERR_DEFINE_STRUCT(GlyphOffset, DWRITE_GLYPH_OFFSET)
+
+            explicit GlyphOffset(float advanceOffset = 0.0f,
+                                 float ascenderOffset = 0.0f) :
+                AdvanceOffset(advanceOffset),
+                AscenderOffset(ascenderOffset)
+            {}
+
+            FLOAT AdvanceOffset;
+            FLOAT AscenderOffset;
+        };
+
+        struct TextRange
+        {
+            KENNYKERR_DEFINE_STRUCT(TextRange, DWRITE_TEXT_RANGE)
+
+            explicit TextRange(unsigned startPosition = 0,
+                               unsigned length = 0) :
+                StartPosition(startPosition),
+                Length(length)
+            {}
+
+            unsigned StartPosition;
+            unsigned Length;
+        };
+
+        struct FontFeature
+        {
+            KENNYKERR_DEFINE_STRUCT(FontFeature, DWRITE_FONT_FEATURE)
+
+            explicit FontFeature(FontFeatureTag nameTag = FontFeatureTag::Default,
+                                 unsigned parameter = 0) :
+                NameTag(nameTag),
+                Parameter(parameter)
+            {}
+
+            FontFeatureTag NameTag;
+            unsigned Parameter;
+        };
+
+        struct TypographicFeatures
+        {
+            KENNYKERR_DEFINE_STRUCT(TypographicFeatures, DWRITE_TYPOGRAPHIC_FEATURES)
+
+            explicit TypographicFeatures(FontFeature * features = nullptr,
+                                         unsigned featureCount = 0) :
+                Features(features),
+                FeatureCount(featureCount)
+            {}
+
+            template <size_t Count>
+            TypographicFeatures(FontFeature (&features)[Count]) :
+                Features(features),
+                FeatureCount(Count)
+            {}
+
+            FontFeature * Features;
+            unsigned FeatureCount;
+        };
+
+        struct Trimming
+        {
+            KENNYKERR_DEFINE_STRUCT(Trimming, DWRITE_TYPOGRAPHIC_FEATURES)
+
+            explicit Trimming(TrimmingGranularity granularity = TrimmingGranularity::None,
+                              unsigned delimiter = 0,
+                              unsigned delimiterCount = 0) :
+                Granularity(granularity),
+                Delimiter(delimiter),
+                DelimiterCount(delimiterCount)
+            {}
+
+            TrimmingGranularity Granularity;
+            unsigned Delimiter;
+            unsigned DelimiterCount;
+        };
+
+        struct ScriptAnalysis
+        {
+            KENNYKERR_DEFINE_STRUCT(ScriptAnalysis, DWRITE_SCRIPT_ANALYSIS)
+
+            explicit ScriptAnalysis(unsigned short script = 0,
+                                    ScriptShapes shapes = ScriptShapes::Default) :
+                Script(script),
+                Shapes(shapes)
+            {}
+
+            unsigned short Script;
+            ScriptShapes Shapes;
+        };
+
+        struct LineBreakpoint
+        {
+            KENNYKERR_DEFINE_STRUCT(LineBreakpoint, DWRITE_LINE_BREAKPOINT)
+
+            explicit LineBreakpoint(bool breakConditionBefore = false,
+                                    bool breakConditionAfter = false,
+                                    bool isWhitespace = false,
+                                    bool isSoftHyphen = false) :
+                BreakConditionBefore(breakConditionBefore),
+                BreakConditionAfter(breakConditionAfter),
+                IsWhitespace(isWhitespace),
+                IsSoftHyphen(isSoftHyphen),
+                Padding()
+            {}
+
+            bool BreakConditionBefore  : 2;
+            bool BreakConditionAfter   : 2;
+            bool IsWhitespace          : 1;
+            bool IsSoftHyphen          : 1;
+            unsigned char Padding      : 2;
+        };
+
+        struct ShapingTextProperties
+        {
+            KENNYKERR_DEFINE_STRUCT(ShapingTextProperties, DWRITE_SHAPING_TEXT_PROPERTIES)
+
+            explicit ShapingTextProperties(bool isShapedAlone = false) :
+                IsShapedAlone(isShapedAlone),
+                Reserved()
+            {}
+
+            unsigned short IsShapedAlone : 1;
+            unsigned short Reserved      : 15;
+        };
+
+        struct ShapingGlyphProperties
+        {
+            KENNYKERR_DEFINE_STRUCT(ShapingGlyphProperties, DWRITE_SHAPING_GLYPH_PROPERTIES)
+
+            explicit ShapingGlyphProperties(unsigned short justification = 0,
+                                            bool isClusterStart = false,
+                                            bool isDiacritic = false,
+                                            bool isZeroWidthSpace = false) :
+                Justification(justification),
+                IsClusterStart(isClusterStart),
+                IsDiacritic(isDiacritic),
+                IsZeroWidthSpace(isZeroWidthSpace),
+                Reserved()
+            {}
+
+            unsigned short Justification       : 4;
+            unsigned short IsClusterStart      : 1;
+            unsigned short IsDiacritic         : 1;
+            unsigned short IsZeroWidthSpace    : 1;
+            unsigned short Reserved            : 9;
+        };
+
+        struct GlyphRun
+        {
+            KENNYKERR_DEFINE_STRUCT(GlyphRun, DWRITE_GLYPH_RUN)
+
+            explicit GlyphRun() :
+                FontFace(),
+                FontEmSize(),
+                GlyphCount(),
+                GlyphIndices(),
+                GlyphAdvances(),
+                GlyphOffsets(),
+                IsSideways(),
+                BidiLevel()
+            {}
+
+            IDWriteFontFace * FontFace;
+            float FontEmSize;
+            unsigned GlyphCount;
+            unsigned short const * GlyphIndices;
+            float const * GlyphAdvances;
+            GlyphOffset const * GlyphOffsets;
+            BOOL IsSideways;
+            unsigned BidiLevel;
+
+        };
+
+        struct GlyphRunDescription
+        {
+            KENNYKERR_DEFINE_STRUCT(GlyphRunDescription, DWRITE_GLYPH_RUN_DESCRIPTION)
+
+            explicit GlyphRunDescription(WCHAR const* localeName = nullptr,
+                                         WCHAR const * string = nullptr,
+                                         unsigned stringLength = 0,
+                                         unsigned short const * clusterMap = nullptr,
+                                         unsigned textPosition = 0) :
+                LocaleName(localeName),
+                String(string),
+                StringLength(stringLength),
+                ClusterMap(clusterMap),
+                TextPosition(textPosition)
+            {}
+
+            WCHAR const* LocaleName;
+            WCHAR const * String;
+            unsigned StringLength;
+            unsigned short const * ClusterMap;
+            unsigned TextPosition;
+        };
+
+        struct Underline
+        {
+            KENNYKERR_DEFINE_STRUCT(Underline, DWRITE_UNDERLINE)
+
+            explicit Underline(float width = 0.0f,
+                               float thickness = 0.0f,
+                               float offset = 0.0f,
+                               float runHeight = 0.0f,
+                               ReadingDirection readingDirection = ReadingDirection::LeftToRight,
+                               WCHAR const * localeName = nullptr,
+                               MeasuringMode measuringMode = MeasuringMode::Natural) :
+                Width(width),
+                Thickness(thickness),
+                Offset(offset),
+                RunHeight(runHeight),
+                ReadingDirection(readingDirection),
+                FlowDirection(DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM),
+                LocaleName(localeName),
+                MeasuringMode(measuringMode)
+            {}
+
+            float Width;
+            float Thickness;
+            float Offset;
+            float RunHeight;
+            ReadingDirection ReadingDirection;
+            DWRITE_FLOW_DIRECTION FlowDirection;
+            WCHAR const * LocaleName;
+            MeasuringMode MeasuringMode;
+        };
+
+        struct Strikethrough
+        {
+            KENNYKERR_DEFINE_STRUCT(Strikethrough, DWRITE_STRIKETHROUGH)
+
+            explicit Strikethrough(float width = 0.0f,
+                                   float thickness = 0.0f,
+                                   float offset = 0.0f,
+                                   ReadingDirection readingDirection = ReadingDirection::LeftToRight,
+                                   WCHAR const * localeName = nullptr,
+                                   MeasuringMode measuringMode = MeasuringMode::Natural) :
+                Width(width),
+                Thickness(thickness),
+                Offset(offset),
+                ReadingDirection(readingDirection),
+                FlowDirection(DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM),
+                LocaleName(localeName),
+                MeasuringMode(measuringMode)
+            {}
+
+            float Width;
+            float Thickness;
+            float Offset;
+            ReadingDirection ReadingDirection;
+            DWRITE_FLOW_DIRECTION FlowDirection;
+            WCHAR const * LocaleName;
+            MeasuringMode MeasuringMode;
+        };
+
+        struct LineMetrics
+        {
+            KENNYKERR_DEFINE_STRUCT(LineMetrics, DWRITE_LINE_METRICS)
+
+            explicit LineMetrics(unsigned length = 0,
+                                 unsigned trailingWhitespaceLength = 0,
+                                 unsigned newlineLength = 0,
+                                 float height = 0.0f,
+                                 float baseline = 0.0f,
+                                 bool isTrimmed = false) :
+                Length(length),
+                TrailingWhitespaceLength(trailingWhitespaceLength),
+                NewlineLength(newlineLength),
+                Height(height),
+                Baseline(baseline),
+                IsTrimmed(isTrimmed)
+            {}
+
+            unsigned Length;
+            unsigned TrailingWhitespaceLength;
+            unsigned NewlineLength;
+            float Height;
+            float Baseline;
+            BOOL IsTrimmed;
+        };
+
+        struct ClusterMetrics
+        {
+            KENNYKERR_DEFINE_STRUCT(ClusterMetrics, DWRITE_CLUSTER_METRICS)
+
+            explicit ClusterMetrics(float width = 0.0f,
+                                    unsigned short length = 0,
+                                    bool canWrapLineAfter = false,
+                                    bool isWhitespace = false,
+                                    bool isNewline = false,
+                                    bool isSoftHyphen = false,
+                                    bool isRightToLeft = false) :
+                Width(width),
+                Length(length),
+                CanWrapLineAfter(canWrapLineAfter),
+                IsWhitespace(isWhitespace),
+                IsNewline(isNewline),
+                IsSoftHyphen(isSoftHyphen),
+                IsRightToLeft(isRightToLeft),
+                Padding()
+            {}
+
+            float Width;
+            unsigned short Length;
+            unsigned short CanWrapLineAfter : 1;
+            unsigned short IsWhitespace : 1;
+            unsigned short IsNewline : 1;
+            unsigned short IsSoftHyphen : 1;
+            unsigned short IsRightToLeft : 1;
+            unsigned short Padding : 11;
+        };
+
+        struct TextMetrics
+        {
+            KENNYKERR_DEFINE_STRUCT(TextMetrics, DWRITE_TEXT_METRICS)
+
+            explicit TextMetrics(float left = 0.0f,
+                                 float top = 0.0f,
+                                 float width = 0.0f,
+                                 float widthIncludingTrailingWhitespace = 0.0f,
+                                 float height = 0.0f,
+                                 float layoutWidth = 0.0f,
+                                 float layoutHeight = 0.0f,
+                                 unsigned maxBidiReorderingDepth = 0,
+                                 unsigned lineCount = 0) :
+                Left(left),
+                Top(top),
+                Width(width),
+                WidthIncludingTrailingWhitespace(widthIncludingTrailingWhitespace),
+                Height(height),
+                LayoutWidth(layoutWidth),
+                LayoutHeight(layoutHeight),
+                MaxBidiReorderingDepth(maxBidiReorderingDepth),
+                LineCount(lineCount)
+            {}
+
+            float Left;
+            float Top;
+            float Width;
+            float WidthIncludingTrailingWhitespace;
+            float Height;
+            float LayoutWidth;
+            float LayoutHeight;
+            unsigned MaxBidiReorderingDepth;
+            unsigned LineCount;
+        };
+
+        struct InlineObjectMetrics
+        {
+            KENNYKERR_DEFINE_STRUCT(InlineObjectMetrics, DWRITE_INLINE_OBJECT_METRICS)
+
+            explicit InlineObjectMetrics(float width = 0.0f,
+                                         float height = 0.0f,
+                                         float baseline = 0.0f,
+                                         bool supportsSideways = false) :
+                Width(width),
+                Height(height),
+                Baseline(baseline),
+                SupportsSideways(supportsSideways)
+            {}
+
+            float Width;
+            float Height;
+            float Baseline;
+            BOOL SupportsSideways;
+        };
+
+        struct OVERHANG_METRICS
+        {
+        };
+
+    } // DirectWrite
 
     namespace Direct2D
     {
@@ -2492,6 +3175,17 @@ namespace KennyKerr
         struct TextFormat : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(TextFormat, Details::Object, IDWriteTextFormat)
+
+            auto SetTextAlignment(TextAlignment textAlignment) const -> void;
+            auto SetParagraphAlignment(ParagraphAlignment paragraphAlignment) const -> void;
+            auto SetWordWrapping(WordWrapping wordWrapping) const -> void;
+            auto SetReadingDirection(ReadingDirection readingDirection) const -> void;
+            // SetFlowDirection
+            auto SetIncrementalTabStop(float incrementalTabStop) const -> void;
+            auto SetTrimming(Trimming const & trimmingOptions) const -> void;
+
+            //auto SetTrimming(Trimming const & trimmingOptions,
+            //                 InlineObject const & trimmingSign) const -> void;
         };
 
         struct TextLayout : TextFormat
