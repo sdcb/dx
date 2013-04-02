@@ -1835,8 +1835,41 @@ namespace KennyKerr
             BOOL SupportsSideways;
         };
 
-        struct OVERHANG_METRICS
+        // struct OverhangMetrics - just use RectF
+
+        struct HitTestMetrics
         {
+            KENNYKERR_DEFINE_STRUCT(HitTestMetrics, DWRITE_HIT_TEST_METRICS)
+
+            explicit HitTestMetrics(unsigned textPosition = 0,
+                                    unsigned length = 0,
+                                    float left = 0.0f,
+                                    float top = 0.0f,
+                                    float width = 0.0f,
+                                    float height = 0.0f,
+                                    unsigned bidiLevel = 0,
+                                    bool isText = false,
+                                    bool isTrimmed = false) :
+                TextPosition(textPosition),
+                Length(length),
+                Left(left),
+                Top(top),
+                Width(width),
+                Height(height),
+                BidiLevel(bidiLevel),
+                IsText(isText),
+                IsTrimmed(isTrimmed)
+            {}
+
+            unsigned TextPosition;
+            unsigned Length;
+            float Left;
+            float Top;
+            float Width;
+            float Height;
+            unsigned BidiLevel;
+            BOOL IsText;
+            BOOL IsTrimmed;
         };
 
     } // DirectWrite
@@ -3161,6 +3194,76 @@ namespace KennyKerr
 
     namespace DirectWrite
     {
+        struct FontFileStream : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(FontFileStream, Details::Object, IDWriteFontFileStream)
+        };
+
+        struct FontFileLoader : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(FontFileLoader, Details::Object, IDWriteFontFileLoader)
+        };
+
+        struct LocalFontFileLoader : FontFileLoader
+        {
+            KENNYKERR_DEFINE_CLASS(LocalFontFileLoader, FontFileLoader, IDWriteLocalFontFileLoader)
+        };
+
+        struct FontFile : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(FontFile, Details::Object, IDWriteFontFile)
+        };
+
+        struct FontFace : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(FontFace, Details::Object, IDWriteFontFace)
+        };
+
+        struct FontCollectionLoader : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(FontCollectionLoader, Details::Object, IDWriteFontCollectionLoader)
+        };
+
+        struct FontFileEnumerator : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(FontFileEnumerator, Details::Object, IDWriteFontFileEnumerator)
+        };
+
+        struct LocalizedStrings : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(LocalizedStrings, Details::Object, IDWriteLocalizedStrings)
+        };
+
+        struct FontCollection : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(FontCollection, Details::Object, IDWriteFontCollection)
+        };
+
+        struct FontList : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(FontList, Details::Object, IDWriteFontList)
+        };
+
+        struct FontFamily : FontList
+        {
+            KENNYKERR_DEFINE_CLASS(FontFamily, FontList, IDWriteFontFamily)
+        };
+
+        struct Font : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Font, Details::Object, IDWriteFont)
+        };
+
+        struct InlineObject : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(InlineObject, Details::Object, IDWriteInlineObject)
+        };
+
+        struct Typography : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Typography, Details::Object, IDWriteTypography)
+        };
+
         struct RenderingParams : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(RenderingParams, Details::Object, IDWriteRenderingParams)
@@ -3184,13 +3287,219 @@ namespace KennyKerr
             auto SetIncrementalTabStop(float incrementalTabStop) const -> void;
             auto SetTrimming(Trimming const & trimmingOptions) const -> void;
 
-            //auto SetTrimming(Trimming const & trimmingOptions,
-            //                 InlineObject const & trimmingSign) const -> void;
+            auto SetTrimming(Trimming const & trimmingOptions,
+                             InlineObject const & trimmingSign) const -> void;
+
+            auto SetLineSpacing(LineSpacingMethod lineSpacingMethod,
+                                float lineSpacing,
+                                float baseline) const -> void;
+
+            auto GetTextAlignment() const -> TextAlignment;
+            auto GetParagraphAlignment() const -> ParagraphAlignment;
+            auto GetWordWrapping() const -> WordWrapping;
+            auto GetReadingDirection() const -> ReadingDirection;
+            // GetFlowDirection
+            auto GetIncrementalTabStop() const -> float;
+            auto GetTrimming(Trimming & trimming) const -> void;
+
+            auto GetTrimming(Trimming & trimming,
+                             InlineObject & trimmingSign) const -> void;
+
+            auto GetLineSpacing(LineSpacingMethod & lineSpacingMethod,
+                                float & lineSpacing,
+                                float & baseline) const -> void;
+
+            auto GetFontCollection() const -> FontCollection;
+            auto GetFontFamilyNameLength() const -> unsigned;
+
+            auto GetFontFamilyName(WCHAR * fontFamilyName,
+                                   unsigned nameSize) const -> void;
+
+            auto GetFontWeight() const -> FontWeight;
+            auto GetFontStyle() const -> FontStyle;
+            auto GetFontStretch() const -> FontStretch;
+            auto GetFontSize() const -> float;
+            auto GetLocaleNameLength() const -> unsigned;
+
+            auto GetLocaleName(WCHAR * localeName,
+                               unsigned nameSize) const -> void;
+
+            template <size_t Count>
+            void GetFontFamilyName(WCHAR (&fontFamilyName)[Count]) const
+            {
+                GetFontFamilyName(fontFamilyName, Count);
+            }
+
+            template <size_t Count>
+            void GetLocaleName(WCHAR (&localeName)[Count]) const
+            {
+                GetLocaleName(localeName, Count);
+            }
         };
 
         struct TextLayout : TextFormat
         {
             KENNYKERR_DEFINE_CLASS(TextLayout, TextFormat, IDWriteTextLayout)
+
+            auto SetMaxWidth(float maxWidth) const -> void;
+            auto SetMaxHeight(float maxHeight) const -> void;
+
+            auto SetFontCollection(FontCollection const & fontCollection,
+                                   TextRange const & textRange) const -> void;
+
+            auto SetFontFamilyName(WCHAR const * fontFamilyName,
+                                   TextRange const & textRange) const -> void;
+
+            auto SetFontWeight(FontWeight fontWeight,
+                               TextRange const & textRange) const -> void;
+
+            auto SetFontStyle(FontStyle fontStyle,
+                              TextRange const & textRange) const -> void;
+
+            auto SetFontStretch(FontStretch fontStretch,
+                                TextRange const & textRange) const -> void;
+
+            auto SetFontSize(float fontSize,
+                             TextRange const & textRange) const -> void;
+
+            auto SetUnderline(bool hasUnderline,
+                              TextRange const & textRange) const -> void;
+
+            auto SetStrikethrough(bool hasStrikethrough,
+                                  TextRange const & textRange) const -> void;
+
+            // SetDrawingEffect
+
+            auto SetInlineObject(InlineObject const & inlineObject,
+                                 TextRange const & textRange) const -> void;
+
+            auto SetTypography(Typography const & typography,
+                               TextRange const & textRange) const -> void;
+
+            auto SetLocaleName(WCHAR const * localeName,
+                               TextRange const & textRange) const -> void;
+
+            auto GetMaxWidth() const -> float;
+            auto GetMaxHeight() const -> float;
+
+            auto GetFontCollection(unsigned currentPosition) const -> FontCollection;
+
+            auto GetFontCollection(unsigned currentPosition,
+                                   TextRange & textRange) const -> FontCollection;
+
+            auto GetFontFamilyNameLength(unsigned currentPosition) const -> unsigned;
+
+            auto GetFontFamilyNameLength(unsigned currentPosition,
+                                         TextRange & textRange) const -> unsigned;
+
+            auto GetFontFamilyName(unsigned currentPosition,
+                                   WCHAR * fontFamilyName,
+                                   unsigned nameSize) const -> void;
+
+            auto GetFontFamilyName(unsigned currentPosition,
+                                   WCHAR * fontFamilyName,
+                                   unsigned nameSize,
+                                   TextRange & textRange) const -> void;
+
+            auto GetFontWeight(unsigned currentPosition) const -> FontWeight;
+
+            auto GetFontWeight(unsigned currentPosition,
+                               TextRange & textRange) const -> FontWeight;
+
+            auto GetFontStyle(unsigned currentPosition) const -> FontStyle;
+
+            auto GetFontStyle(unsigned currentPosition,
+                              TextRange & textRange) const -> FontStyle;
+
+            auto GetFontStretch(unsigned currentPosition) const -> FontStretch;
+
+            auto GetFontStretch(unsigned currentPosition,
+                                TextRange & textRange) const -> FontStretch;
+
+            auto GetFontSize(unsigned currentPosition) const -> float;
+
+            auto GetFontSize(unsigned currentPosition,
+                             TextRange & textRange) const -> float;
+
+            auto GetUnderline(unsigned currentPosition) const -> bool;
+
+            auto GetUnderline(unsigned currentPosition,
+                              TextRange & textRange) const -> bool;
+
+            auto GetStrikethrough(unsigned currentPosition) const -> bool;
+
+            auto GetStrikethrough(unsigned currentPosition,
+                                  TextRange & textRange) const -> bool;
+
+            // GetDrawingEffect
+
+            auto GetInlineObject(unsigned currentPosition) const -> InlineObject;
+
+            auto GetInlineObject(unsigned currentPosition,
+                                 TextRange & textRange) const -> InlineObject;
+
+            auto GetTypography(unsigned currentPosition) const -> Typography;
+
+            auto GetTypography(unsigned currentPosition,
+                               TextRange & textRange) const -> Typography;
+
+            auto GetLocaleNameLength(unsigned currentPosition) const -> unsigned;
+
+            auto GetLocaleNameLength(unsigned currentPosition,
+                                     TextRange & textRange) const -> unsigned;
+
+            auto GetLocaleName(unsigned currentPosition,
+                               WCHAR * localeName,
+                               unsigned nameSize) const -> void;
+
+            auto GetLocaleName(unsigned currentPosition,
+                               WCHAR * localeName,
+                               unsigned nameSize,
+                               TextRange & textRange) const -> void;
+
+
+
+
+
+            template <size_t Count>
+            void GetFontFamilyName(unsigned currentPosition,
+                                   WCHAR (&fontFamilyName)[Count]) const
+            {
+                GetFontFamilyName(currentPosition,
+                                  fontFamilyName,
+                                  Count);
+            }
+
+            template <size_t Count>
+            void GetFontFamilyName(unsigned currentPosition,
+                                   WCHAR (&fontFamilyName)[Count],
+                                   TextRange & textRange) const
+            {
+                GetFontFamilyName(currentPosition,
+                                  fontFamilyName,
+                                  Count,
+                                  textRange);
+            }
+
+            template <size_t Count>
+            void GetLocaleName(unsigned currentPosition,
+                               WCHAR (&localeName)[Count]) const
+            {
+                GetLocaleName(currentPosition,
+                              localeName,
+                              Count);
+            }
+
+            template <size_t Count>
+            void GetLocaleName(unsigned currentPosition,
+                               WCHAR (&localeName)[Count],
+                               TextRange & textRange) const
+            {
+                GetLocaleName(currentPosition,
+                              localeName,
+                              Count,
+                              textRange);
+            }
         };
 
         struct Factory : Details::Object
