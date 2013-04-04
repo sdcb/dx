@@ -13,6 +13,7 @@
 #include <memory>
 
 #pragma comment(lib, "d2d1")
+#pragma comment(lib, "dwrite")
 #pragma comment(lib, "d3d11")
 #pragma comment(lib, "dxgi")
 
@@ -163,13 +164,13 @@ namespace KennyKerr
 
     namespace Dxgi
     {
-        enum class Format // DXGI_FORMAT
+        enum class Format
         {
             Unknown        = DXGI_FORMAT_UNKNOWN,
             B8G8R8A8_UNORM = DXGI_FORMAT_B8G8R8A8_UNORM,
         };
 
-        enum class Usage // DXGI_USAGE
+        enum class Usage
         {
             ShaderInput        = DXGI_USAGE_SHADER_INPUT,
             RenderTargetOutput = DXGI_USAGE_RENDER_TARGET_OUTPUT,
@@ -180,20 +181,20 @@ namespace KennyKerr
             UnorderedAccess    = DXGI_USAGE_UNORDERED_ACCESS,
         };
 
-        enum class Scaling // DXGI_SCALING
+        enum class Scaling
         {
             Stretch = DXGI_SCALING_STRETCH,
             None    = DXGI_SCALING_NONE,
         };
 
-        enum class SwapEffect // DXGI_SWAP_EFFECT
+        enum class SwapEffect
         {
             Discard        = DXGI_SWAP_EFFECT_DISCARD,
             Sequential     = DXGI_SWAP_EFFECT_SEQUENTIAL,
             FlipSequential = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL,
         };
 
-        enum class SwapChainFlag // DXGI_SWAP_CHAIN_FLAG
+        enum class SwapChainFlag
         {
             None                         = 0,
             NonPrerotated                = DXGI_SWAP_CHAIN_FLAG_NONPREROTATED,
@@ -207,7 +208,7 @@ namespace KennyKerr
 
         enum class Present
         {
-            None            = 0,
+            None                = 0,
             Test                = DXGI_PRESENT_TEST,
             DoNotSequence       = DXGI_PRESENT_DO_NOT_SEQUENCE,
             Restart             = DXGI_PRESENT_RESTART,
@@ -1835,7 +1836,7 @@ namespace KennyKerr
             BOOL SupportsSideways;
         };
 
-        // struct OverhangMetrics - just use RectF
+        // TODO: struct OverhangMetrics - just use RectF
 
         struct HitTestMetrics
         {
@@ -2907,14 +2908,22 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_CLASS(VariableChangeHandler, Details::Object, IUIAnimationVariableChangeHandler2)
 
-            auto OnValueChanged(Storyboard const & storyboard, Variable const & variable, double * newValues, double * prevValues, unsigned count) const -> void;
+            auto OnValueChanged(Storyboard const & storyboard,
+                                Variable const & variable,
+                                double * newValues,
+                                double * prevValues,
+                                unsigned count) const -> void;
         };
 
         struct VariableIntegerChangeHandler : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(VariableIntegerChangeHandler, Details::Object, IUIAnimationVariableIntegerChangeHandler2)
 
-            auto OnIntegerValueChanged(Storyboard const & storyboard, Variable const & variable, int * newValues, int * prevValues, unsigned count) const -> void;
+            auto OnIntegerValueChanged(Storyboard const & storyboard,
+                                       Variable const & variable,
+                                       int * newValues,
+                                       int * prevValues,
+                                       unsigned count) const -> void;
         };
 
         struct VariableCurveChangeHandler : Details::Object
@@ -2930,7 +2939,9 @@ namespace KennyKerr
             
             auto GetDimension() const -> unsigned;
             auto GetValue() const -> double;
-            auto GetVectorValue(double * values, unsigned count) const -> void;
+            
+            auto GetVectorValue(double * values,
+                                unsigned count) const -> void;
 
             #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
             auto GetCurve(DirectComposition::Animation const & animation) const -> void;
@@ -2938,72 +2949,114 @@ namespace KennyKerr
 
             // TODO: GetVectorCurve
             auto GetFinalValue() const -> double;
-            auto GetFinalVectorValue(double * values, unsigned count) const -> void;
+
+            auto GetFinalVectorValue(double * values,
+                                     unsigned count) const -> void;
+
             auto GetPreviousValue() const -> double;
-            auto GetPreviousVectorValue(double * values, unsigned count) const -> void;
+
+            auto GetPreviousVectorValue(double * values,
+                                        unsigned count) const -> void;
+
             auto GetIntegerValue() const -> int;
-            auto GetIntegerVectorValue(int * values, unsigned count) const -> void;
+
+            auto GetIntegerVectorValue(int * values,
+                                       unsigned count) const -> void;
+
             auto GetFinalIntegerValue() const -> int;
-            auto GetFinalIntegerVectorValue(int * values, unsigned count) const -> void;
+
+            auto GetFinalIntegerVectorValue(int * values,
+                                            unsigned count) const -> void;
+
             auto GetPreviousIntegerValue() const -> int;
-            auto GetPreviousIntegerVectorValue(int * values, unsigned count) const -> void;
+
+            auto GetPreviousIntegerVectorValue(int * values,
+                                               unsigned count) const -> void;
+
             auto GetCurrentStoryboard() const -> Storyboard;
+
             auto SetLowerBound(double bound) const -> void;
-            auto SetLowerBoundVector(double const * bounds,  unsigned count) const -> void;
+
+            auto SetLowerBoundVector(double const * bounds,
+                                     unsigned count) const -> void;
+
             auto SetUpperBound(double bound) const -> void;
-            auto SetUpperBoundVector(double const * bounds,  unsigned count) const -> void;
+
+            auto SetUpperBoundVector(double const * bounds,
+                                     unsigned count) const -> void;
+
             auto SetRoundingMode(RoundingMode mode) const -> void;
+
             auto SetTag(unsigned id) const -> void;
-            auto SetTag(Details::Object const & object, unsigned id) const -> void;
+
+            auto SetTag(Details::Object const & object,
+                        unsigned id) const -> void;
+
             auto GetTag() const -> unsigned;
+
             // TODO: GetTag with object
+
             auto SetVariableChangeHandler() const -> void;
-            auto SetVariableChangeHandler(VariableChangeHandler const & handler, bool registerForNextAnimationEvent = false) const -> void;
+
+            auto SetVariableChangeHandler(VariableChangeHandler const & handler,
+                                          bool registerForNextAnimationEvent = false) const -> void;
+
             auto SetVariableIntegerChangeHandler() const -> void;
-            auto SetVariableIntegerChangeHandler(VariableIntegerChangeHandler const & handler, bool registerForNextAnimationEvent = false) const -> void;
+
+            auto SetVariableIntegerChangeHandler(VariableIntegerChangeHandler const & handler,
+                                                 bool registerForNextAnimationEvent = false) const -> void;
+
             auto SetVariableCurveChangeHandler() const -> void;
+
             auto SetVariableCurveChangeHandler(VariableCurveChangeHandler const & handler) const -> void;
 
             template <size_t Count>
             auto GetVectorValue(double (&values)[Count]) const -> void
             {
-                GetVectorValue(values, Count);
+                GetVectorValue(values,
+                               Count);
             }
 
             template <size_t Count>
             auto GetFinalVectorValue(double (&values)[Count]) const -> void
             {
-                GetFinalVectorValue(values, Count);
+                GetFinalVectorValue(values,
+                                    Count);
             }
 
             template <size_t Count>
             auto GetPreviousVectorValue(double (&values)[Count]) const -> void
             {
-                GetPreviousVectorValue(values, Count);
+                GetPreviousVectorValue(values,
+                                       Count);
             }
 
             template <size_t Count>
             auto GetIntegerVectorValue(int (&values)[Count]) const -> void
             {
-                GetIntegerVectorValue(values, Count);
+                GetIntegerVectorValue(values,
+                                      Count);
             }
 
             template <size_t Count>
             auto GetFinalIntegerVectorValue(int (&values)[Count]) const -> void
             {
-                GetFinalIntegerVectorValue(values, Count);
+                GetFinalIntegerVectorValue(values,
+                                           Count);
             }
 
             template <size_t Count>
             auto GetPreviousIntegerVectorValue(int (&values)[Count]) const -> void
             {
-                GetPreviousIntegerVectorValue(values, Count);
+                GetPreviousIntegerVectorValue(values,
+                                              Count);
             }
 
             template <size_t Count>
             auto SetLowerBoundVector(double const (&bounds)[Count]) const -> void
             {
-                SetLowerBoundVector(bounds, Count);
+                SetLowerBoundVector(bounds,
+                                    Count);
             }
         };
 
@@ -3013,22 +3066,30 @@ namespace KennyKerr
 
             auto GetDimension() const -> unsigned;
             auto SetInitialValue(double value) const -> void;
-            auto SetInitialVectorValue(double const * values, unsigned count) const -> void;
+
+            auto SetInitialVectorValue(double const * values,
+                                       unsigned count) const -> void;
+
             auto SetInitialVelocity(double velocity) const -> void;
-            auto SetInitialVectorVelocity(double const * values, unsigned count) const -> void;
+
+            auto SetInitialVectorVelocity(double const * values,
+                                          unsigned count) const -> void;
+
             auto IsDurationKnown() const -> HRESULT;
             auto GetDuration() const -> double;
 
             template <size_t Count>
             auto SetInitialVectorValue(double const (&values)[Count]) const -> void
             {
-                SetInitialVectorValue(values, Count);
+                SetInitialVectorValue(values,
+                                      Count);
             }
 
             template <size_t Count>
             auto SetInitialVectorVelocity(double const (&values)[Count]) const -> void
             {
-                SetInitialVectorVelocity(values, Count);
+                SetInitialVectorVelocity(values,
+                                         Count);
             }
         };
 
@@ -3036,7 +3097,8 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_CLASS(ManagerEventHandler, Details::Object, IUIAnimationManagerEventHandler2)
 
-            auto OnManagerStatusChanged(ManagerStatus newStatus, ManagerStatus prevStatus) const -> void;
+            auto OnManagerStatusChanged(ManagerStatus newStatus,
+                                        ManagerStatus prevStatus) const -> void;
         };
 
 
@@ -3044,31 +3106,48 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_CLASS(PriorityComparison, Details::Object, IUIAnimationPriorityComparison2)
 
-            auto HasPriority(Storyboard const & scheduledStoryboard, Storyboard const & newStoryboard, PriorityEffect priorityEffect) const -> void;
+            auto HasPriority(Storyboard const & scheduledStoryboard,
+                             Storyboard const & newStoryboard,
+                             PriorityEffect priorityEffect) const -> void;
         };
 
         struct Manager : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Manager, Details::Object, IUIAnimationManager2)
 
-            auto CreateAnimationVectorVariable(double const * initialValues, unsigned count) const -> Variable;
+            auto CreateAnimationVectorVariable(double const * initialValues,
+                                               unsigned count) const -> Variable;
+
             auto CreateAnimationVariable(double initialValue) const -> Variable;
-            auto ScheduleTransition(Variable const & variable, Transition const & transition, double timeNow) const -> void;
+
+            auto ScheduleTransition(Variable const & variable,
+                                    Transition const & transition,
+                                    double timeNow) const -> void;
+
             auto CreateStoryboard() const -> Storyboard;
             auto FinishAllStoryboards(double completionDeadline) const -> void;
             auto AbandonAllStoryboards() const -> void;
             auto Update(double timeNow) const -> UpdateResult;
             auto GetVariableFromTag(unsigned id) const -> Variable;
-            auto GetVariableFromTag(Details::Object const & object, unsigned id) const -> Variable;
+
+            auto GetVariableFromTag(Details::Object const & object,
+                                    unsigned id) const -> Variable;
+
             auto GetStoryboardFromTag(unsigned id) const -> Storyboard;
-            auto GetStoryboardFromTag(Details::Object const & object, unsigned id) const -> Storyboard;
+
+            auto GetStoryboardFromTag(Details::Object const & object,
+                                      unsigned id) const -> Storyboard;
+
             auto EstimateNextEventTime() const -> double;
             auto GetStatus() const -> ManagerStatus;
             auto SetAnimationMode(Mode mode) const -> void;
             auto Pause() const -> void;
             auto Resume() const -> void;
             auto SetManagerEventHandler() const -> void;
-            auto SetManagerEventHandler(ManagerEventHandler const & handler, bool registerForNextAnimationEvent = false) const -> void;
+
+            auto SetManagerEventHandler(ManagerEventHandler const & handler,
+                                        bool registerForNextAnimationEvent = false) const -> void;
+
             auto SetCancelPriorityComparison() const -> void;
             auto SetCancelPriorityComparison(PriorityComparison const & comparison) const -> void;
             auto SetTrimPriorityComparison() const -> void;
@@ -3083,7 +3162,8 @@ namespace KennyKerr
             template <size_t Count>
             auto CreateAnimationVectorVariable(double const (&initialValues)[Count]) const -> Variable
             {
-                return CreateAnimationVectorVariable(initialValues, Count);
+                return CreateAnimationVectorVariable(initialValues,
+                                                     Count);
             }
         };
 
@@ -3092,52 +3172,133 @@ namespace KennyKerr
             KENNYKERR_DEFINE_CLASS(TransitionLibrary, Details::Object, IUIAnimationTransitionLibrary2)
 
             auto CreateInstantaneousTransition(double finalValue) const -> Transition;
-            auto CreateInstantaneousVectorTransition(double const * finalValues, unsigned count) const -> Transition;
+
+            auto CreateInstantaneousVectorTransition(double const * finalValues,
+                                                     unsigned count) const -> Transition;
+
             auto CreateConstantTransition(double duration) const -> Transition;
-            auto CreateDiscreteTransition(double delay, double finalValue, double hold) const -> Transition;
-            auto CreateDiscreteVectorTransition(double delay, double const * finalValues, unsigned count, double hold) const -> Transition;
-            auto CreateLinearTransition(double duration, double finalValue) const -> Transition;
-            auto CreateLinearVectorTransition(double duration, double const * finalValues, unsigned count) const -> Transition;
-            auto CreateLinearTransitionFromSpeed(double speed, double finalValue) const -> Transition;
-            auto CreateLinearVectorTransitionFromSpeed(double speed, double const * finalValues, unsigned count) const -> Transition;
-            auto CreateSinusoidalTransitionFromVelocity(double duration, double period) const -> Transition;
-            auto CreateSinusoidalTransitionFromRange(double duration, double minValue, double maxValue, double period, Slope slope) const -> Transition;
-            auto CreateAccelerateDecelerateTransition(double duration, double finalValue, double accelerationRatio, double decelerationRatio) const -> Transition;
+
+            auto CreateDiscreteTransition(double delay,
+                                          double finalValue,
+                                          double hold) const -> Transition;
+
+            auto CreateDiscreteVectorTransition(double delay,
+                                                double const * finalValues,
+                                                unsigned count,
+                                                double hold) const -> Transition;
+
+            auto CreateLinearTransition(double duration,
+                                        double finalValue) const -> Transition;
+
+            auto CreateLinearVectorTransition(double duration,
+                                              double const * finalValues,
+                                              unsigned count) const -> Transition;
+
+            auto CreateLinearTransitionFromSpeed(double speed,
+                                                 double finalValue) const -> Transition;
+
+            auto CreateLinearVectorTransitionFromSpeed(double speed,
+                                                       double const * finalValues,
+                                                       unsigned count) const -> Transition;
+
+            auto CreateSinusoidalTransitionFromVelocity(double duration,
+                                                        double period) const -> Transition;
+
+            auto CreateSinusoidalTransitionFromRange(double duration,
+                                                     double minValue,
+                                                     double maxValue,
+                                                     double period,
+                                                     Slope slope) const -> Transition;
+
+            auto CreateAccelerateDecelerateTransition(double duration,
+                                                      double finalValue,
+                                                      double accelerationRatio,
+                                                      double decelerationRatio) const -> Transition;
+
             auto CreateReversalTransition(double duration) const -> Transition;
-            auto CreateCubicTransition(double duration, double finalValue, double finalVelocity) const -> Transition;
-            auto CreateCubicVectorTransition(double duration, double const * finalValues, double const * finalVelocities, unsigned count) const -> Transition;
-            auto CreateSmoothStopTransition(double maxDuration, double finalValue) const -> Transition;
-            auto CreateParabolicTransitionFromAcceleration(double finalValue, double finalVelocity, double acceleration) const -> Transition;
-            auto CreateCubicBezierLinearTransition(double duration, double finalValue, double x1, double y1, double x2, double y2) const -> Transition;
-            auto CreateCubicBezierLinearVectorTransition(double duration, double const * finalValues, unsigned count, double x1, double y1, double x2, double y2) const -> Transition;
+
+            auto CreateCubicTransition(double duration,
+                                       double finalValue,
+                                       double finalVelocity) const -> Transition;
+
+            auto CreateCubicVectorTransition(double duration,
+                                             double const * finalValues,
+                                             double const * finalVelocities,
+                                             unsigned count) const -> Transition;
+
+            auto CreateSmoothStopTransition(double maxDuration,
+                                            double finalValue) const -> Transition;
+
+            auto CreateParabolicTransitionFromAcceleration(double finalValue,
+                                                           double finalVelocity,
+                                                           double acceleration) const -> Transition;
+
+            auto CreateCubicBezierLinearTransition(double duration,
+                                                   double finalValue,
+                                                   double x1,
+                                                   double y1,
+                                                   double x2,
+                                                   double y2) const -> Transition;
+
+            auto CreateCubicBezierLinearVectorTransition(double duration,
+                                                         double const * finalValues,
+                                                         unsigned count,
+                                                         double x1,
+                                                         double y1,
+                                                         double x2,
+                                                         double y2) const -> Transition;
 
             template <size_t Count>
             auto CreateInstantaneousVectorTransition(double const (&finalValues)[Count]) const -> Transition
             {
-                return CreateInstantaneousVectorTransition(finalValues, Count);
+                return CreateInstantaneousVectorTransition(finalValues,
+                                                           Count);
             }
 
             template <size_t Count>
-            auto CreateDiscreteVectorTransition(double delay, double const (&finalValues)[Count], double hold) const -> Transition
+            auto CreateDiscreteVectorTransition(double delay,
+                                                double const (&finalValues)[Count],
+                                                double hold) const -> Transition
             {
-                return CreateDiscreteVectorTransition(finalValues, Count);
+                return CreateDiscreteVectorTransition(delay,
+                                                      finalValues,
+                                                      Count,
+                                                      hold);
             }
 
             template <size_t Count>
-            auto CreateLinearVectorTransition(double duration, double const (&finalValues)[Count]) const -> Transition
+            auto CreateLinearVectorTransition(double duration,
+                                              double const (&finalValues)[Count]) const -> Transition
             {
-                return CreateLinearVectorTransition(duration, finalValues, Count);
+                return CreateLinearVectorTransition(duration,
+                                                    finalValues,
+                                                    Count);
             }
 
             template <size_t Count>
-            auto CreateLinearVectorTransitionFromSpeed(double speed, double const (&finalValues)[Count]) const -> Transition
+            auto CreateLinearVectorTransitionFromSpeed(double speed,
+                                                       double const (&finalValues)[Count]) const -> Transition
             {
-                return CreateLinearVectorTransitionFromSpeed(speed, finalValues, Count);
+                return CreateLinearVectorTransitionFromSpeed(speed,
+                                                             finalValues,
+                                                             Count);
             }
 
             template <size_t Count>
-            auto CreateCubicBezierLinearVectorTransition(double duration, double const (&finalValues)[Count], double x1, double y1, double x2, double y2) const -> Transition
+            auto CreateCubicBezierLinearVectorTransition(double duration,
+                                                         double const (&finalValues)[Count],
+                                                         double x1,
+                                                         double y1,
+                                                         double x2,
+                                                         double y2) const -> Transition
             {
+                return CreateLinearVectorTransitionFromSpeed(duration,
+                                                             finalValues,
+                                                             Count,
+                                                             x1,
+                                                             y1,
+                                                             x2,
+                                                             y2);
             }
         };
 
@@ -3145,8 +3306,19 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_CLASS(PrimitiveInterpolation, Details::Object, IUIAnimationPrimitiveInterpolation)
 
-            auto AddCubic(unsigned dimension, double beginOffset, float constantCoefficient, float linearCoefficient, float quadraticCoefficient, float cubicCoefficient) const -> void;
-            auto AddSinusoidal(unsigned dimension, double beginOffset, float bias, float amplitude, float frequency, float phase) const -> void;
+            auto AddCubic(unsigned dimension,
+                          double beginOffset,
+                          float constantCoefficient,
+                          float linearCoefficient,
+                          float quadraticCoefficient,
+                          float cubicCoefficient) const -> void;
+
+            auto AddSinusoidal(unsigned dimension,
+                               double beginOffset,
+                               float bias,
+                               float amplitude,
+                               float frequency,
+                               float phase) const -> void;
         };
 
         struct Interpolator : Details::Object
@@ -3154,31 +3326,55 @@ namespace KennyKerr
             KENNYKERR_DEFINE_CLASS(Interpolator, Details::Object, IUIAnimationInterpolator2)
 
             auto GetDimension() const -> unsigned;
-            auto SetInitialValueAndVelocity(double * initialValues, double * initialVelocities, unsigned count) const -> void;
+
+            auto SetInitialValueAndVelocity(double * initialValues,
+                                            double * initialVelocities,
+                                            unsigned count) const -> void;
+
             auto SetDuration(double duration) const -> void;
             auto GetDuration() const -> double;
-            auto GetFinalValue(double * values, unsigned count) const -> void;
-            auto InterpolateValue(double offset, double * values, unsigned count) const -> void;
-            auto InterpolateVelocity(double offset, double * velocities, unsigned count) const -> void;
-            auto GetPrimitiveInterpolation(PrimitiveInterpolation const & interpolation, unsigned dimension) const -> void;
-            auto GetDependencies(Dependencies & initialValueDependencies, Dependencies & initialVelocityDependencies, Dependencies & durationDependencies) const -> void;
+
+            auto GetFinalValue(double * values,
+                               unsigned count) const -> void;
+
+            auto InterpolateValue(double offset,
+                                  double * values,
+                                  unsigned count) const -> void;
+
+            auto InterpolateVelocity(double offset,
+                                     double * velocities,
+                                     unsigned count) const -> void;
+
+            auto GetPrimitiveInterpolation(PrimitiveInterpolation const & interpolation,
+                                           unsigned dimension) const -> void;
+
+            auto GetDependencies(Dependencies & initialValueDependencies,
+                                 Dependencies & initialVelocityDependencies,
+                                 Dependencies & durationDependencies) const -> void;
 
             template <size_t Count>
             auto GetFinalValue(double (&values)[Count]) const -> void
             {
-                GetFinalValue(values, Count);
+                GetFinalValue(values,
+                              Count);
             }
 
             template <size_t Count>
-            auto InterpolateValue(double offset, double (&values)[Count]) const -> void
+            auto InterpolateValue(double offset,
+                                  double (&values)[Count]) const -> void
             {
-                InterpolateValue(offset, values, Count);
+                InterpolateValue(offset,
+                                 values,
+                                 Count);
             }
 
             template <size_t Count>
-            auto InterpolateVelocity(double offset, double (&velocities)[Count]) const -> void
+            auto InterpolateVelocity(double offset,
+                                     double (&velocities)[Count]) const -> void
             {
-                InterpolateVelocity(offset, velocities, Count);
+                InterpolateVelocity(offset,
+                                    velocities,
+                                    Count);
             }
         };
 
@@ -3188,7 +3384,6 @@ namespace KennyKerr
 
             auto CreateTransition(Interpolator const & interpolator) const -> Transition;
         };
-
 
     } // Wam
 
@@ -3347,13 +3542,15 @@ namespace KennyKerr
             template <size_t Count>
             void GetFontFamilyName(WCHAR (&fontFamilyName)[Count]) const
             {
-                GetFontFamilyName(fontFamilyName, Count);
+                GetFontFamilyName(fontFamilyName,
+                                  Count);
             }
 
             template <size_t Count>
             void GetLocaleName(WCHAR (&localeName)[Count]) const
             {
-                GetLocaleName(localeName, Count);
+                GetLocaleName(localeName,
+                              Count);
             }
         };
 
@@ -5925,9 +6122,11 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto Variable::GetVectorValue(double * values, unsigned count) const -> void
+        inline auto Variable::GetVectorValue(double * values,
+                                             unsigned count) const -> void
         {
-            HR((*this)->GetVectorValue(values, count));
+            HR((*this)->GetVectorValue(values,
+                                       count));
         }
 
         #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
@@ -5944,9 +6143,11 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto Variable::GetFinalVectorValue(double * values, unsigned count) const -> void
+        inline auto Variable::GetFinalVectorValue(double * values,
+                                                  unsigned count) const -> void
         {
-            HR((*this)->GetFinalVectorValue(values, count));
+            HR((*this)->GetFinalVectorValue(values,
+                                            count));
         }
 
         inline auto Variable::GetPreviousValue() const -> double
@@ -5956,9 +6157,11 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto Variable::GetPreviousVectorValue(double * values, unsigned count) const -> void
+        inline auto Variable::GetPreviousVectorValue(double * values,
+                                                     unsigned count) const -> void
         {
-            HR((*this)->GetPreviousVectorValue(values, count));
+            HR((*this)->GetPreviousVectorValue(values,
+                                               count));
         }
 
         inline auto Variable::GetIntegerValue() const -> int
@@ -5968,9 +6171,11 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto Variable::GetIntegerVectorValue(int * values, unsigned count) const -> void
+        inline auto Variable::GetIntegerVectorValue(int * values,
+                                                    unsigned count) const -> void
         {
-            HR((*this)->GetIntegerVectorValue(values, count));
+            HR((*this)->GetIntegerVectorValue(values,
+                                              count));
         }
 
         inline auto Variable::GetFinalIntegerValue() const -> int
@@ -5980,9 +6185,11 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto Variable::GetFinalIntegerVectorValue(int * values, unsigned count) const -> void
+        inline auto Variable::GetFinalIntegerVectorValue(int * values,
+                                                         unsigned count) const -> void
         {
-            HR((*this)->GetFinalIntegerVectorValue(values, count));
+            HR((*this)->GetFinalIntegerVectorValue(values,
+                                                   count));
         }
 
         inline auto Variable::GetPreviousIntegerValue() const -> int
@@ -5992,9 +6199,11 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto Variable::GetPreviousIntegerVectorValue(int * values, unsigned count) const -> void
+        inline auto Variable::GetPreviousIntegerVectorValue(int * values,
+                                                            unsigned count) const -> void
         {
-            HR((*this)->GetPreviousIntegerVectorValue(values, count));
+            HR((*this)->GetPreviousIntegerVectorValue(values,
+                                                      count));
         }
 
         inline auto Variable::GetCurrentStoryboard() const -> Storyboard
@@ -6009,9 +6218,11 @@ namespace KennyKerr
             HR((*this)->SetLowerBound(bound));
         }
 
-        inline auto Variable::SetLowerBoundVector(double const * bounds,  unsigned count) const -> void
+        inline auto Variable::SetLowerBoundVector(double const * bounds,
+                                                  unsigned count) const -> void
         {
-            HR((*this)->SetLowerBoundVector(bounds, count));
+            HR((*this)->SetLowerBoundVector(bounds,
+                                            count));
         }
 
         inline auto Variable::SetUpperBound(double bound) const -> void
@@ -6019,9 +6230,11 @@ namespace KennyKerr
             HR((*this)->SetUpperBound(bound));
         }
 
-        inline auto Variable::SetUpperBoundVector(double const * bounds,  unsigned count) const -> void
+        inline auto Variable::SetUpperBoundVector(double const * bounds,
+                                                  unsigned count) const -> void
         {
-            HR((*this)->SetUpperBoundVector(bounds, count));
+            HR((*this)->SetUpperBoundVector(bounds,
+                                            count));
         }
 
         inline auto Variable::SetRoundingMode(RoundingMode mode) const -> void
@@ -6035,7 +6248,8 @@ namespace KennyKerr
                                id));
         }
 
-        inline auto Variable::SetTag(Details::Object const & object, unsigned id) const -> void
+        inline auto Variable::SetTag(Details::Object const & object,
+                                     unsigned id) const -> void
         {
             HR((*this)->SetTag(object.Unknown(),
                                id));
@@ -6057,7 +6271,8 @@ namespace KennyKerr
                                                  false));
         }
 
-        inline auto Variable::SetVariableChangeHandler(VariableChangeHandler const & handler, bool registerForNextAnimationEvent) const -> void
+        inline auto Variable::SetVariableChangeHandler(VariableChangeHandler const & handler,
+                                                       bool registerForNextAnimationEvent) const -> void
         {
             HR((*this)->SetVariableChangeHandler(handler.Get(),
                                                  registerForNextAnimationEvent));
@@ -6069,7 +6284,8 @@ namespace KennyKerr
                                                         false));
         }
 
-        inline auto Variable::SetVariableIntegerChangeHandler(VariableIntegerChangeHandler const & handler, bool registerForNextAnimationEvent) const -> void
+        inline auto Variable::SetVariableIntegerChangeHandler(VariableIntegerChangeHandler const & handler,
+                                                              bool registerForNextAnimationEvent) const -> void
         {
             HR((*this)->SetVariableIntegerChangeHandler(handler.Get(),
                                                         registerForNextAnimationEvent));
@@ -6097,7 +6313,8 @@ namespace KennyKerr
             HR((*this)->SetInitialValue(value));
         }
 
-        inline auto Transition::SetInitialVectorValue(double const * values, unsigned count) const -> void
+        inline auto Transition::SetInitialVectorValue(double const * values,
+                                                      unsigned count) const -> void
         {
             HR((*this)->SetInitialVectorValue(values,
                                               count));
@@ -6108,7 +6325,8 @@ namespace KennyKerr
             HR((*this)->SetInitialVelocity(velocity));
         }
 
-        inline auto Transition::SetInitialVectorVelocity(double const * values, unsigned count) const -> void
+        inline auto Transition::SetInitialVectorVelocity(double const * values,
+                                                         unsigned count) const -> void
         {
             HR((*this)->SetInitialVectorVelocity(values,
                                                  count));
@@ -6142,7 +6360,8 @@ namespace KennyKerr
                                     static_cast<UI_ANIMATION_PRIORITY_EFFECT>(priorityEffect)));
         }
 
-        inline auto Manager::CreateAnimationVectorVariable(double const * initialValues, unsigned count) const -> Variable
+        inline auto Manager::CreateAnimationVectorVariable(double const * initialValues,
+                                                           unsigned count) const -> Variable
         {
             Variable result;
 
@@ -6163,7 +6382,9 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto Manager::ScheduleTransition(Variable const & variable, Transition const & transition, double timeNow) const -> void
+        inline auto Manager::ScheduleTransition(Variable const & variable,
+                                                Transition const & transition,
+                                                double timeNow) const -> void
         {
             HR((*this)->ScheduleTransition(variable.Get(),
                                            transition.Get(),
@@ -6208,7 +6429,8 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto Manager::GetVariableFromTag(Details::Object const & object, unsigned id) const -> Variable
+        inline auto Manager::GetVariableFromTag(Details::Object const & object,
+                                                unsigned id) const -> Variable
         {
             Variable result;
 
@@ -6230,7 +6452,8 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto Manager::GetStoryboardFromTag(Details::Object const & object, unsigned id) const -> Storyboard
+        inline auto Manager::GetStoryboardFromTag(Details::Object const & object,
+                                                  unsigned id) const -> Storyboard
         {
             Storyboard result;
 
@@ -6343,7 +6566,8 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateInstantaneousVectorTransition(double const * finalValues, unsigned count) const -> Transition
+        inline auto TransitionLibrary::CreateInstantaneousVectorTransition(double const * finalValues,
+                                                                           unsigned count) const -> Transition
         {
             Transition result;
 
@@ -6364,7 +6588,9 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateDiscreteTransition(double delay, double finalValue, double hold) const -> Transition
+        inline auto TransitionLibrary::CreateDiscreteTransition(double delay,
+                                                                double finalValue,
+                                                                double hold) const -> Transition
         {
             Transition result;
 
@@ -6376,7 +6602,10 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateDiscreteVectorTransition(double delay, double const * finalValues, unsigned count, double hold) const -> Transition
+        inline auto TransitionLibrary::CreateDiscreteVectorTransition(double delay,
+                                                                      double const * finalValues,
+                                                                      unsigned count,
+                                                                      double hold) const -> Transition
         {
             Transition result;
 
@@ -6389,7 +6618,8 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateLinearTransition(double duration, double finalValue) const -> Transition
+        inline auto TransitionLibrary::CreateLinearTransition(double duration,
+                                                              double finalValue) const -> Transition
         {
             Transition result;
 
@@ -6400,7 +6630,9 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateLinearVectorTransition(double duration, double const * finalValues, unsigned count) const -> Transition
+        inline auto TransitionLibrary::CreateLinearVectorTransition(double duration,
+                                                                    double const * finalValues,
+                                                                    unsigned count) const -> Transition
         {
             Transition result;
 
@@ -6412,7 +6644,8 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateLinearTransitionFromSpeed(double speed, double finalValue) const -> Transition
+        inline auto TransitionLibrary::CreateLinearTransitionFromSpeed(double speed,
+                                                                       double finalValue) const -> Transition
         {
             Transition result;
 
@@ -6423,7 +6656,9 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateLinearVectorTransitionFromSpeed(double speed, double const * finalValues, unsigned count) const -> Transition
+        inline auto TransitionLibrary::CreateLinearVectorTransitionFromSpeed(double speed,
+                                                                             double const * finalValues,
+                                                                             unsigned count) const -> Transition
         {
             Transition result;
 
@@ -6435,7 +6670,8 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateSinusoidalTransitionFromVelocity(double duration, double period) const -> Transition
+        inline auto TransitionLibrary::CreateSinusoidalTransitionFromVelocity(double duration,
+                                                                              double period) const -> Transition
         {
             Transition result;
 
@@ -6446,7 +6682,11 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateSinusoidalTransitionFromRange(double duration, double minValue, double maxValue, double period, Slope slope) const -> Transition
+        inline auto TransitionLibrary::CreateSinusoidalTransitionFromRange(double duration,
+                                                                           double minValue,
+                                                                           double maxValue,
+                                                                           double period,
+                                                                           Slope slope) const -> Transition
         {
             Transition result;
 
@@ -6460,7 +6700,10 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateAccelerateDecelerateTransition(double duration, double finalValue, double accelerationRatio, double decelerationRatio) const -> Transition
+        inline auto TransitionLibrary::CreateAccelerateDecelerateTransition(double duration,
+                                                                            double finalValue,
+                                                                            double accelerationRatio,
+                                                                            double decelerationRatio) const -> Transition
         {
             Transition result;
 
@@ -6483,7 +6726,9 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateCubicTransition(double duration, double finalValue, double finalVelocity) const -> Transition
+        inline auto TransitionLibrary::CreateCubicTransition(double duration,
+                                                             double finalValue,
+                                                             double finalVelocity) const -> Transition
         {
             Transition result;
 
@@ -6495,7 +6740,10 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateCubicVectorTransition(double duration, double const * finalValues, double const * finalVelocities, unsigned count) const -> Transition
+        inline auto TransitionLibrary::CreateCubicVectorTransition(double duration,
+                                                                   double const * finalValues,
+                                                                   double const * finalVelocities,
+                                                                   unsigned count) const -> Transition
         {
             Transition result;
 
@@ -6508,7 +6756,8 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateSmoothStopTransition(double maxDuration, double finalValue) const -> Transition
+        inline auto TransitionLibrary::CreateSmoothStopTransition(double maxDuration,
+                                                                  double finalValue) const -> Transition
         {
             Transition result;
 
@@ -6519,7 +6768,9 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateParabolicTransitionFromAcceleration(double finalValue, double finalVelocity, double acceleration) const -> Transition
+        inline auto TransitionLibrary::CreateParabolicTransitionFromAcceleration(double finalValue,
+                                                                                 double finalVelocity,
+                                                                                 double acceleration) const -> Transition
         {
             Transition result;
 
@@ -6531,7 +6782,12 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateCubicBezierLinearTransition(double duration, double finalValue, double x1, double y1, double x2, double y2) const -> Transition
+        inline auto TransitionLibrary::CreateCubicBezierLinearTransition(double duration,
+                                                                         double finalValue,
+                                                                         double x1,
+                                                                         double y1,
+                                                                         double x2,
+                                                                         double y2) const -> Transition
         {
             Transition result;
 
@@ -6546,7 +6802,13 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto TransitionLibrary::CreateCubicBezierLinearVectorTransition(double duration, double const * finalValues, unsigned count, double x1, double y1, double x2, double y2) const -> Transition
+        inline auto TransitionLibrary::CreateCubicBezierLinearVectorTransition(double duration,
+                                                                               double const * finalValues,
+                                                                               unsigned count,
+                                                                               double x1,
+                                                                               double y1,
+                                                                               double x2,
+                                                                               double y2) const -> Transition
         {
             Transition result;
 
@@ -6562,7 +6824,12 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto PrimitiveInterpolation::AddCubic(unsigned dimension, double beginOffset, float constantCoefficient, float linearCoefficient, float quadraticCoefficient, float cubicCoefficient) const -> void
+        inline auto PrimitiveInterpolation::AddCubic(unsigned dimension,
+                                                     double beginOffset,
+                                                     float constantCoefficient,
+                                                     float linearCoefficient,
+                                                     float quadraticCoefficient,
+                                                     float cubicCoefficient) const -> void
         {
             HR((*this)->AddCubic(dimension,
                                  beginOffset,
@@ -6572,7 +6839,12 @@ namespace KennyKerr
                                  cubicCoefficient));
         }
 
-        inline auto PrimitiveInterpolation::AddSinusoidal(unsigned dimension, double beginOffset, float bias, float amplitude, float frequency, float phase) const -> void
+        inline auto PrimitiveInterpolation::AddSinusoidal(unsigned dimension,
+                                                          double beginOffset,
+                                                          float bias,
+                                                          float amplitude,
+                                                          float frequency,
+                                                          float phase) const -> void
         {
             HR((*this)->AddSinusoidal(dimension,
                                       beginOffset,
@@ -6589,7 +6861,9 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto Interpolator::SetInitialValueAndVelocity(double * initialValues, double * initialVelocities, unsigned count) const -> void
+        inline auto Interpolator::SetInitialValueAndVelocity(double * initialValues,
+                                                             double * initialVelocities,
+                                                             unsigned count) const -> void
         {
             HR((*this)->SetInitialValueAndVelocity(initialValues,
                                                    initialVelocities,
@@ -6608,33 +6882,41 @@ namespace KennyKerr
             return result;
         }
 
-        inline auto Interpolator::GetFinalValue(double * values, unsigned count) const -> void
+        inline auto Interpolator::GetFinalValue(double * values,
+                                                unsigned count) const -> void
         {
             HR((*this)->GetFinalValue(values,
                                       count));
         }
 
-        inline auto Interpolator::InterpolateValue(double offset, double * values, unsigned count) const -> void
+        inline auto Interpolator::InterpolateValue(double offset,
+                                                   double * values,
+                                                   unsigned count) const -> void
         {
             HR((*this)->InterpolateValue(offset,
                                          values,
                                          count));
         }
 
-        inline auto Interpolator::InterpolateVelocity(double offset, double * velocities, unsigned count) const -> void
+        inline auto Interpolator::InterpolateVelocity(double offset,
+                                                      double * velocities,
+                                                      unsigned count) const -> void
         {
             HR((*this)->InterpolateVelocity(offset,
                                             velocities,
                                             count));
         }
 
-        inline auto Interpolator::GetPrimitiveInterpolation(PrimitiveInterpolation const & interpolation, unsigned dimension) const -> void
+        inline auto Interpolator::GetPrimitiveInterpolation(PrimitiveInterpolation const & interpolation,
+                                                            unsigned dimension) const -> void
         {
             HR((*this)->GetPrimitiveInterpolation(interpolation.Get(),
                                                   dimension));
         }
 
-        inline auto Interpolator::GetDependencies(Dependencies & initialValueDependencies, Dependencies & initialVelocityDependencies, Dependencies & durationDependencies) const -> void
+        inline auto Interpolator::GetDependencies(Dependencies & initialValueDependencies,
+                                                  Dependencies & initialVelocityDependencies,
+                                                  Dependencies & durationDependencies) const -> void
         {
             HR((*this)->GetDependencies(reinterpret_cast<UI_ANIMATION_DEPENDENCIES *>(&initialValueDependencies),
                                         reinterpret_cast<UI_ANIMATION_DEPENDENCIES *>(initialVelocityDependencies),
@@ -7348,7 +7630,7 @@ namespace KennyKerr
                                          static_cast<DWRITE_FONT_STYLE>(fontStyle),
                                          static_cast<DWRITE_FONT_STRETCH>(fontStretch),
                                          fontSize,
-                                         nullptr,
+                                         L"",
                                          result.GetAddressOf()));
 
             return result;
@@ -7390,7 +7672,7 @@ namespace KennyKerr
                                          static_cast<DWRITE_FONT_STYLE>(fontStyle),
                                          static_cast<DWRITE_FONT_STRETCH>(fontStretch),
                                          fontSize,
-                                         nullptr,
+                                         L"",
                                          result.GetAddressOf()));
 
             return result;
