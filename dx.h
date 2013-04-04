@@ -3752,6 +3752,9 @@ namespace KennyKerr
             auto UnregisterFontFileLoader(FontFileLoader const & fontFileLoader) const -> void;
 
             auto CreateTextFormat(WCHAR const * fontFamilyName,
+                                  float fontSize) const -> TextFormat;
+
+            auto CreateTextFormat(WCHAR const * fontFamilyName,
                                   FontWeight fontWeight,
                                   FontStyle fontStyle,
                                   FontStretch fontStretch,
@@ -7615,6 +7618,17 @@ namespace KennyKerr
         {
             HR((*this)->UnregisterFontFileLoader(fontFileLoader.Get()));
         }
+
+        inline auto Factory::CreateTextFormat(WCHAR const * fontFamilyName,
+                                              float fontSize) const -> TextFormat
+        {
+            return CreateTextFormat(fontFamilyName,
+                                    FontWeight::Normal,
+                                    FontStyle::Normal,
+                                    FontStretch::Normal,
+                                    fontSize);
+        }
+
 
         inline auto Factory::CreateTextFormat(WCHAR const * fontFamilyName,
                                               FontWeight fontWeight,

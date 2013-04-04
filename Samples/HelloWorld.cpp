@@ -26,9 +26,6 @@ static void CreateDeviceIndependentResources()
     auto factory = DirectWrite::CreateFactory();
 
     auto format = factory.CreateTextFormat(L"Candara",
-                                           FontWeight::Normal,
-                                           FontStyle::Normal,
-                                           FontStretch::Normal,
                                            100.0f);
 
     format.SetTextAlignment(TextAlignment::Center);
