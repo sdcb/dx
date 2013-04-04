@@ -1529,7 +1529,7 @@ namespace KennyKerr
 
         struct Trimming
         {
-            KENNYKERR_DEFINE_STRUCT(Trimming, DWRITE_TYPOGRAPHIC_FEATURES)
+            KENNYKERR_DEFINE_STRUCT(Trimming, DWRITE_TRIMMING)
 
             explicit Trimming(TrimmingGranularity granularity = TrimmingGranularity::None,
                               unsigned delimiter = 0,
@@ -3264,6 +3264,26 @@ namespace KennyKerr
             KENNYKERR_DEFINE_CLASS(Typography, Details::Object, IDWriteTypography)
         };
 
+        struct GdiInterop : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(GdiInterop, Details::Object, IDWriteGdiInterop)
+        };
+
+        struct TextAnalyzer : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(TextAnalyzer, Details::Object, IDWriteTextAnalyzer)
+        };
+
+        struct NumberSubstitution : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(NumberSubstitution, Details::Object, IDWriteNumberSubstitution)
+        };
+
+        struct GlyphRunAnalysis : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(GlyphRunAnalysis, Details::Object, IDWriteGlyphRunAnalysis)
+        };
+
         struct RenderingParams : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(RenderingParams, Details::Object, IDWriteRenderingParams)
@@ -3457,10 +3477,6 @@ namespace KennyKerr
                                unsigned nameSize,
                                TextRange & textRange) const -> void;
 
-
-
-
-
             template <size_t Count>
             void GetFontFamilyName(unsigned currentPosition,
                                    WCHAR (&fontFamilyName)[Count]) const
@@ -3505,6 +3521,115 @@ namespace KennyKerr
         struct Factory : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Factory, Details::Object, IDWriteFactory)
+
+            auto GetSystemFontCollection(bool checkForUpdates = false) const -> FontCollection;
+
+            auto CreateCustomFontCollection(FontCollectionLoader const & collectionLoader,
+                                            void const * collectionKey,
+                                            unsigned collectionKeySize) const -> FontCollection;
+
+            auto RegisterFontCollectionLoader(FontCollectionLoader const & collectionLoader) const -> void;
+            auto UnregisterFontCollectionLoader(FontCollectionLoader const & collectionLoader) const -> void;
+
+            auto CreateFontFileReference(WCHAR const * filePath) const -> FontFile;
+
+            auto CreateFontFileReference(WCHAR const * filePath,
+                                         FILETIME const & lastWriteTime) const -> FontFile;
+
+            auto CreateCustomFontFileReference(void const * fontFileReferenceKey,
+                                               unsigned fontFileReferenceKeySize,
+                                               FontFileLoader const & fontFileLoader) const -> FontFile;
+
+            // CreateFontFace
+
+            auto CreateRenderingParams() const -> RenderingParams;
+            auto CreateMonitorRenderingParams(HMONITOR monitor) const -> RenderingParams;
+
+            auto CreateCustomRenderingParams(float gamma,
+                                             float enhancedContrast,
+                                             float clearTypeLevel,
+                                             PixelGeometry pixelGeometry,
+                                             RenderingMode renderingMode) const -> RenderingParams;
+
+            auto RegisterFontFileLoader(FontFileLoader const & fontFileLoader) const -> void;
+            auto UnregisterFontFileLoader(FontFileLoader const & fontFileLoader) const -> void;
+
+            auto CreateTextFormat(WCHAR const * fontFamilyName,
+                                  FontWeight fontWeight,
+                                  FontStyle fontStyle,
+                                  FontStretch fontStretch,
+                                  float fontSize) const -> TextFormat;
+
+            auto CreateTextFormat(WCHAR const * fontFamilyName,
+                                  FontWeight fontWeight,
+                                  FontStyle fontStyle,
+                                  FontStretch fontStretch,
+                                  float fontSize,
+                                  WCHAR const * localeName) const -> TextFormat;
+
+            auto CreateTextFormat(WCHAR const * fontFamilyName,
+                                  FontCollection const & fontCollection,
+                                  FontWeight fontWeight,
+                                  FontStyle fontStyle,
+                                  FontStretch fontStretch,
+                                  float fontSize) const -> TextFormat;
+
+            auto CreateTextFormat(WCHAR const * fontFamilyName,
+                                  FontCollection const & fontCollection,
+                                  FontWeight fontWeight,
+                                  FontStyle fontStyle,
+                                  FontStretch fontStretch,
+                                  float fontSize,
+                                  WCHAR const * localeName) const -> TextFormat;
+
+            auto CreateTypography() const -> Typography;
+            auto GetGdiInterop() const -> GdiInterop;
+
+            auto CreateTextLayout(WCHAR const * string,
+                                  unsigned stringLength,
+                                  TextFormat const & textFormat,
+                                  float maxWidth,
+                                  float maxHeight) const -> TextLayout;
+
+            auto CreateGdiCompatibleTextLayout(WCHAR const * string,
+                                               unsigned stringLength,
+                                               TextFormat const & textFormat,
+                                               float layoutWidth,
+                                               float layoutHeight,
+                                               float pixelsPerDip,
+                                               DWRITE_MATRIX const & transform,
+                                               bool useGdiNatural) const -> TextLayout;
+
+            auto CreateGdiCompatibleTextLayout(WCHAR const * string,
+                                               unsigned stringLength,
+                                               TextFormat const & textFormat,
+                                               float layoutWidth,
+                                               float layoutHeight,
+                                               float pixelsPerDip,
+                                               bool useGdiNatural) const -> TextLayout;
+
+            auto CreateEllipsisTrimmingSign(TextFormat const & textFormat) const -> InlineObject;
+            auto CreateTextAnalyzer() const -> TextAnalyzer;
+
+            auto CreateNumberSubstitution(NumberSubstitutionMethod substitutionMethod,
+                                          WCHAR const * localeName,
+                                          bool ignoreUserOverride) const -> NumberSubstitution;
+
+            auto CreateGlyphRunAnalysis(GlyphRun const & glyphRun,
+                                        float pixelsPerDip,
+                                        DWRITE_MATRIX const & transform,
+                                        RenderingMode renderingMode,
+                                        MeasuringMode measuringMode,
+                                        float baselineOriginX,
+                                        float baselineOriginY) const -> GlyphRunAnalysis;
+
+            auto CreateGlyphRunAnalysis(GlyphRun const & glyphRun,
+                                        float pixelsPerDip,
+                                        RenderingMode renderingMode,
+                                        MeasuringMode measuringMode,
+                                        float baselineOriginX,
+                                        float baselineOriginY) const -> GlyphRunAnalysis;
+
         };
 
         struct __declspec(uuid("30572f99-dac6-41db-a16e-0486307e606a")) Factory1 : Factory
@@ -6553,6 +6678,897 @@ namespace KennyKerr
         inline auto RenderingParams::GetRenderingMode() const -> RenderingMode
         {
             return static_cast<RenderingMode>((*this)->GetRenderingMode());
+        }
+
+        inline auto TextFormat::SetTextAlignment(TextAlignment textAlignment) const -> void
+        {
+            HR((*this)->SetTextAlignment(static_cast<DWRITE_TEXT_ALIGNMENT>(textAlignment)));
+        }
+
+        inline auto TextFormat::SetParagraphAlignment(ParagraphAlignment paragraphAlignment) const -> void
+        {
+            HR((*this)->SetParagraphAlignment(static_cast<DWRITE_PARAGRAPH_ALIGNMENT>(paragraphAlignment)));
+        }
+
+        inline auto TextFormat::SetWordWrapping(WordWrapping wordWrapping) const -> void
+        {
+            HR((*this)->SetWordWrapping(static_cast<DWRITE_WORD_WRAPPING>(wordWrapping)));
+        }
+
+        inline auto TextFormat::SetReadingDirection(ReadingDirection readingDirection) const -> void
+        {
+            HR((*this)->SetReadingDirection(static_cast<DWRITE_READING_DIRECTION>(readingDirection)));
+        }
+
+        inline auto TextFormat::SetIncrementalTabStop(float incrementalTabStop) const -> void
+        {
+            HR((*this)->SetIncrementalTabStop(incrementalTabStop));
+        }
+
+        inline auto TextFormat::SetTrimming(Trimming const & trimmingOptions) const -> void
+        {
+            HR((*this)->SetTrimming(trimmingOptions.Get(),
+                                    nullptr));
+        }
+
+        inline auto TextFormat::SetTrimming(Trimming const & trimmingOptions,
+                                            InlineObject const & trimmingSign) const -> void
+        {
+            HR((*this)->SetTrimming(trimmingOptions.Get(),
+                                    trimmingSign.Get()));
+        }
+
+        inline auto TextFormat::SetLineSpacing(LineSpacingMethod lineSpacingMethod,
+                                               float lineSpacing,
+                                               float baseline) const -> void
+        {
+            HR((*this)->SetLineSpacing(static_cast<DWRITE_LINE_SPACING_METHOD>(lineSpacingMethod),
+                                       lineSpacing,
+                                       baseline));
+        }
+
+        inline auto TextFormat::GetTextAlignment() const -> TextAlignment
+        {
+            return static_cast<TextAlignment>((*this)->GetTextAlignment());
+        }
+
+        inline auto TextFormat::GetParagraphAlignment() const -> ParagraphAlignment
+        {
+            return static_cast<ParagraphAlignment>((*this)->GetParagraphAlignment());
+        }
+
+        inline auto TextFormat::GetWordWrapping() const -> WordWrapping
+        {
+            return static_cast<WordWrapping>((*this)->GetWordWrapping());
+        }
+
+        inline auto TextFormat::GetReadingDirection() const -> ReadingDirection
+        {
+            return static_cast<ReadingDirection>((*this)->GetReadingDirection());
+        }
+
+        inline auto TextFormat::GetIncrementalTabStop() const -> float
+        {
+            return (*this)->GetIncrementalTabStop();
+        }
+
+        inline auto TextFormat::GetTrimming(Trimming & trimming) const -> void
+        {
+            HR((*this)->GetTrimming(trimming.Get(),
+                                    nullptr));
+        }
+
+        inline auto TextFormat::GetTrimming(Trimming & trimming,
+                                            InlineObject & trimmingSign) const -> void
+        {
+            HR((*this)->GetTrimming(trimming.Get(),
+                                    trimmingSign.GetAddressOf()));
+        }
+
+        inline auto TextFormat::GetLineSpacing(LineSpacingMethod & lineSpacingMethod,
+                                               float & lineSpacing,
+                                               float & baseline) const -> void
+        {
+            HR((*this)->GetLineSpacing(reinterpret_cast<DWRITE_LINE_SPACING_METHOD *>(&lineSpacingMethod),
+                                       &lineSpacing,
+                                       &baseline));
+        }
+
+        inline auto TextFormat::GetFontCollection() const -> FontCollection
+        {
+            FontCollection result;
+            HR((*this)->GetFontCollection(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto TextFormat::GetFontFamilyNameLength() const -> unsigned
+        {
+            return (*this)->GetFontFamilyNameLength();
+        }
+
+        inline auto TextFormat::GetFontFamilyName(WCHAR * fontFamilyName,
+                                                  unsigned nameSize) const -> void
+        {
+            HR((*this)->GetFontFamilyName(fontFamilyName,
+                                          nameSize));
+        }
+
+        inline auto TextFormat::GetFontWeight() const -> FontWeight
+        {
+            return static_cast<FontWeight>((*this)->GetFontWeight());
+        }
+
+        inline auto TextFormat::GetFontStyle() const -> FontStyle
+        {
+            return static_cast<FontStyle>((*this)->GetFontStyle());
+        }
+
+        inline auto TextFormat::GetFontStretch() const -> FontStretch
+        {
+            return static_cast<FontStretch>((*this)->GetFontStretch());
+        }
+
+        inline auto TextFormat::GetFontSize() const -> float
+        {
+            return (*this)->GetFontSize();
+        }
+
+        inline auto TextFormat::GetLocaleNameLength() const -> unsigned
+        {
+            (*this)->GetLocaleNameLength();
+        }
+
+        inline auto TextFormat::GetLocaleName(WCHAR * localeName,
+                                              unsigned nameSize) const -> void
+        {
+            HR((*this)->GetLocaleName(localeName,
+                                      nameSize));
+        }
+
+        inline auto TextLayout::SetMaxWidth(float maxWidth) const -> void
+        {
+            HR((*this)->SetMaxWidth(maxWidth));
+        }
+
+        inline auto TextLayout::SetMaxHeight(float maxHeight) const -> void
+        {
+            HR((*this)->SetMaxHeight(maxHeight));
+        }
+
+        inline auto TextLayout::SetFontCollection(FontCollection const & fontCollection,
+                                                  TextRange const & textRange) const -> void
+        {
+            HR((*this)->SetFontCollection(fontCollection.Get(),
+                                          textRange.Ref()));
+        }
+
+        inline auto TextLayout::SetFontFamilyName(WCHAR const * fontFamilyName,
+                                                  TextRange const & textRange) const -> void
+        {
+            HR((*this)->SetFontFamilyName(fontFamilyName,
+                                          textRange.Ref()));
+        }
+
+        inline auto TextLayout::SetFontWeight(FontWeight fontWeight,
+                                              TextRange const & textRange) const -> void
+        {
+            HR((*this)->SetFontWeight(static_cast<DWRITE_FONT_WEIGHT>(fontWeight),
+                                      textRange.Ref()));
+        }
+
+        inline auto TextLayout::SetFontStyle(FontStyle fontStyle,
+                                             TextRange const & textRange) const -> void
+        {
+            HR((*this)->SetFontStyle(static_cast<DWRITE_FONT_STYLE>(fontStyle),
+                                     textRange.Ref()));
+        }
+
+        inline auto TextLayout::SetFontStretch(FontStretch fontStretch,
+                                               TextRange const & textRange) const -> void
+        {
+            HR((*this)->SetFontStretch(static_cast<DWRITE_FONT_STRETCH>(fontStretch),
+                                       textRange.Ref()));
+        }
+
+        inline auto TextLayout::SetFontSize(float fontSize,
+                                            TextRange const & textRange) const -> void
+        {
+            HR((*this)->SetFontSize(fontSize,
+                                    textRange.Ref()));
+        }
+
+        inline auto TextLayout::SetUnderline(bool hasUnderline,
+                                             TextRange const & textRange) const -> void
+        {
+            HR((*this)->SetUnderline(hasUnderline,
+                                     textRange.Ref()));
+        }
+
+        inline auto TextLayout::SetStrikethrough(bool hasStrikethrough,
+                                                 TextRange const & textRange) const -> void
+        {
+            HR((*this)->SetStrikethrough(hasStrikethrough,
+                                         textRange.Ref()));
+        }
+
+        inline auto TextLayout::SetInlineObject(InlineObject const & inlineObject,
+                                                TextRange const & textRange) const -> void
+        {
+            HR((*this)->SetInlineObject(inlineObject.Get(),
+                                        textRange.Ref()));
+        }
+
+        inline auto TextLayout::SetTypography(Typography const & typography,
+                                              TextRange const & textRange) const -> void
+        {
+            HR((*this)->SetTypography(typography.Get(),
+                                      textRange.Ref()));
+        }
+
+        inline auto TextLayout::SetLocaleName(WCHAR const * localeName,
+                                              TextRange const & textRange) const -> void
+        {
+            HR((*this)->SetLocaleName(localeName,
+                                      textRange.Ref()));
+        }
+
+        inline auto TextLayout::GetMaxWidth() const -> float
+        {
+            return (*this)->GetMaxWidth();
+        }
+
+        inline auto TextLayout::GetMaxHeight() const -> float
+        {
+            return (*this)->GetMaxHeight();
+        }
+
+        inline auto TextLayout::GetFontCollection(unsigned currentPosition) const -> FontCollection
+        {
+            FontCollection result;
+
+            HR((*this)->GetFontCollection(currentPosition,
+                                          result.GetAddressOf(),
+                                          nullptr));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetFontCollection(unsigned currentPosition,
+                                                  TextRange & textRange) const -> FontCollection
+        {
+            FontCollection result;
+
+            HR((*this)->GetFontCollection(currentPosition,
+                                          result.GetAddressOf(),
+                                          textRange.Get()));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetFontFamilyNameLength(unsigned currentPosition) const -> unsigned
+        {
+            unsigned result;
+
+            HR((*this)->GetFontFamilyNameLength(currentPosition,
+                                                &result,
+                                                nullptr));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetFontFamilyNameLength(unsigned currentPosition,
+                                                        TextRange & textRange) const -> unsigned
+        {
+            unsigned result;
+
+            HR((*this)->GetFontFamilyNameLength(currentPosition,
+                                                &result,
+                                                textRange.Get()));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetFontFamilyName(unsigned currentPosition,
+                                                  WCHAR * fontFamilyName,
+                                                  unsigned nameSize) const -> void
+        {
+            HR((*this)->GetFontFamilyName(currentPosition,
+                                          fontFamilyName,
+                                          nameSize,
+                                          nullptr));
+        }
+
+        inline auto TextLayout::GetFontFamilyName(unsigned currentPosition,
+                                                  WCHAR * fontFamilyName,
+                                                  unsigned nameSize,
+                                                  TextRange & textRange) const -> void
+        {
+            HR((*this)->GetFontFamilyName(currentPosition,
+                                          fontFamilyName,
+                                          nameSize,
+                                          textRange.Get()));
+        }
+
+        inline auto TextLayout::GetFontWeight(unsigned currentPosition) const -> FontWeight
+        {
+            FontWeight result;
+
+            HR((*this)->GetFontWeight(currentPosition,
+                                      reinterpret_cast<DWRITE_FONT_WEIGHT *>(&result),
+                                      nullptr));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetFontWeight(unsigned currentPosition,
+                                              TextRange & textRange) const -> FontWeight
+        {
+            FontWeight result;
+
+            HR((*this)->GetFontWeight(currentPosition,
+                                      reinterpret_cast<DWRITE_FONT_WEIGHT *>(&result),
+                                      textRange.Get()));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetFontStyle(unsigned currentPosition) const -> FontStyle
+        {
+            FontStyle result;
+
+            HR((*this)->GetFontStyle(currentPosition,
+                                     reinterpret_cast<DWRITE_FONT_STYLE *>(&result),
+                                     nullptr));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetFontStyle(unsigned currentPosition,
+                                             TextRange & textRange) const -> FontStyle
+        {
+            FontStyle result;
+
+            HR((*this)->GetFontStyle(currentPosition,
+                                     reinterpret_cast<DWRITE_FONT_STYLE *>(&result),
+                                     textRange.Get()));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetFontStretch(unsigned currentPosition) const -> FontStretch
+        {
+            FontStretch result;
+
+            HR((*this)->GetFontStretch(currentPosition,
+                                       reinterpret_cast<DWRITE_FONT_STRETCH *>(&result),
+                                       nullptr));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetFontStretch(unsigned currentPosition,
+                                               TextRange & textRange) const -> FontStretch
+        {
+            FontStretch result;
+
+            HR((*this)->GetFontStretch(currentPosition,
+                                       reinterpret_cast<DWRITE_FONT_STRETCH *>(&result),
+                                       textRange.Get()));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetFontSize(unsigned currentPosition) const -> float
+        {
+            float result;
+
+            HR((*this)->GetFontSize(currentPosition,
+                                    &result,
+                                    nullptr));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetFontSize(unsigned currentPosition,
+                                            TextRange & textRange) const -> float
+        {
+            float result;
+
+            HR((*this)->GetFontSize(currentPosition,
+                                    &result,
+                                    textRange.Get()));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetUnderline(unsigned currentPosition) const -> bool
+        {
+            BOOL result;
+
+            HR((*this)->GetUnderline(currentPosition,
+                                     &result,
+                                     nullptr));
+
+            return 0 != result;
+        }
+
+        inline auto TextLayout::GetUnderline(unsigned currentPosition,
+                                             TextRange & textRange) const -> bool
+        {
+            BOOL result;
+
+            HR((*this)->GetUnderline(currentPosition,
+                                     &result,
+                                     textRange.Get()));
+
+            return 0 != result;
+        }
+
+        inline auto TextLayout::GetStrikethrough(unsigned currentPosition) const -> bool
+        {
+            BOOL result;
+
+            HR((*this)->GetStrikethrough(currentPosition,
+                                         &result,
+                                         nullptr));
+
+            return 0 != result;
+        }
+
+        inline auto TextLayout::GetStrikethrough(unsigned currentPosition,
+                                                 TextRange & textRange) const -> bool
+        {
+            BOOL result;
+
+            HR((*this)->GetStrikethrough(currentPosition,
+                                         &result,
+                                         textRange.Get()));
+
+            return 0 != result;
+        }
+
+        inline auto TextLayout::GetInlineObject(unsigned currentPosition) const -> InlineObject
+        {
+            InlineObject result;
+
+            HR((*this)->GetInlineObject(currentPosition,
+                                        result.GetAddressOf(),
+                                        nullptr));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetInlineObject(unsigned currentPosition,
+                                                TextRange & textRange) const -> InlineObject
+        {
+            InlineObject result;
+
+            HR((*this)->GetInlineObject(currentPosition,
+                                        result.GetAddressOf(),
+                                        textRange.Get()));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetTypography(unsigned currentPosition) const -> Typography
+        {
+            Typography result;
+
+            HR((*this)->GetTypography(currentPosition,
+                                      result.GetAddressOf(),
+                                      nullptr));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetTypography(unsigned currentPosition,
+                                              TextRange & textRange) const -> Typography
+        {
+            Typography result;
+
+            HR((*this)->GetTypography(currentPosition,
+                                      result.GetAddressOf(),
+                                      textRange.Get()));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetLocaleNameLength(unsigned currentPosition) const -> unsigned
+        {
+            unsigned result;
+
+            HR((*this)->GetLocaleNameLength(currentPosition,
+                                            &result,
+                                            nullptr));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetLocaleNameLength(unsigned currentPosition,
+                                                    TextRange & textRange) const -> unsigned
+        {
+            unsigned result;
+
+            HR((*this)->GetLocaleNameLength(currentPosition,
+                                            &result,
+                                            textRange.Get()));
+
+            return result;
+        }
+
+        inline auto TextLayout::GetLocaleName(unsigned currentPosition,
+                                              WCHAR * localeName,
+                                              unsigned nameSize) const -> void
+        {
+            HR((*this)->GetLocaleName(currentPosition,
+                                      localeName,
+                                      nameSize,
+                                      nullptr));
+        }
+
+        inline auto TextLayout::GetLocaleName(unsigned currentPosition,
+                                              WCHAR * localeName,
+                                              unsigned nameSize,
+                                              TextRange & textRange) const -> void
+        {
+            HR((*this)->GetLocaleName(currentPosition,
+                                      localeName,
+                                      nameSize,
+                                      textRange.Get()));
+        }
+
+        inline auto Factory::GetSystemFontCollection(bool checkForUpdates) const -> FontCollection
+        {
+            FontCollection result;
+
+            HR((*this)->GetSystemFontCollection(result.GetAddressOf(),
+                                                checkForUpdates));
+
+            return result;
+        }
+
+        inline auto Factory::CreateCustomFontCollection(FontCollectionLoader const & collectionLoader,
+                                                        void const * collectionKey,
+                                                        unsigned collectionKeySize) const -> FontCollection
+        {
+            FontCollection result;
+
+            HR((*this)->CreateCustomFontCollection(collectionLoader.Get(),
+                                                   collectionKey,
+                                                   collectionKeySize,
+                                                   result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::RegisterFontCollectionLoader(FontCollectionLoader const & collectionLoader) const -> void
+        {
+            HR((*this)->RegisterFontCollectionLoader(collectionLoader.Get()));
+        }
+
+        inline auto Factory::UnregisterFontCollectionLoader(FontCollectionLoader const & collectionLoader) const -> void
+        {
+            HR((*this)->UnregisterFontCollectionLoader(collectionLoader.Get()));
+        }
+
+        inline auto Factory::CreateFontFileReference(WCHAR const * filePath) const -> FontFile
+        {
+            FontFile result;
+
+            HR((*this)->CreateFontFileReference(filePath,
+                                                nullptr,
+                                                result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateFontFileReference(WCHAR const * filePath,
+                                                     FILETIME const & lastWriteTime) const -> FontFile
+        {
+            FontFile result;
+
+            HR((*this)->CreateFontFileReference(filePath,
+                                                &lastWriteTime,
+                                                result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateCustomFontFileReference(void const * fontFileReferenceKey,
+                                                           unsigned fontFileReferenceKeySize,
+                                                           FontFileLoader const & fontFileLoader) const -> FontFile
+        {
+            FontFile result;
+
+            HR((*this)->CreateCustomFontFileReference(fontFileReferenceKey,
+                                                      fontFileReferenceKeySize,
+                                                      fontFileLoader.Get(),
+                                                      result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateRenderingParams() const -> RenderingParams
+        {
+            RenderingParams result;
+            HR((*this)->CreateRenderingParams(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto Factory::CreateMonitorRenderingParams(HMONITOR monitor) const -> RenderingParams
+        {
+            RenderingParams result;
+
+            HR((*this)->CreateMonitorRenderingParams(monitor,
+                                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateCustomRenderingParams(float gamma,
+                                                         float enhancedContrast,
+                                                         float clearTypeLevel,
+                                                         PixelGeometry pixelGeometry,
+                                                         RenderingMode renderingMode) const -> RenderingParams
+                                                         
+        {
+            RenderingParams result;
+
+            HR((*this)->CreateCustomRenderingParams(gamma,
+                                                    enhancedContrast,
+                                                    clearTypeLevel,
+                                                    static_cast<DWRITE_PIXEL_GEOMETRY>(pixelGeometry),
+                                                    static_cast<DWRITE_RENDERING_MODE>(renderingMode),
+                                                    result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::RegisterFontFileLoader(FontFileLoader const & fontFileLoader) const -> void
+        {
+            HR((*this)->RegisterFontFileLoader(fontFileLoader.Get()));
+        }
+
+        inline auto Factory::UnregisterFontFileLoader(FontFileLoader const & fontFileLoader) const -> void
+        {
+            HR((*this)->UnregisterFontFileLoader(fontFileLoader.Get()));
+        }
+
+        inline auto Factory::CreateTextFormat(WCHAR const * fontFamilyName,
+                                              FontWeight fontWeight,
+                                              FontStyle fontStyle,
+                                              FontStretch fontStretch,
+                                              float fontSize) const -> TextFormat
+        {
+            TextFormat result;
+
+            HR((*this)->CreateTextFormat(fontFamilyName,
+                                         nullptr,
+                                         static_cast<DWRITE_FONT_WEIGHT>(fontWeight),
+                                         static_cast<DWRITE_FONT_STYLE>(fontStyle),
+                                         static_cast<DWRITE_FONT_STRETCH>(fontStretch),
+                                         fontSize,
+                                         nullptr,
+                                         result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateTextFormat(WCHAR const * fontFamilyName,
+                                              FontWeight fontWeight,
+                                              FontStyle fontStyle,
+                                              FontStretch fontStretch,
+                                              float fontSize,
+                                              WCHAR const * localeName) const -> TextFormat
+        {
+            TextFormat result;
+
+            HR((*this)->CreateTextFormat(fontFamilyName,
+                                         nullptr,
+                                         static_cast<DWRITE_FONT_WEIGHT>(fontWeight),
+                                         static_cast<DWRITE_FONT_STYLE>(fontStyle),
+                                         static_cast<DWRITE_FONT_STRETCH>(fontStretch),
+                                         fontSize,
+                                         localeName,
+                                         result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateTextFormat(WCHAR const * fontFamilyName,
+                                              FontCollection const & fontCollection,
+                                              FontWeight fontWeight,
+                                              FontStyle fontStyle,
+                                              FontStretch fontStretch,
+                                              float fontSize) const -> TextFormat
+        {
+            TextFormat result;
+
+            HR((*this)->CreateTextFormat(fontFamilyName,
+                                         fontCollection.Get(),
+                                         static_cast<DWRITE_FONT_WEIGHT>(fontWeight),
+                                         static_cast<DWRITE_FONT_STYLE>(fontStyle),
+                                         static_cast<DWRITE_FONT_STRETCH>(fontStretch),
+                                         fontSize,
+                                         nullptr,
+                                         result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateTextFormat(WCHAR const * fontFamilyName,
+                                              FontCollection const & fontCollection,
+                                              FontWeight fontWeight,
+                                              FontStyle fontStyle,
+                                              FontStretch fontStretch,
+                                              float fontSize,
+                                              WCHAR const * localeName) const -> TextFormat
+        {
+            TextFormat result;
+
+            HR((*this)->CreateTextFormat(fontFamilyName,
+                                         fontCollection.Get(),
+                                         static_cast<DWRITE_FONT_WEIGHT>(fontWeight),
+                                         static_cast<DWRITE_FONT_STYLE>(fontStyle),
+                                         static_cast<DWRITE_FONT_STRETCH>(fontStretch),
+                                         fontSize,
+                                         localeName,
+                                         result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateTypography() const -> Typography
+        {
+            Typography result;
+            HR((*this)->CreateTypography(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto Factory::GetGdiInterop() const -> GdiInterop
+        {
+            GdiInterop result;
+            HR((*this)->GetGdiInterop(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto Factory::CreateTextLayout(WCHAR const * string,
+                                              unsigned stringLength,
+                                              TextFormat const & textFormat,
+                                              float maxWidth,
+                                              float maxHeight) const -> TextLayout
+        {
+            TextLayout result;
+
+            HR((*this)->CreateTextLayout(string,
+                                         stringLength,
+                                         textFormat.Get(),
+                                         maxWidth,
+                                         maxHeight,
+                                         result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateGdiCompatibleTextLayout(WCHAR const * string,
+                                                           unsigned stringLength,
+                                                           TextFormat const & textFormat,
+                                                           float layoutWidth,
+                                                           float layoutHeight,
+                                                           float pixelsPerDip,
+                                                           DWRITE_MATRIX const & transform,
+                                                           bool useGdiNatural) const -> TextLayout
+        {
+            TextLayout result;
+
+            HR((*this)->CreateGdiCompatibleTextLayout(string,
+                                                      stringLength,
+                                                      textFormat.Get(),
+                                                      layoutWidth,
+                                                      layoutHeight,
+                                                      pixelsPerDip,
+                                                      &transform,
+                                                      useGdiNatural,
+                                                      result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateGdiCompatibleTextLayout(WCHAR const * string,
+                                                           unsigned stringLength,
+                                                           TextFormat const & textFormat,
+                                                           float layoutWidth,
+                                                           float layoutHeight,
+                                                           float pixelsPerDip,
+                                                           bool useGdiNatural) const -> TextLayout
+        {
+            TextLayout result;
+
+            HR((*this)->CreateGdiCompatibleTextLayout(string,
+                                                      stringLength,
+                                                      textFormat.Get(),
+                                                      layoutWidth,
+                                                      layoutHeight,
+                                                      pixelsPerDip,
+                                                      nullptr,
+                                                      useGdiNatural,
+                                                      result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateEllipsisTrimmingSign(TextFormat const & textFormat) const -> InlineObject
+        {
+            InlineObject result;
+
+            HR((*this)->CreateEllipsisTrimmingSign(textFormat.Get(),
+                                                   result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateTextAnalyzer() const -> TextAnalyzer
+        {
+            TextAnalyzer result;
+            HR((*this)->CreateTextAnalyzer(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto Factory::CreateNumberSubstitution(NumberSubstitutionMethod substitutionMethod,
+                                                      WCHAR const * localeName,
+                                                      bool ignoreUserOverride) const -> NumberSubstitution
+        {
+            NumberSubstitution result;
+
+            HR((*this)->CreateNumberSubstitution(static_cast<DWRITE_NUMBER_SUBSTITUTION_METHOD>(substitutionMethod),
+                                                 localeName,
+                                                 ignoreUserOverride,
+                                                 result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateGlyphRunAnalysis(GlyphRun const & glyphRun,
+                                                    float pixelsPerDip,
+                                                    DWRITE_MATRIX const & transform,
+                                                    RenderingMode renderingMode,
+                                                    MeasuringMode measuringMode,
+                                                    float baselineOriginX,
+                                                    float baselineOriginY) const -> GlyphRunAnalysis
+        {
+            GlyphRunAnalysis result;
+
+            HR((*this)->CreateGlyphRunAnalysis(glyphRun.Get(),
+                                               pixelsPerDip,
+                                               &transform,
+                                               static_cast<DWRITE_RENDERING_MODE>(renderingMode),
+                                               static_cast<DWRITE_MEASURING_MODE>(measuringMode),
+                                               baselineOriginX,
+                                               baselineOriginY,
+                                               result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Factory::CreateGlyphRunAnalysis(GlyphRun const & glyphRun,
+                                                    float pixelsPerDip,
+                                                    RenderingMode renderingMode,
+                                                    MeasuringMode measuringMode,
+                                                    float baselineOriginX,
+                                                    float baselineOriginY) const -> GlyphRunAnalysis
+        {
+            GlyphRunAnalysis result;
+
+            HR((*this)->CreateGlyphRunAnalysis(glyphRun.Get(),
+                                               pixelsPerDip,
+                                               nullptr,
+                                               static_cast<DWRITE_RENDERING_MODE>(renderingMode),
+                                               static_cast<DWRITE_MEASURING_MODE>(measuringMode),
+                                               baselineOriginX,
+                                               baselineOriginY,
+                                               result.GetAddressOf()));
+
+            return result;
         }
 
     } // DirectWrite
