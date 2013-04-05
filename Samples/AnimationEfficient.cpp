@@ -1,6 +1,7 @@
-// This minimal animation sample illustrates how to use the animation manager to
-// schedule a transition to animate a variable's value. This sample uses
-// continuous rendering (typically 60fps).
+// This is variant of the Animation.cpp that only renders while the animation
+// manager is busy. This is more efficient as the message loop goes to sleep
+// once the animation concludes. A callback may be added to resume animation
+// as needed.
 
 #define NOMINMAX
 #ifndef UNICODE
@@ -126,6 +127,11 @@ static void Render(HWND window)
     {
         ReleaseDevice();
     }
+
+    if (Wam::ManagerStatus::Busy == manager.GetStatus())
+    {
+        InvalidateRect(window, nullptr, false);
+    }
 }
 
 static void ResizeSwapChainBitmap()
@@ -195,29 +201,16 @@ int __stdcall wWinMain(HINSTANCE module, HINSTANCE, PWSTR, int)
 
     RegisterClass(&wc);
 
-    auto window = CreateWindow(wc.lpszClassName, L"dx.codeplex.com", WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-                               CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                               nullptr, nullptr, module, nullptr);
-    ASSERT(window);
+    CreateWindow(wc.lpszClassName, L"dx.codeplex.com", WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                 CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+                 nullptr, nullptr, module, nullptr);
 
     MSG message;
+    BOOL result;
 
-    while (true)
+    while (result = GetMessage(&message, 0, 0, 0))
     {
-        Render(window);
-
-        while (PeekMessage(&message,
-                           nullptr,
-                           0, 0,
-                           PM_REMOVE))
-        {
-            DispatchMessage(&message);
-        }
-
-        if (WM_QUIT == message.message)
-        {
-            break;
-        }
+        if (-1 != result) DispatchMessage(&message);
     }
 
     ReleaseDevice();
