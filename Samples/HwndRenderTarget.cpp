@@ -8,6 +8,7 @@
 #include "..\dx.h"
 
 #pragma comment(lib, "user32.lib")
+#pragma warning(disable: 4706)
 
 using namespace KennyKerr;
 

@@ -17,9 +17,6 @@
 #pragma comment(lib, "d3d11")
 #pragma comment(lib, "dxgi")
 
-#pragma warning(disable: 4706)
-#pragma warning(disable: 4127)
-
 #ifndef ASSERT
 #define ASSERT(cond) _ASSERTE(cond)
 #if WINAPI_FAMILY_PHONE_APP == WINAPI_FAMILY
@@ -1518,7 +1515,7 @@ namespace KennyKerr
                 FeatureCount(featureCount)
             {}
 
-            template <size_t Count>
+            template <unsigned Count>
             TypographicFeatures(FontFeature (&features)[Count]) :
                 Features(features),
                 FeatureCount(Count)
@@ -3010,49 +3007,49 @@ namespace KennyKerr
 
             auto SetVariableCurveChangeHandler(VariableCurveChangeHandler const & handler) const -> void;
 
-            template <size_t Count>
+            template <unsigned Count>
             auto GetVectorValue(double (&values)[Count]) const -> void
             {
                 GetVectorValue(values,
                                Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             auto GetFinalVectorValue(double (&values)[Count]) const -> void
             {
                 GetFinalVectorValue(values,
                                     Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             auto GetPreviousVectorValue(double (&values)[Count]) const -> void
             {
                 GetPreviousVectorValue(values,
                                        Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             auto GetIntegerVectorValue(int (&values)[Count]) const -> void
             {
                 GetIntegerVectorValue(values,
                                       Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             auto GetFinalIntegerVectorValue(int (&values)[Count]) const -> void
             {
                 GetFinalIntegerVectorValue(values,
                                            Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             auto GetPreviousIntegerVectorValue(int (&values)[Count]) const -> void
             {
                 GetPreviousIntegerVectorValue(values,
                                               Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             auto SetLowerBoundVector(double const (&bounds)[Count]) const -> void
             {
                 SetLowerBoundVector(bounds,
@@ -3078,14 +3075,14 @@ namespace KennyKerr
             auto IsDurationKnown() const -> HRESULT;
             auto GetDuration() const -> double;
 
-            template <size_t Count>
+            template <unsigned Count>
             auto SetInitialVectorValue(double const (&values)[Count]) const -> void
             {
                 SetInitialVectorValue(values,
                                       Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             auto SetInitialVectorVelocity(double const (&values)[Count]) const -> void
             {
                 SetInitialVectorVelocity(values,
@@ -3159,7 +3156,7 @@ namespace KennyKerr
             auto SetDefaultLongestAcceptableDelay(double delay) const -> void;
             auto Shutdown() const -> void;
 
-            template <size_t Count>
+            template <unsigned Count>
             auto CreateAnimationVectorVariable(double const (&initialValues)[Count]) const -> Variable
             {
                 return CreateAnimationVectorVariable(initialValues,
@@ -3248,14 +3245,14 @@ namespace KennyKerr
                                                          double x2,
                                                          double y2) const -> Transition;
 
-            template <size_t Count>
+            template <unsigned Count>
             auto CreateInstantaneousVectorTransition(double const (&finalValues)[Count]) const -> Transition
             {
                 return CreateInstantaneousVectorTransition(finalValues,
                                                            Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             auto CreateDiscreteVectorTransition(double delay,
                                                 double const (&finalValues)[Count],
                                                 double hold) const -> Transition
@@ -3266,7 +3263,7 @@ namespace KennyKerr
                                                       hold);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             auto CreateLinearVectorTransition(double duration,
                                               double const (&finalValues)[Count]) const -> Transition
             {
@@ -3275,7 +3272,7 @@ namespace KennyKerr
                                                     Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             auto CreateLinearVectorTransitionFromSpeed(double speed,
                                                        double const (&finalValues)[Count]) const -> Transition
             {
@@ -3284,7 +3281,7 @@ namespace KennyKerr
                                                              Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             auto CreateCubicBezierLinearVectorTransition(double duration,
                                                          double const (&finalValues)[Count],
                                                          double x1,
@@ -3352,14 +3349,14 @@ namespace KennyKerr
                                  Dependencies & initialVelocityDependencies,
                                  Dependencies & durationDependencies) const -> void;
 
-            template <size_t Count>
+            template <unsigned Count>
             auto GetFinalValue(double (&values)[Count]) const -> void
             {
                 GetFinalValue(values,
                               Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             auto InterpolateValue(double offset,
                                   double (&values)[Count]) const -> void
             {
@@ -3368,7 +3365,7 @@ namespace KennyKerr
                                  Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             auto InterpolateVelocity(double offset,
                                      double (&velocities)[Count]) const -> void
             {
@@ -3539,14 +3536,14 @@ namespace KennyKerr
             auto GetLocaleName(WCHAR * localeName,
                                unsigned nameSize) const -> void;
 
-            template <size_t Count>
+            template <unsigned Count>
             void GetFontFamilyName(WCHAR (&fontFamilyName)[Count]) const
             {
                 GetFontFamilyName(fontFamilyName,
                                   Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             void GetLocaleName(WCHAR (&localeName)[Count]) const
             {
                 GetLocaleName(localeName,
@@ -3674,7 +3671,7 @@ namespace KennyKerr
                                unsigned nameSize,
                                TextRange & textRange) const -> void;
 
-            template <size_t Count>
+            template <unsigned Count>
             void GetFontFamilyName(unsigned currentPosition,
                                    WCHAR (&fontFamilyName)[Count]) const
             {
@@ -3683,7 +3680,7 @@ namespace KennyKerr
                                   Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             void GetFontFamilyName(unsigned currentPosition,
                                    WCHAR (&fontFamilyName)[Count],
                                    TextRange & textRange) const
@@ -3694,7 +3691,7 @@ namespace KennyKerr
                                   textRange);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             void GetLocaleName(unsigned currentPosition,
                                WCHAR (&localeName)[Count]) const
             {
@@ -3703,7 +3700,7 @@ namespace KennyKerr
                               Count);
             }
 
-            template <size_t Count>
+            template <unsigned Count>
             void GetLocaleName(unsigned currentPosition,
                                WCHAR (&localeName)[Count],
                                TextRange & textRange) const
@@ -3854,7 +3851,7 @@ namespace KennyKerr
             void AddLines(Point2F const * points,
                           unsigned count) const;
 
-            template <size_t Count>
+            template <unsigned Count>
             void AddLines(Point2F const (&points)[Count]) const
             {
                 AddLines(points,
@@ -3864,7 +3861,7 @@ namespace KennyKerr
             void AddBeziers(BezierSegment const * beziers,
                             unsigned count) const;
 
-            template <size_t Count>
+            template <unsigned Count>
             void AddBeziers(BezierSegment const (&beziers)[Count]) const
             {
                 AddBeziers(beziers,
@@ -3881,7 +3878,7 @@ namespace KennyKerr
             void AddTriangles(Triangle const * triangles,
                               unsigned count) const;
 
-            template <size_t Count>
+            template <unsigned Count>
             void AddTriangles(Triangle const (&triangles)[Count]) const
             {
                 AddTriangles(triangles,
@@ -3977,7 +3974,7 @@ namespace KennyKerr
             void GetGradientStops(GradientStop * stops,
                                   unsigned count) const;
 
-            template <size_t Count>
+            template <unsigned Count>
             void GetGradientStops(GradientStop (&stops)[Count]) const
             {
                 GetGradientStops(stops, Count);
@@ -3994,7 +3991,7 @@ namespace KennyKerr
             void GetGradientStops1(GradientStop * stops,
                                   unsigned count) const;
 
-            template <size_t Count>
+            template <unsigned Count>
             void GetGradientStops1(GradientStop (&stops)[Count]) const
             {
                 GetGradientStops1(stops, Count);
@@ -4088,7 +4085,7 @@ namespace KennyKerr
             void GetDashes(float * dashes,
                            unsigned count) const;
 
-            template <size_t Count>
+            template <unsigned Count>
             void GetDashes(float (&dashes)[Count])
             {
                 GetDashes(dashes,
@@ -4390,7 +4387,7 @@ namespace KennyKerr
             void AddQuadraticBeziers(QuadraticBezierSegment const * beziers,
                                      unsigned count) const;
 
-            template <size_t Count>
+            template <unsigned Count>
             void AddQuadraticBeziers(QuadraticBezierSegment const (&beziers),
                                      unsigned count) const
             {
@@ -4568,7 +4565,7 @@ namespace KennyKerr
                                               Gamma gamma = Gamma::_2_2,
                                               ExtendMode mode = ExtendMode::Clamp) const -> GradientStopCollection;
 
-            template <size_t Count>
+            template <unsigned Count>
             auto CreateGradientStopCollection(GradientStop const (&stops)[Count],
                                               Gamma gamma = Gamma::_2_2,
                                               ExtendMode mode = ExtendMode::Clamp) const -> GradientStopCollection
@@ -4936,7 +4933,7 @@ namespace KennyKerr
                                               ExtendMode extendMode,
                                               ColorInterpolationMode colorInterpolationMode) const -> GradientStopCollection1;
 
-            template <size_t Count>
+            template <unsigned Count>
             auto CreateGradientStopCollection(GradientStop const (&stops)[Count],
                                               ColorSpace preInterpolationSpace,
                                               ColorSpace postInterpolationSpace,
@@ -5111,7 +5108,7 @@ namespace KennyKerr
                                    float const * dashes = nullptr,
                                    unsigned count = 0) const -> StrokeStyle;
 
-            template <size_t Count>
+            template <unsigned Count>
             auto CreateStrokeStyle(StrokeStyleProperties const & properties,
                                    float const (&dashes)[Count]) const -> StrokeStyle
             {

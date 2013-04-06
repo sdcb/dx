@@ -7,6 +7,7 @@
 #endif
 
 #pragma comment(lib, "user32.lib")
+#pragma warning(disable: 4706)
 
 #include "..\dx.h"
 

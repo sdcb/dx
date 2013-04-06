@@ -202,7 +202,7 @@ int __stdcall wWinMain(HINSTANCE module, HINSTANCE, PWSTR, int)
 
     MSG message;
 
-    while (true)
+    for (;;)
     {
         Render(window);
 
