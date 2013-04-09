@@ -2552,6 +2552,11 @@ namespace KennyKerr
             auto GetMaximumFrameLatency() const -> unsigned;
         };
 
+        struct Device2 : Device1
+        {
+            KENNYKERR_DEFINE_CLASS(Device2, Device1, IDXGIDevice2)
+        };
+
     } // Dxgi
 
     namespace Direct3D
@@ -2604,7 +2609,7 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_CLASS(Device, Details::Object, ID3D11Device)
 
-            auto AsDxgi() const -> Dxgi::Device1;
+            auto AsDxgi() const -> Dxgi::Device2;
             auto AsMultiThread() const -> MultiThread;
             auto GetDxgiFactory() const -> Dxgi::Factory2;
 
@@ -4576,12 +4581,16 @@ namespace KennyKerr
                                                     mode);
             }
 
+            auto CreateLinearGradientBrush(GradientStopCollection const & stops) const -> LinearGradientBrush;
+
             auto CreateLinearGradientBrush(LinearGradientBrushProperties const & linearGradientBrushProperties,
                                            GradientStopCollection const & stops) const -> LinearGradientBrush;
 
             auto CreateLinearGradientBrush(LinearGradientBrushProperties const & linearGradientBrushProperties,
                                            BrushProperties const & brushProperties,
                                            GradientStopCollection const & stops) const -> LinearGradientBrush;
+
+            auto CreateRadialGradientBrush(GradientStopCollection const & stops) const -> RadialGradientBrush;
 
             auto CreateRadialGradientBrush(RadialGradientBrushProperties const & radialGradientBrushProperties,
                                            GradientStopCollection const & stops) const -> RadialGradientBrush;
@@ -5518,9 +5527,9 @@ namespace KennyKerr
             (*this)->Flush();
         }
 
-        inline auto Device::AsDxgi() const -> Dxgi::Device1
+        inline auto Device::AsDxgi() const -> Dxgi::Device2
         {
-            Dxgi::Device1 result;
+            Dxgi::Device2 result;
             HR(m_ptr.CopyTo(result.GetAddressOf()));
             return result;
         }
@@ -9512,6 +9521,12 @@ namespace KennyKerr
             return result;
         }
 
+        inline auto RenderTarget::CreateLinearGradientBrush(GradientStopCollection const & stops) const -> LinearGradientBrush
+        {
+            return CreateLinearGradientBrush(LinearGradientBrushProperties(),
+                                             stops);
+        }
+
         inline auto RenderTarget::CreateLinearGradientBrush(LinearGradientBrushProperties const & linearGradientBrushProperties,
                                                             GradientStopCollection const & stops) const -> LinearGradientBrush
         {
@@ -9537,6 +9552,12 @@ namespace KennyKerr
                                                   result.GetAddressOf()));
 
             return result;
+        }
+
+        inline auto RenderTarget::CreateRadialGradientBrush(GradientStopCollection const & stops) const -> RadialGradientBrush
+        {
+            return CreateRadialGradientBrush(RadialGradientBrushProperties(),
+                                             stops);
         }
 
         inline auto RenderTarget::CreateRadialGradientBrush(RadialGradientBrushProperties const & radialGradientBrushProperties,
