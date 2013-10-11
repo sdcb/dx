@@ -1,36 +1,18 @@
 #pragma once
 
-// Created by Kenny Kerr.
-// Get the latest version here: http://dx.codeplex.com
-
 #include <windows.h>
-#include <crtdbg.h>
-
-#define HANDLE_ASSERT _ASSERTE
-
-#ifdef _DEBUG
-#define HANDLE_VERIFY(expression) HANDLE_ASSERT(expression)
-#define HANDLE_VERIFY_(expected, expression) HANDLE_ASSERT(expected == expression) 
-#else
-#define HANDLE_VERIFY(expression) (expression)
-#define HANDLE_VERIFY_(expected, expression) (expression) 
-#endif
+#include "debug.h"
 
 namespace KennyKerr
 {
     template <typename Traits>
     class unique_handle
     {
-        struct boolean_struct { int member; };
-        typedef int boolean_struct::* boolean_type;
-        typedef typename Traits::pointer pointer;
+        using pointer = typename Traits::pointer;
 
-        unique_handle(unique_handle const &);
-        unique_handle & operator=(unique_handle const &);
-        bool operator==(unique_handle const &);
-        bool operator!=(unique_handle const &);
+        pointer m_value;
 
-        void close() throw()
+        auto close() throw() -> void
         {
             if (*this)
             {
@@ -38,13 +20,29 @@ namespace KennyKerr
             }
         }
 
-        pointer m_value;
-
     public:
 
+        unique_handle(unique_handle const &) = delete;
+        auto operator=(unique_handle const &) -> unique_handle & = delete;
+
         explicit unique_handle(pointer value = Traits::invalid()) throw() :
-            m_value(value)
+            m_value { value }
         {
+        }
+
+        unique_handle(unique_handle && other) throw() :
+            m_value { other.release() }
+        {
+        }
+
+        auto operator=(unique_handle && other) throw() -> unique_handle &
+        {
+            if (this != &other)
+            {
+                reset(other.release());
+            }
+
+            return *this;
         }
 
         ~unique_handle() throw()
@@ -52,30 +50,24 @@ namespace KennyKerr
             close();
         }
 
-        unique_handle(unique_handle && other) throw() :
-            m_value(other.release())
+        explicit operator bool() const throw()
         {
+            return m_value != Traits::invalid();
         }
 
-        unique_handle & operator=(unique_handle && other) throw()
-        {
-            HANDLE_ASSERT(this != &other);
-
-            reset(other.release());
-            return *this;
-        }
-
-        operator boolean_type() const throw()
-        {
-            return Traits::invalid() != m_value ? &boolean_struct::member : nullptr;
-        }
-
-        pointer get() const throw()
+        auto get() const throw() -> pointer
         {
             return m_value;
         }
-        
-        bool reset(pointer value = Traits::invalid()) throw()
+
+        auto release() throw() -> pointer
+        {
+            auto value = m_value;
+            m_value = Traits::invalid();
+            return value;
+        }
+
+        auto reset(pointer value = Traits::invalid()) throw() -> bool
         {
             if (m_value != value)
             {
@@ -83,65 +75,94 @@ namespace KennyKerr
                 m_value = value;
             }
 
-            return *this;
+            return static_cast<bool>(*this);
         }
 
-        pointer release() throw()
+        auto swap(unique_handle<Traits> & other) throw() -> void
         {
-            auto value = m_value;
-            m_value = Traits::invalid();
-            return value;
+            std::swap(m_value, other.m_value);
         }
     };
 
+    template <typename Traits>
+    auto swap(unique_handle<Traits> & left,
+              unique_handle<Traits> & right) throw() -> void
+    {
+        left.swap(right);
+    }
+
+    template <typename Traits>
+    auto operator==(unique_handle<Traits> const & left,
+                    unique_handle<Traits> const & right) throw() -> bool
+    {
+        return left.get() == right.get();
+    }
+
+    template <typename Traits>
+    auto operator!=(unique_handle<Traits> const & left,
+                    unique_handle<Traits> const & right) throw() -> bool
+    {
+        return left.get() != right.get();
+    }
+
+    template <typename Traits>
+    auto operator<(unique_handle<Traits> const & left,
+                   unique_handle<Traits> const & right) throw() -> bool
+    {
+        return left.get() < right.get();
+    }
+
+    template <typename Traits>
+    auto operator>=(unique_handle<Traits> const & left,
+                    unique_handle<Traits> const & right) throw() -> bool
+    {
+        return left.get() >= right.get();
+    }
+
+    template <typename Traits>
+    auto operator>(unique_handle<Traits> const & left,
+                   unique_handle<Traits> const & right) throw() -> bool
+    {
+        return left.get() > right.get();
+    }
+
+    template <typename Traits>
+    auto operator<=(unique_handle<Traits> const & left,
+                    unique_handle<Traits> const & right) throw() -> bool
+    {
+        return left.get() <= right.get();
+    }
+
     struct null_handle_traits
     {
-        typedef HANDLE pointer;
+        using pointer = HANDLE;
 
-        static pointer invalid() throw()
+        static auto invalid() throw() -> pointer
         {
             return nullptr;
         }
 
-        static void close(pointer value) throw()
+        static auto close(pointer value) throw() -> void
         {
-            HANDLE_VERIFY(CloseHandle(value));
+            VERIFY(CloseHandle(value));
         }
     };
 
     struct invalid_handle_traits
     {
-        typedef HANDLE pointer;
+        using pointer = HANDLE;
 
-        static pointer invalid() throw()
+        static auto invalid() throw() -> pointer
         {
             return INVALID_HANDLE_VALUE;
         }
 
-        static void close(pointer value) throw()
+        static auto close(pointer value) throw() -> void
         {
-            HANDLE_VERIFY(CloseHandle(value));
+            VERIFY(CloseHandle(value));
         }
     };
 
-    struct registry_key_traits
-    {
-        typedef HKEY pointer;
-
-        static pointer invalid() throw()
-        {
-            return nullptr;
-        }
-
-        static void close(pointer value) throw()
-        {
-            HANDLE_VERIFY_(ERROR_SUCCESS, RegCloseKey(value));
-        }
-    };
-
-    typedef unique_handle<null_handle_traits> null_handle;
-    typedef unique_handle<invalid_handle_traits> invalid_handle;
-    typedef unique_handle<registry_key_traits> registry_key;
-
-    static_assert(sizeof(HANDLE) == sizeof(null_handle), "The handle wrapper should not impose any space overhead");
+    using null_handle = unique_handle<null_handle_traits>;
+    using invalid_handle = unique_handle<invalid_handle_traits>;
 }
