@@ -32,7 +32,7 @@ struct Tracer
     template <typename... Args>
     auto operator()(wchar_t const * format, Args... args) const -> void
     {
-        wchar_t buffer [256];
+        wchar_t buffer [400];
 
         auto count = swprintf_s(buffer,
                                 L"%S(%d): ",

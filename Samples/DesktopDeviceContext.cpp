@@ -10,6 +10,7 @@
 #pragma warning(disable: 4706)
 
 #include "..\dx.h"
+#include <algorithm>
 
 using namespace KennyKerr;
 using namespace KennyKerr::Direct2D;

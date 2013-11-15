@@ -60,6 +60,12 @@ namespace KennyKerr
             return m_value;
         }
 
+        auto get_address_of() throw() -> pointer *
+        {
+            ASSERT(!*this);
+            return &m_value;
+        }
+
         auto release() throw() -> pointer
         {
             auto value = m_value;

@@ -869,9 +869,10 @@ namespace KennyKerr
 
         enum class DrawTextOptions
         {
-            NoSnap = D2D1_DRAW_TEXT_OPTIONS_NO_SNAP,
-            Clip   = D2D1_DRAW_TEXT_OPTIONS_CLIP,
-            None   = D2D1_DRAW_TEXT_OPTIONS_NONE,
+            NoSnap          = D2D1_DRAW_TEXT_OPTIONS_NO_SNAP,
+            Clip            = D2D1_DRAW_TEXT_OPTIONS_CLIP,
+            None            = D2D1_DRAW_TEXT_OPTIONS_NONE,
+            EnableColorFont = D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
         };
         DEFINE_ENUM_FLAG_OPERATORS(DrawTextOptions);
 
@@ -4498,9 +4499,22 @@ namespace KennyKerr
             void SetDescription(DrawingStateDescription1 const & description) const;
         };
 
+        #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
+        struct GdiInteropRenderTarget : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(GdiInteropRenderTarget, Details::Object, ID2D1GdiInteropRenderTarget)
+
+            auto GetDC(DcInitializeMode mode) const -> HDC;
+            void ReleaseDC() const;
+            void ReleaseDC(RECT const & rect) const;
+        };
+        #endif
+
         struct RenderTarget : Resource
         {
             KENNYKERR_DEFINE_CLASS(RenderTarget, Resource, ID2D1RenderTarget)
+
+            auto AsGdiInteropRenderTarget() const -> GdiInteropRenderTarget;
 
             auto CreateBitmap(SizeU const & size,
                               BitmapProperties const & properties) const -> Bitmap;
@@ -4800,6 +4814,7 @@ namespace KennyKerr
 
             auto GetPixelFormat() const -> PixelFormat;
             void SetDpi(float x, float y) const;
+            auto GetDpi() const -> float;
             void GetDpi(float & x, float & y) const;
             auto GetSize() const -> SizeF;
             auto GetPixelSize() const -> SizeU;
@@ -4822,17 +4837,6 @@ namespace KennyKerr
             auto Resize(SizeU const & size) const -> HRESULT;
             auto GetHwnd() const -> HWND;
         };
-
-        #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
-        struct GdiInteropRenderTarget : Details::Object
-        {
-            KENNYKERR_DEFINE_CLASS(GdiInteropRenderTarget, Details::Object, ID2D1GdiInteropRenderTarget)
-
-            auto GetDC(DcInitializeMode mode) const -> HDC;
-            void ReleaseDC() const;
-            void ReleaseDC(RECT const & rect) const;
-        };
-        #endif
 
         struct DcRenderTarget : RenderTarget
         {
@@ -5101,6 +5105,7 @@ namespace KennyKerr
             KENNYKERR_DEFINE_CLASS(Factory, Details::Object, ID2D1Factory)
 
             auto AsMultiThread() const -> MultiThread;
+            auto ReloadSystemMetrics() const -> void;
             auto GetDesktopDpi() const -> float;
             auto CreateRectangleGeometry(RectF const & rect) const -> RectangleGeometry;
             auto CreateRoundedRectangleGeometry(RoundedRect const & roundedRect) const -> RoundedRectangleGeometry;
@@ -9334,6 +9339,13 @@ namespace KennyKerr
             (*this)->SetDescription(description.Get());
         }
 
+        inline auto RenderTarget::AsGdiInteropRenderTarget() const -> GdiInteropRenderTarget
+        {
+            GdiInteropRenderTarget result;
+            HR(m_ptr.CopyTo(result.GetAddressOf()));
+            return result;
+        }
+
         inline auto RenderTarget::CreateBitmap(SizeU const & size,
                                                void const * data,
                                                unsigned pitch,
@@ -10249,6 +10261,13 @@ namespace KennyKerr
             (*this)->SetDpi(x, y);
         }
 
+        inline auto RenderTarget::GetDpi() const -> float
+        {
+            float x, y;
+            GetDpi(x, y);
+            return x;
+        }
+
         inline void RenderTarget::GetDpi(float & x, float & y) const
         {
             (*this)->GetDpi(&x, &y);
@@ -10961,6 +10980,11 @@ namespace KennyKerr
             MultiThread result;
             HR(m_ptr.CopyTo(result.GetAddressOf()));
             return result;
+        }
+
+        inline auto Factory::ReloadSystemMetrics() const -> void
+        {
+            HR((*this)->ReloadSystemMetrics());
         }
 
         inline auto Factory::GetDesktopDpi() const -> float
