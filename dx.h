@@ -1,11 +1,12 @@
 #pragma once
 
-// Created by Kenny Kerr. Get the latest version here: http://dx.codeplex.com
+// Created by Kenny Kerr.
+// Get the latest version here: http://dx.codeplex.com
 
 #include <windows.h>
-#include <d2d1_1.h>
-#include <d3d11_1.h>
-#include <dwrite_1.h>
+#include <d2d1_2.h>
+#include <d3d11_2.h>
+#include <dwrite_2.h>
 #include <wincodec.h>
 #include <uianimation.h>
 #include <DcompAnimation.h>
@@ -124,6 +125,7 @@ namespace KennyKerr
 
     inline void HR(HRESULT const result)
     {
+        ASSERT(S_OK == result);
         if (S_OK != result)
         #ifndef __cplusplus_winrt
         throw Exception(result);
@@ -2439,6 +2441,12 @@ namespace KennyKerr
         struct Storyboard;
     };
 
+    namespace DirectWrite
+    {
+        struct FontCollection;
+
+    } // DirectWrite
+
     namespace Direct2D
     {
         struct Image;
@@ -2510,16 +2518,16 @@ namespace KennyKerr
 
             auto CreateSwapChainForHwnd(Details::Object const & device, // Direct3D or Dxgi Device
                                         HWND window,
-                                        SwapChainDescription1 const & description) const -> SwapChain1;
+                                        SwapChainDescription1 const & description = SwapChainDescription1()) const -> SwapChain1;
 
             auto CreateSwapChainForCoreWindow(Details::Object const & device, // Direct3D or Dxgi Device
                                               IUnknown * window,
-                                              SwapChainDescription1 const & description) const -> SwapChain1;
+                                              SwapChainDescription1 const & description = SwapChainDescription1()) const -> SwapChain1;
 
             #ifdef __cplusplus_winrt
             auto CreateSwapChainForCoreWindow(Details::Object const & device, // Direct3D or Dxgi Device
                                               Windows::UI::Core::CoreWindow ^ window,
-                                              SwapChainDescription1 const & description) const -> SwapChain1;
+                                              SwapChainDescription1 const & description = SwapChainDescription1()) const -> SwapChain1;
             #endif
 
             auto CreateSwapChainForComposition(Details::Object const & device, // Direct3D or Dxgi Device
@@ -3430,26 +3438,105 @@ namespace KennyKerr
         struct LocalizedStrings : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(LocalizedStrings, Details::Object, IDWriteLocalizedStrings)
-        };
 
-        struct FontCollection : Details::Object
-        {
-            KENNYKERR_DEFINE_CLASS(FontCollection, Details::Object, IDWriteFontCollection)
-        };
+            auto GetCount() const -> unsigned;
 
-        struct FontList : Details::Object
-        {
-            KENNYKERR_DEFINE_CLASS(FontList, Details::Object, IDWriteFontList)
-        };
+            auto FindLocaleName(wchar_t const * localeName,
+                                unsigned & index) const -> bool;
 
-        struct FontFamily : FontList
-        {
-            KENNYKERR_DEFINE_CLASS(FontFamily, FontList, IDWriteFontFamily)
+            auto GetLocaleNameLength(unsigned index) const -> unsigned;
+
+            auto GetLocaleName(unsigned index,
+                               wchar_t * localName,
+                               unsigned count) const -> void;
+
+            auto GetStringLength(unsigned index) const -> unsigned;
+
+            auto GetString(unsigned index,
+                           wchar_t * string,
+                           unsigned count) const -> void;
+
+            template <unsigned Count>
+            auto GetLocaleName(unsigned index,
+                               wchar_t (&localName)[Count]) const -> void
+            {
+                GetLocaleName(index,
+                              localName,
+                              Count);
+            }
+
+            template <unsigned Count>
+            auto GetString(unsigned index,
+                           wchar_t (&string)[Count]) const -> void
+            {
+                GetString(index,
+                          string,
+                          Count);
+            }
         };
 
         struct Font : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Font, Details::Object, IDWriteFont)
+        };
+
+        struct FontList : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(FontList, Details::Object, IDWriteFontList)
+
+            auto GetFontCollection() const -> FontCollection;
+            auto GetFontCount() const -> unsigned;
+            auto GetFont(unsigned index) const -> Font;
+        };
+
+        struct FontFamily : FontList
+        {
+            KENNYKERR_DEFINE_CLASS(FontFamily, FontList, IDWriteFontFamily)
+
+            auto GetFamilyNames() const -> LocalizedStrings;
+
+            auto GetFirstMatchingFont(FontWeight weight,
+                                      FontStretch stretch,
+                                      FontStyle style) const -> Font;
+
+            auto GetMatchingFonts(FontWeight weight,
+                                  FontStretch stretch,
+                                  FontStyle style) const -> FontList;
+        };
+
+        struct FontCollection : Details::Object
+        {
+            class iterator
+            {
+                unsigned m_index;
+                FontCollection const * m_container;
+
+            public:
+
+                iterator(unsigned index = 0,
+                         FontCollection const * container = nullptr);
+
+                auto operator ++() -> iterator &; // pre-increment
+
+                // This normally returns a reference but we don't actually have a reference so we call out and get a copy
+                auto operator *() const -> FontFamily;
+
+                auto operator ==(iterator const & other) const -> bool;
+                auto operator !=(iterator const & other) const -> bool;
+            };
+
+            auto begin() const -> iterator;
+            auto end() const   -> iterator;
+
+            KENNYKERR_DEFINE_CLASS(FontCollection, Details::Object, IDWriteFontCollection)
+
+            auto GetFontFamilyCount() const -> unsigned;
+            auto GetFontFamily(unsigned index) const -> FontFamily;
+
+            auto FindFamilyName(wchar_t const * familyName,
+                                unsigned & index) const -> bool;
+
+            auto GetFontFromFontFace(FontFace const & fontFace) const -> Font;
         };
 
         struct InlineObject : Details::Object
@@ -3838,6 +3925,11 @@ namespace KennyKerr
         struct __declspec(uuid("30572f99-dac6-41db-a16e-0486307e606a")) Factory1 : Factory
         {
             KENNYKERR_DEFINE_CLASS(Factory1, Factory, IDWriteFactory1)
+        };
+
+        struct __declspec(uuid("0439fc60-ca44-4994-8dee-3a9af7b732ec")) Factory2 : Factory1
+        {
+            KENNYKERR_DEFINE_CLASS(Factory2, Factory1, IDWriteFactory2)
         };
 
     } // DirectWrite
@@ -4514,7 +4606,9 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_CLASS(RenderTarget, Resource, ID2D1RenderTarget)
 
+            #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
             auto AsGdiInteropRenderTarget() const -> GdiInteropRenderTarget;
+            #endif
 
             auto CreateBitmap(SizeU const & size,
                               BitmapProperties const & properties) const -> Bitmap;
@@ -4813,6 +4907,7 @@ namespace KennyKerr
             auto EndDraw(UINT64 & tag1, UINT64 & tag2) const -> HRESULT;
 
             auto GetPixelFormat() const -> PixelFormat;
+            void SetDpi(float dpi) const;
             void SetDpi(float x, float y) const;
             auto GetDpi() const -> float;
             void GetDpi(float & x, float & y) const;
@@ -5163,6 +5258,11 @@ namespace KennyKerr
             // TODO: remaining methods
         };
 
+        struct Factory2 : Factory1
+        {
+            KENNYKERR_DEFINE_CLASS(Factory2, Factory1, ID2D1Factory2)
+        };
+
     } // Direct2D
 
     #pragma endregion Classes
@@ -5299,9 +5399,9 @@ namespace KennyKerr
 
     namespace DirectWrite
     {
-        inline auto CreateFactory(FactoryType type = FactoryType::Shared) -> Factory1
+        inline auto CreateFactory(FactoryType type = FactoryType::Shared) -> Factory2
         {
-            Factory1 result;
+            Factory2 result;
 
             HR(DWriteCreateFactory(static_cast<DWRITE_FACTORY_TYPE>(type),
                                    __uuidof(result),
@@ -6951,6 +7051,200 @@ namespace KennyKerr
 
     namespace DirectWrite
     {
+        inline auto LocalizedStrings::GetCount() const -> unsigned
+        {
+            return (*this)->GetCount();
+        }
+
+        inline auto LocalizedStrings::FindLocaleName(wchar_t const * localeName,
+                                                     unsigned & index) const -> bool
+        {
+            BOOL result;
+
+            HR((*this)->FindLocaleName(localeName,
+                                       &index,
+                                       &result));
+
+            return 0 != result;
+        }
+
+        inline auto LocalizedStrings::GetLocaleNameLength(unsigned index) const -> unsigned
+        {
+            unsigned result;
+
+            HR((*this)->GetLocaleNameLength(index,
+                                            &result));
+
+            return result;
+        }
+
+        inline auto LocalizedStrings::GetLocaleName(unsigned index,
+                                                    wchar_t * localeName,
+                                                    unsigned count) const -> void
+        {
+            HR((*this)->GetLocaleName(index,
+                                      localeName,
+                                      count));
+        }
+
+        inline auto LocalizedStrings::GetStringLength(unsigned index) const -> unsigned
+        {
+            unsigned result;
+
+            HR((*this)->GetStringLength(index,
+                                        &result));
+
+            return result;
+        }
+
+        inline auto LocalizedStrings::GetString(unsigned index,
+                                                wchar_t * string,
+                                                unsigned count) const -> void
+        {
+            HR((*this)->GetString(index,
+                                  string,
+                                  count));
+        }
+
+        inline auto FontList::GetFontCollection() const -> FontCollection
+        {
+            FontCollection result;
+            HR((*this)->GetFontCollection(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto FontList::GetFontCount() const -> unsigned
+        {
+            return (*this)->GetFontCount();
+        }
+
+        inline auto FontList::GetFont(unsigned index) const -> Font
+        {
+            Font result;
+
+            HR((*this)->GetFont(index,
+                                result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto FontFamily::GetFamilyNames() const -> LocalizedStrings
+        {
+            LocalizedStrings result;
+            HR((*this)->GetFamilyNames(result.GetAddressOf()));
+            return result;
+        }
+
+        inline auto FontFamily::GetFirstMatchingFont(FontWeight weight,
+                                                     FontStretch stretch,
+                                                     FontStyle style) const -> Font
+        {
+            Font result;
+
+            HR((*this)->GetFirstMatchingFont(static_cast<DWRITE_FONT_WEIGHT>(weight),
+                                             static_cast<DWRITE_FONT_STRETCH>(stretch),
+                                             static_cast<DWRITE_FONT_STYLE>(style),
+                                             result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto FontFamily::GetMatchingFonts(FontWeight weight,
+                                                 FontStretch stretch,
+                                                 FontStyle style) const -> FontList
+        {
+            FontList result;
+
+            HR((*this)->GetMatchingFonts(static_cast<DWRITE_FONT_WEIGHT>(weight),
+                                         static_cast<DWRITE_FONT_STRETCH>(stretch),
+                                         static_cast<DWRITE_FONT_STYLE>(style),
+                                         result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline FontCollection::iterator::iterator(unsigned index,
+                                                  FontCollection const * container) :
+            m_index(index),
+            m_container(container)
+        {
+        }
+
+        inline auto FontCollection::iterator::operator *() const -> FontFamily
+        {
+            ASSERT(m_container);
+
+            return m_container->GetFontFamily(m_index);
+        }
+
+        inline auto FontCollection::iterator::operator ++() -> iterator & 
+        {
+            ASSERT(m_container);
+
+            ++m_index;
+            return *this;
+        }
+
+        inline auto FontCollection::iterator::operator ==(iterator const & other) const -> bool
+        {
+            ASSERT(m_container);
+            ASSERT(m_container == other.m_container);
+
+            return m_index == other.m_index;
+        }
+
+        inline auto FontCollection::iterator::operator !=(iterator const & other) const -> bool
+        {
+            return !(*this == other);
+        }
+
+        inline auto FontCollection::begin() const -> iterator
+        {
+            return iterator(0, this);
+        }
+
+        inline auto FontCollection::end() const -> iterator
+        {
+            return iterator(GetFontFamilyCount(), this);
+        }
+
+        inline auto FontCollection::GetFontFamilyCount() const -> unsigned
+        {
+            return (*this)->GetFontFamilyCount();
+        }
+
+        inline auto FontCollection::GetFontFamily(unsigned index) const -> FontFamily
+        {
+            FontFamily result;
+
+            HR((*this)->GetFontFamily(index,
+                                      result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto FontCollection::FindFamilyName(wchar_t const * familyName,
+                                                   unsigned & index) const -> bool
+        {
+            BOOL result;
+
+            HR((*this)->FindFamilyName(familyName,
+                                       &index,
+                                       &result));
+
+            return 0 != result;
+        }
+
+        inline auto FontCollection::GetFontFromFontFace(FontFace const & fontFace) const -> Font
+        {
+            Font result;
+
+            HR((*this)->GetFontFromFontFace(fontFace.Get(),
+                                            result.GetAddressOf()));
+
+            return result;
+        }
+
         inline auto RenderingParams::GetGamma() const -> float
         {
             return (*this)->GetGamma();
@@ -9339,12 +9633,14 @@ namespace KennyKerr
             (*this)->SetDescription(description.Get());
         }
 
+        #if WINAPI_FAMILY_DESKTOP_APP == WINAPI_FAMILY
         inline auto RenderTarget::AsGdiInteropRenderTarget() const -> GdiInteropRenderTarget
         {
             GdiInteropRenderTarget result;
             HR(m_ptr.CopyTo(result.GetAddressOf()));
             return result;
         }
+        #endif
 
         inline auto RenderTarget::CreateBitmap(SizeU const & size,
                                                void const * data,
@@ -10254,6 +10550,11 @@ namespace KennyKerr
         inline auto RenderTarget::GetPixelFormat() const -> PixelFormat
         {
             return (*this)->GetPixelFormat();
+        }
+
+        inline void RenderTarget::SetDpi(float dpi) const
+        {
+            (*this)->SetDpi(dpi, dpi);
         }
 
         inline void RenderTarget::SetDpi(float x, float y) const
