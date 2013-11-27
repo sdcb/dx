@@ -138,10 +138,10 @@ namespace KennyKerr
 
     enum class AlphaMode // compatible with both DXGI_ALPHA_MODE and D2D1_ALPHA_MODE
     {
-        Unknown      = D2D1_ALPHA_MODE_UNKNOWN,       // DXGI_ALPHA_MODE_UNSPECIFIED
-        Premultipled = D2D1_ALPHA_MODE_PREMULTIPLIED, // DXGI_ALPHA_MODE_PREMULTIPLIED
-        Straight     = D2D1_ALPHA_MODE_STRAIGHT,      // DXGI_ALPHA_MODE_STRAIGHT
-        Ignore       = D2D1_ALPHA_MODE_IGNORE,        // DXGI_ALPHA_MODE_IGNORE
+        Unknown       = D2D1_ALPHA_MODE_UNKNOWN,       // DXGI_ALPHA_MODE_UNSPECIFIED
+        Premultiplied = D2D1_ALPHA_MODE_PREMULTIPLIED, // DXGI_ALPHA_MODE_PREMULTIPLIED
+        Straight      = D2D1_ALPHA_MODE_STRAIGHT,      // DXGI_ALPHA_MODE_STRAIGHT
+        Ignore        = D2D1_ALPHA_MODE_IGNORE,        // DXGI_ALPHA_MODE_IGNORE
     };
 
     enum class ExecutionContext
@@ -1374,7 +1374,7 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_STRUCT(ImageParameters, WICImageParameters)
 
-            explicit ImageParameters(PixelFormat const & pixelFormat = KennyKerr::PixelFormat(Dxgi::Format::B8G8R8A8_UNORM, AlphaMode::Premultipled),
+            explicit ImageParameters(PixelFormat const & pixelFormat = KennyKerr::PixelFormat(Dxgi::Format::B8G8R8A8_UNORM, AlphaMode::Premultiplied),
                                      float dpiX                      = 96.0f,
                                      float dpiY                      = 96.0f,
                                      float top                       = 0.0f,

@@ -35,7 +35,7 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         // Create the bitmap (on the GPU) that will act as the rendering surface.
 
         BitmapProperties1 props(BitmapOptions::Target,
-                                PixelFormat(Dxgi::Format::B8G8R8A8_UNORM, AlphaMode::Premultipled));
+                                PixelFormat(Dxgi::Format::B8G8R8A8_UNORM, AlphaMode::Premultiplied));
 
         auto bitmap = target.CreateBitmap(SizeU(600, 400), props);
         target.SetTarget(bitmap);

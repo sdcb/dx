@@ -76,7 +76,7 @@ int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         auto target = device.CreateDeviceContext();
 
         BitmapProperties1 props(BitmapOptions::Target,
-                                PixelFormat(Dxgi::Format::B8G8R8A8_UNORM, AlphaMode::Premultipled));
+                                PixelFormat(Dxgi::Format::B8G8R8A8_UNORM, AlphaMode::Premultiplied));
 
         auto bitmap = target.CreateBitmap(SizeU(800, 700), props);
         target.SetTarget(bitmap);
