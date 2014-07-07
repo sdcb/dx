@@ -165,8 +165,122 @@ namespace KennyKerr
     {
         enum class Format
         {
-            Unknown        = DXGI_FORMAT_UNKNOWN,
-            B8G8R8A8_UNORM = DXGI_FORMAT_B8G8R8A8_UNORM,
+            Unknown                    = DXGI_FORMAT_UNKNOWN,
+            R32G32B32A32_TYPELESS      = DXGI_FORMAT_R32G32B32A32_TYPELESS,
+            R32G32B32A32_FLOAT         = DXGI_FORMAT_R32G32B32A32_FLOAT,
+            R32G32B32A32_UINT          = DXGI_FORMAT_R32G32B32A32_UINT,
+            R32G32B32A32_SINT          = DXGI_FORMAT_R32G32B32A32_SINT,
+            R32G32B32_TYPELESS         = DXGI_FORMAT_R32G32B32_TYPELESS,
+            R32G32B32_FLOAT            = DXGI_FORMAT_R32G32B32_FLOAT,
+            R32G32B32_UINT             = DXGI_FORMAT_R32G32B32_UINT,
+            R32G32B32_SINT             = DXGI_FORMAT_R32G32B32_SINT,
+            R16G16B16A16_TYPELESS      = DXGI_FORMAT_R16G16B16A16_TYPELESS,
+            R16G16B16A16_FLOAT         = DXGI_FORMAT_R16G16B16A16_FLOAT,
+            R16G16B16A16_UNORM         = DXGI_FORMAT_R16G16B16A16_UNORM,
+            R16G16B16A16_UINT          = DXGI_FORMAT_R16G16B16A16_UINT,
+            R16G16B16A16_SNORM         = DXGI_FORMAT_R16G16B16A16_SNORM,
+            R16G16B16A16_SINT          = DXGI_FORMAT_R16G16B16A16_SINT,
+            R32G32_TYPELESS            = DXGI_FORMAT_R32G32_TYPELESS,
+            R32G32_FLOAT               = DXGI_FORMAT_R32G32_FLOAT,
+            R32G32_UINT                = DXGI_FORMAT_R32G32_UINT,
+            R32G32_SINT                = DXGI_FORMAT_R32G32_SINT,
+            R32G8X24_TYPELESS          = DXGI_FORMAT_R32G8X24_TYPELESS,
+            D32_FLOAT_S8X24_UINT       = DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
+            R32_FLOAT_X8X24_TYPELESS   = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS,
+            X32_TYPELESS_G8X24_UINT    = DXGI_FORMAT_X32_TYPELESS_G8X24_UINT,
+            R10G10B10A2_TYPELESS       = DXGI_FORMAT_R10G10B10A2_TYPELESS,
+            R10G10B10A2_UNORM          = DXGI_FORMAT_R10G10B10A2_UNORM,
+            R10G10B10A2_UINT           = DXGI_FORMAT_R10G10B10A2_UINT,
+            R11G11B10_FLOAT            = DXGI_FORMAT_R11G11B10_FLOAT,
+            R8G8B8A8_TYPELESS          = DXGI_FORMAT_R8G8B8A8_TYPELESS,
+            R8G8B8A8_UNORM             = DXGI_FORMAT_R8G8B8A8_UNORM,
+            R8G8B8A8_UNORM_SRGB        = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+            R8G8B8A8_UINT              = DXGI_FORMAT_R8G8B8A8_UINT,
+            R8G8B8A8_SNORM             = DXGI_FORMAT_R8G8B8A8_SNORM,
+            R8G8B8A8_SINT              = DXGI_FORMAT_R8G8B8A8_SINT,
+            R16G16_TYPELESS            = DXGI_FORMAT_R16G16_TYPELESS,
+            R16G16_FLOAT               = DXGI_FORMAT_R16G16_FLOAT,
+            R16G16_UNORM               = DXGI_FORMAT_R16G16_UNORM,
+            R16G16_UINT                = DXGI_FORMAT_R16G16_UINT,
+            R16G16_SNORM               = DXGI_FORMAT_R16G16_SNORM,
+            R16G16_SINT                = DXGI_FORMAT_R16G16_SINT,
+            R32_TYPELESS               = DXGI_FORMAT_R32_TYPELESS,
+            D32_FLOAT                  = DXGI_FORMAT_D32_FLOAT,
+            R32_FLOAT                  = DXGI_FORMAT_R32_FLOAT,
+            R32_UINT                   = DXGI_FORMAT_R32_UINT,
+            R32_SINT                   = DXGI_FORMAT_R32_SINT,
+            R24G8_TYPELESS             = DXGI_FORMAT_R24G8_TYPELESS,
+            D24_UNORM_S8_UINT          = DXGI_FORMAT_D24_UNORM_S8_UINT,
+            R24_UNORM_X8_TYPELESS      = DXGI_FORMAT_R24_UNORM_X8_TYPELESS,
+            X24_TYPELESS_G8_UINT       = DXGI_FORMAT_X24_TYPELESS_G8_UINT,
+            R8G8_TYPELESS              = DXGI_FORMAT_R8G8_TYPELESS,
+            R8G8_UNORM                 = DXGI_FORMAT_R8G8_UNORM,
+            R8G8_UINT                  = DXGI_FORMAT_R8G8_UINT,
+            R8G8_SNORM                 = DXGI_FORMAT_R8G8_SNORM,
+            R8G8_SINT                  = DXGI_FORMAT_R8G8_SINT,
+            R16_TYPELESS               = DXGI_FORMAT_R16_TYPELESS,
+            R16_FLOAT                  = DXGI_FORMAT_R16_FLOAT,
+            D16_UNORM                  = DXGI_FORMAT_D16_UNORM,
+            R16_UNORM                  = DXGI_FORMAT_R16_UNORM,
+            R16_UINT                   = DXGI_FORMAT_R16_UINT,
+            R16_SNORM                  = DXGI_FORMAT_R16_SNORM,
+            R16_SINT                   = DXGI_FORMAT_R16_SINT,
+            R8_TYPELESS                = DXGI_FORMAT_R8_TYPELESS,
+            R8_UNORM                   = DXGI_FORMAT_R8_UNORM,
+            R8_UINT                    = DXGI_FORMAT_R8_UINT,
+            R8_SNORM                   = DXGI_FORMAT_R8_SNORM,
+            R8_SINT                    = DXGI_FORMAT_R8_SINT,
+            A8_UNORM                   = DXGI_FORMAT_A8_UNORM,
+            R1_UNORM                   = DXGI_FORMAT_R1_UNORM,
+            R9G9B9E5_SHAREDEXP         = DXGI_FORMAT_R9G9B9E5_SHAREDEXP,
+            R8G8_B8G8_UNORM            = DXGI_FORMAT_R8G8_B8G8_UNORM,
+            G8R8_G8B8_UNORM            = DXGI_FORMAT_G8R8_G8B8_UNORM,
+            BC1_TYPELESS               = DXGI_FORMAT_BC1_TYPELESS,
+            BC1_UNORM                  = DXGI_FORMAT_BC1_UNORM,
+            BC1_UNORM_SRGB             = DXGI_FORMAT_BC1_UNORM_SRGB,
+            BC2_TYPELESS               = DXGI_FORMAT_BC2_TYPELESS,
+            BC2_UNORM                  = DXGI_FORMAT_BC2_UNORM,
+            BC2_UNORM_SRGB             = DXGI_FORMAT_BC2_UNORM_SRGB,
+            BC3_TYPELESS               = DXGI_FORMAT_BC3_TYPELESS,
+            BC3_UNORM                  = DXGI_FORMAT_BC3_UNORM,
+            BC3_UNORM_SRGB             = DXGI_FORMAT_BC3_UNORM_SRGB,
+            BC4_TYPELESS               = DXGI_FORMAT_BC4_TYPELESS,
+            BC4_UNORM                  = DXGI_FORMAT_BC4_UNORM,
+            BC4_SNORM                  = DXGI_FORMAT_BC4_SNORM,
+            BC5_TYPELESS               = DXGI_FORMAT_BC5_TYPELESS,
+            BC5_UNORM                  = DXGI_FORMAT_BC5_UNORM,
+            BC5_SNORM                  = DXGI_FORMAT_BC5_SNORM,
+            B5G6R5_UNORM               = DXGI_FORMAT_B5G6R5_UNORM,
+            B5G5R5A1_UNORM             = DXGI_FORMAT_B5G5R5A1_UNORM,
+            B8G8R8A8_UNORM             = DXGI_FORMAT_B8G8R8A8_UNORM,
+            B8G8R8X8_UNORM             = DXGI_FORMAT_B8G8R8X8_UNORM,
+            R10G10B10_XR_BIAS_A2_UNORM = DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM,
+            B8G8R8A8_TYPELESS          = DXGI_FORMAT_B8G8R8A8_TYPELESS,
+            B8G8R8A8_UNORM_SRGB        = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,
+            B8G8R8X8_TYPELESS          = DXGI_FORMAT_B8G8R8X8_TYPELESS,
+            B8G8R8X8_UNORM_SRGB        = DXGI_FORMAT_B8G8R8X8_UNORM_SRGB,
+            BC6H_TYPELESS              = DXGI_FORMAT_BC6H_TYPELESS,
+            BC6H_UF16                  = DXGI_FORMAT_BC6H_UF16,
+            BC6H_SF16                  = DXGI_FORMAT_BC6H_SF16,
+            BC7_TYPELESS               = DXGI_FORMAT_BC7_TYPELESS,
+            BC7_UNORM                  = DXGI_FORMAT_BC7_UNORM,
+            BC7_UNORM_SRGB             = DXGI_FORMAT_BC7_UNORM_SRGB,
+            AYUV                       = DXGI_FORMAT_AYUV,
+            Y410                       = DXGI_FORMAT_Y410,
+            Y416                       = DXGI_FORMAT_Y416,
+            NV12                       = DXGI_FORMAT_NV12,
+            P010                       = DXGI_FORMAT_P010,
+            P016                       = DXGI_FORMAT_P016,
+            OPAQUE_420                 = DXGI_FORMAT_420_OPAQUE,
+            YUY2                       = DXGI_FORMAT_YUY2,
+            Y210                       = DXGI_FORMAT_Y210,
+            Y216                       = DXGI_FORMAT_Y216,
+            NV11                       = DXGI_FORMAT_NV11,
+            AI44                       = DXGI_FORMAT_AI44,
+            IA44                       = DXGI_FORMAT_IA44,
+            P8                         = DXGI_FORMAT_P8,
+            A8P8                       = DXGI_FORMAT_A8P8,
+            B4G4R4A4_UNORM             = DXGI_FORMAT_B4G4R4A4_UNORM,
         };
 
         enum class Usage
@@ -225,6 +339,15 @@ namespace KennyKerr
             Rotate90    = DXGI_MODE_ROTATION_ROTATE90,
             Rotate180   = DXGI_MODE_ROTATION_ROTATE180,
             Rotate270   = DXGI_MODE_ROTATION_ROTATE270,
+        };
+
+        enum class ResourcePriority : unsigned
+        {
+            Minimum = DXGI_RESOURCE_PRIORITY_MINIMUM,
+            Low     = DXGI_RESOURCE_PRIORITY_LOW,
+            Normal  = DXGI_RESOURCE_PRIORITY_NORMAL,
+            High    = DXGI_RESOURCE_PRIORITY_HIGH,
+            Maximum = DXGI_RESOURCE_PRIORITY_MAXIMUM,
         };
 
     } // Dxgi
@@ -303,6 +426,93 @@ namespace KennyKerr
             Guarded                      = D3D11_RESOURCE_MISC_GUARDED,
         };
         DEFINE_ENUM_FLAG_OPERATORS(ResourceMiscFlag)
+
+        enum class ResourceDimension
+        {
+            Unknown   = D3D11_RESOURCE_DIMENSION_UNKNOWN,
+            Buffer    = D3D11_RESOURCE_DIMENSION_BUFFER,
+            Texture1D = D3D11_RESOURCE_DIMENSION_TEXTURE1D,
+            Texture2D = D3D11_RESOURCE_DIMENSION_TEXTURE2D,
+            Texture3D = D3D11_RESOURCE_DIMENSION_TEXTURE3D
+        };
+
+        enum class InputClassification
+        {
+            PerVertexData   = D3D11_INPUT_PER_VERTEX_DATA,
+            PerInstanceData = D3D11_INPUT_PER_INSTANCE_DATA,
+        };
+
+        enum class PrimitiveTopology
+        {
+            Undefined              = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED,
+            PointList              = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST,
+            LineList               = D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+            LineStrip              = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP,
+            TriangleList           = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+            TriangleStrip          = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
+            LineListAdjacency      = D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ,
+            LineStripAdjacency     = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ,
+            TriangleListAdjacency  = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ,
+            TriangleStripAdjacency = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ,
+            PatchList1             = D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST,
+            PatchList2             = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST,
+            PatchList3             = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST,
+            PatchList4             = D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST,
+            PatchList5             = D3D11_PRIMITIVE_TOPOLOGY_5_CONTROL_POINT_PATCHLIST,
+            PatchList6             = D3D11_PRIMITIVE_TOPOLOGY_6_CONTROL_POINT_PATCHLIST,
+            PatchList7             = D3D11_PRIMITIVE_TOPOLOGY_7_CONTROL_POINT_PATCHLIST,
+            PatchList8             = D3D11_PRIMITIVE_TOPOLOGY_8_CONTROL_POINT_PATCHLIST,
+            PatchList9             = D3D11_PRIMITIVE_TOPOLOGY_9_CONTROL_POINT_PATCHLIST,
+            PatchList10            = D3D11_PRIMITIVE_TOPOLOGY_10_CONTROL_POINT_PATCHLIST,
+            PatchList11            = D3D11_PRIMITIVE_TOPOLOGY_11_CONTROL_POINT_PATCHLIST,
+            PatchList12            = D3D11_PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST,
+            PatchList13            = D3D11_PRIMITIVE_TOPOLOGY_13_CONTROL_POINT_PATCHLIST,
+            PatchList14            = D3D11_PRIMITIVE_TOPOLOGY_14_CONTROL_POINT_PATCHLIST,
+            PatchList15            = D3D11_PRIMITIVE_TOPOLOGY_15_CONTROL_POINT_PATCHLIST,
+            PatchList16            = D3D11_PRIMITIVE_TOPOLOGY_16_CONTROL_POINT_PATCHLIST,
+            PatchList17            = D3D11_PRIMITIVE_TOPOLOGY_17_CONTROL_POINT_PATCHLIST,
+            PatchList18            = D3D11_PRIMITIVE_TOPOLOGY_18_CONTROL_POINT_PATCHLIST,
+            PatchList19            = D3D11_PRIMITIVE_TOPOLOGY_19_CONTROL_POINT_PATCHLIST,
+            PatchList20            = D3D11_PRIMITIVE_TOPOLOGY_20_CONTROL_POINT_PATCHLIST,
+            PatchList21            = D3D11_PRIMITIVE_TOPOLOGY_21_CONTROL_POINT_PATCHLIST,
+            PatchList22            = D3D11_PRIMITIVE_TOPOLOGY_22_CONTROL_POINT_PATCHLIST,
+            PatchList23            = D3D11_PRIMITIVE_TOPOLOGY_23_CONTROL_POINT_PATCHLIST,
+            PatchList24            = D3D11_PRIMITIVE_TOPOLOGY_24_CONTROL_POINT_PATCHLIST,
+            PatchList25            = D3D11_PRIMITIVE_TOPOLOGY_25_CONTROL_POINT_PATCHLIST,
+            PatchList26            = D3D11_PRIMITIVE_TOPOLOGY_26_CONTROL_POINT_PATCHLIST,
+            PatchList27            = D3D11_PRIMITIVE_TOPOLOGY_27_CONTROL_POINT_PATCHLIST,
+            PatchList28            = D3D11_PRIMITIVE_TOPOLOGY_28_CONTROL_POINT_PATCHLIST,
+            PatchList29            = D3D11_PRIMITIVE_TOPOLOGY_29_CONTROL_POINT_PATCHLIST,
+            PatchList30            = D3D11_PRIMITIVE_TOPOLOGY_30_CONTROL_POINT_PATCHLIST,
+            PatchList31            = D3D11_PRIMITIVE_TOPOLOGY_31_CONTROL_POINT_PATCHLIST,
+            PatchList32            = D3D11_PRIMITIVE_TOPOLOGY_32_CONTROL_POINT_PATCHLIST,
+        };
+
+        enum class DSVDimension
+        {
+            Unknown          = D3D11_DSV_DIMENSION_UNKNOWN,
+            Texture1D        = D3D11_DSV_DIMENSION_TEXTURE1D,
+            Texture1DArray   = D3D11_DSV_DIMENSION_TEXTURE1DARRAY,
+            Texture2D        = D3D11_DSV_DIMENSION_TEXTURE2D,
+            Texture2DArray   = D3D11_DSV_DIMENSION_TEXTURE2DARRAY,
+            Texture2DMS      = D3D11_DSV_DIMENSION_TEXTURE2DMS,
+            Texture2DMSArray = D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY
+        };
+
+        enum class DSVFlag
+        {
+            None            = 0,
+            ReadOnlyDepth   = D3D11_DSV_READ_ONLY_DEPTH,
+            ReadOnlyStencil = D3D11_DSV_READ_ONLY_STENCIL,
+        };
+        DEFINE_ENUM_FLAG_OPERATORS(DSVFlag)
+
+        enum class ClearFlag
+        {
+            Depth   = D3D11_CLEAR_DEPTH,
+            Stencil = D3D11_CLEAR_STENCIL,
+        };
+        DEFINE_ENUM_FLAG_OPERATORS(ClearFlag)
 
     } // Direct3D
     
@@ -1360,6 +1570,191 @@ namespace KennyKerr
             BindFlag BindFlags;
             CpuAccessFlag CpuAccessFlags;
             ResourceMiscFlag MiscFlags;
+        };
+
+        struct InputElementDescription
+        {
+            KENNYKERR_DEFINE_STRUCT(InputElementDescription, D3D11_INPUT_ELEMENT_DESC)
+
+            explicit InputElementDescription(Dxgi::Format format                = Dxgi::Format::Unknown,
+                                             char const * semanticName          = nullptr,
+                                             unsigned semanticIndex             = 0,
+                                             unsigned inputSlot                 = 0,
+                                             unsigned alignedByteOffset         = 0,
+                                             InputClassification inputSlotClass = InputClassification::PerVertexData,
+                                             unsigned instanceDataStepRate      = 0) :
+                SemanticName(semanticName),
+                SemanticIndex(semanticIndex),
+                Format(format),
+                InputSlot(inputSlot),
+                AlignedByteOffset(alignedByteOffset),
+                InputSlotClass(inputSlotClass),
+                InstanceDataStepRate(instanceDataStepRate)
+            {}
+
+
+            char const * SemanticName;
+            unsigned SemanticIndex;
+            Dxgi::Format Format;
+            unsigned InputSlot;
+            unsigned AlignedByteOffset;
+            InputClassification InputSlotClass;
+            unsigned InstanceDataStepRate;
+        };
+
+        struct BufferDescription
+        {
+            KENNYKERR_DEFINE_STRUCT(BufferDescription, D3D11_BUFFER_DESC)
+
+            explicit BufferDescription(unsigned byteWidth           = 0,
+                                       BindFlag bindFlags           = BindFlag::None,
+                                       Usage usage                  = Usage::Default,
+                                       CpuAccessFlag cpuAccessFlags = CpuAccessFlag::None,
+                                       ResourceMiscFlag miscFlags   = ResourceMiscFlag::None,
+                                       unsigned structureByteStride = 0) :
+                ByteWidth(byteWidth),
+                Usage(usage),
+                BindFlags(bindFlags),
+                CPUAccessFlags(cpuAccessFlags),
+                MiscFlags(miscFlags),
+                StructureByteStride(structureByteStride)
+            {}
+
+            unsigned ByteWidth;
+            Usage Usage;
+            BindFlag BindFlags;
+            CpuAccessFlag CPUAccessFlags;
+            ResourceMiscFlag MiscFlags;
+            unsigned StructureByteStride;
+        };
+
+        struct SubresourceData
+        {
+            KENNYKERR_DEFINE_STRUCT(SubresourceData, D3D11_SUBRESOURCE_DATA)
+
+            explicit SubresourceData(void const * sysMem       = nullptr,
+                                     unsigned sysMemPitch      = 0,
+                                     unsigned sysMemSlicePitch = 0) :
+                SysMem(sysMem),
+                SysMemPitch(sysMemPitch),
+                SysMemSlicePitch(sysMemSlicePitch)
+            {}
+
+            void const * SysMem;
+            unsigned SysMemPitch;
+            unsigned SysMemSlicePitch;
+        };
+
+        struct DepthStencilViewDescription
+        {
+            KENNYKERR_DEFINE_STRUCT(DepthStencilViewDescription, D3D11_DEPTH_STENCIL_VIEW_DESC)
+
+            explicit DepthStencilViewDescription(DSVDimension viewDimension,
+                                                 Dxgi::Format format      = Dxgi::Format::Unknown,
+                                                 unsigned mipSlice        = 0,
+                                                 unsigned firstArraySlice = 0,
+                                                 unsigned arraySize       = -1,
+                                                 DSVFlag flags            = DSVFlag::None) :
+                Format(format),
+                ViewDimension(viewDimension),
+                Flags(flags)
+            {
+                switch (viewDimension)
+                {
+                case DSVDimension::Texture1D:
+                    Texture1D.MipSlice = mipSlice;
+                    break;
+                case DSVDimension::Texture1DArray:
+                    Texture1DArray.MipSlice = mipSlice;
+                    Texture1DArray.FirstArraySlice = firstArraySlice;
+                    Texture1DArray.ArraySize = arraySize;
+                    break;
+                case DSVDimension::Texture2D:
+                    Texture2D.MipSlice = mipSlice;
+                    break;
+                case DSVDimension::Texture2DArray:
+                    Texture2DArray.MipSlice = mipSlice;
+                    Texture2DArray.FirstArraySlice = firstArraySlice;
+                    Texture2DArray.ArraySize = arraySize;
+                    break;
+                case DSVDimension::Texture2DMS:
+                    break;
+                case DSVDimension::Texture2DMSArray:
+                    Texture2DMSArray.FirstArraySlice = firstArraySlice;
+                    Texture2DMSArray.ArraySize = arraySize;
+                    break;
+                default: break;
+                }
+            }
+
+
+            Dxgi::Format Format;
+            DSVDimension ViewDimension;
+            DSVFlag Flags;
+
+            union
+            {
+                struct
+                {
+                    unsigned MipSlice;
+                } Texture1D;
+
+                struct
+                {
+                    unsigned MipSlice;
+                    unsigned FirstArraySlice;
+                    unsigned ArraySize;
+                } Texture1DArray;
+
+                struct
+                {
+                    unsigned MipSlice;
+                } Texture2D;
+
+                struct
+                {
+                    unsigned MipSlice;
+                    unsigned FirstArraySlice;
+                    unsigned ArraySize;
+                } Texture2DArray;
+
+                struct
+                {
+
+                } Texture2DMS;
+
+                struct
+                {
+                    unsigned FirstArraySlice;
+                    unsigned ArraySize;;
+                } Texture2DMSArray;
+            };
+        };
+
+        struct ViewPort
+        {
+            KENNYKERR_DEFINE_STRUCT(ViewPort, D3D11_VIEWPORT)
+
+            explicit ViewPort(float topLeftX,
+                              float topLeftY,
+                              float width,
+                              float height,
+                              float minDepth = D3D11_MIN_DEPTH,
+                              float maxDepth = D3D11_MAX_DEPTH)
+                              : TopLeftX(topLeftX),
+                              TopLeftY(topLeftY),
+                              Width(width),
+                              Height(height),
+                              MinDepth(minDepth),
+                              MaxDepth(maxDepth)
+            {}
+
+            float TopLeftX;
+            float TopLeftY;
+            float Width;
+            float Height;
+            float MinDepth;
+            float MaxDepth;
         };
 
     } // Direct3D
@@ -2457,6 +2852,14 @@ namespace KennyKerr
 
     } // Direct2D
 
+    namespace Direct3D
+    {
+        struct DepthStencilView;
+        struct Device;
+        struct RenderTargetView;
+        struct Texture2D;
+    } // Direct3D
+
     #pragma endregion Forward declarations
 
     #pragma region Classes
@@ -2482,6 +2885,8 @@ namespace KennyKerr
         struct __declspec(uuid("cafcb56c-6ac3-4889-bf47-9e23bbd260ec")) Surface : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(Surface, Details::Object, IDXGISurface)
+
+            auto AsDirect3DTexture2D() const -> Direct3D::Texture2D;
         };
 
         struct SwapChain : Details::Object
@@ -2580,18 +2985,100 @@ namespace KennyKerr
             auto GetMultithreadProtected() const -> bool;
         };
 
-        struct Texture2D : Details::Object
+        struct DeviceChild : Details::Object
         {
-            KENNYKERR_DEFINE_CLASS(Texture2D, Details::Object, ID3D11Texture2D)
+            KENNYKERR_DEFINE_CLASS(DeviceChild, Details::Object, ID3D11DeviceChild)
+
+            auto GetDevice() const -> Device;
+        };
+
+        struct Resource : DeviceChild
+        {
+            KENNYKERR_DEFINE_CLASS(Resource, DeviceChild, ID3D11Resource)
+
+            auto GetEvictionPriority() const -> Dxgi::ResourcePriority;
+            auto GetType() const -> ResourceDimension;
+            void SetEvictionPriority(Dxgi::ResourcePriority priority) const;
+        };
+
+        struct Buffer : Resource
+        {
+            KENNYKERR_DEFINE_CLASS(Buffer, Resource, ID3D11Buffer)
+        };
+
+        struct Texture2D : Resource
+        {
+            KENNYKERR_DEFINE_CLASS(Texture2D, Resource, ID3D11Texture2D)
 
             auto AsDxgiResource() const -> Dxgi::Resource;
         };
+
+        struct PixelShader : DeviceChild
+        {
+            KENNYKERR_DEFINE_CLASS(PixelShader, DeviceChild, ID3D11PixelShader)
+        };
+
+        struct VertexShader : DeviceChild
+        {
+            KENNYKERR_DEFINE_CLASS(VertexShader, DeviceChild, ID3D11VertexShader)
+        };
+
+        struct InputLayout : DeviceChild
+        {
+            KENNYKERR_DEFINE_CLASS(InputLayout, DeviceChild, ID3D11InputLayout)
+        };
+
 
         struct DeviceContext : Details::Object
         {
             KENNYKERR_DEFINE_CLASS(DeviceContext, Details::Object, ID3D11DeviceContext)
 
+            void ClearDepthStencilView(DepthStencilView const & depthStencilView,
+                                       ClearFlag clearFlags  = ClearFlag::Depth | ClearFlag::Stencil,
+                                       float depth           = D3D11_MAX_DEPTH,
+                                       unsigned char stencil = 0) const;
+
+            void ClearRenderTargetView(RenderTargetView const & renderTargetView,
+                                       Color const & color) const;
+
             void Flush() const;
+
+            void DrawIndexed(unsigned indexCount,
+                             unsigned startIndexLocation = 0,
+                             int baseVertexLocation      = 0) const;
+
+            void IASetPrimitiveTopology(PrimitiveTopology topology) const;
+
+            void IASetIndexBuffer(Buffer const & indexBuffer,
+                                  Dxgi::Format format = Dxgi::Format::R16_UINT,
+                                  unsigned offset     = 0) const;
+
+            void IASetInputLayout(InputLayout const & inputLayout) const;
+
+            void IASetVertexBuffers(unsigned startSlot,
+                                    unsigned numBuffers,
+                                    Buffer const * vertexBuffers,
+                                    unsigned const * strides,
+                                    unsigned const * offsets) const;
+
+            void OMSetRenderTargets() const;
+            void OMSetRenderTargets(unsigned numViews,
+                                    RenderTargetView const * renderTargetViews,
+                                    DepthStencilView depthStencilView) const;
+
+            void PSSetShader(PixelShader const & pixelShader) const;
+
+            void RSSetViewports(unsigned numViewports,
+                                ViewPort const * viewports) const;
+
+            void UpdateSubresource(Resource & dstResource,
+                                   void const * srcData) const;
+
+            void VSSetConstantBuffers(unsigned startSlot,
+                                      unsigned numBuffers,
+                                      Buffer const * constantBuffers) const;
+
+            void VSSetShader(VertexShader const & vertexShader) const;
         };
 
         struct DeviceContext1 : DeviceContext
@@ -2622,7 +3109,30 @@ namespace KennyKerr
             auto AsMultiThread() const -> MultiThread;
             auto GetDxgiFactory() const -> Dxgi::Factory2;
 
+            auto CreateBuffer(BufferDescription const & description) const -> Buffer;
+
+            auto CreateBuffer(BufferDescription const & description,
+                              SubresourceData const & initalData) const -> Buffer;
+
+            auto CreateDepthStencilView(Resource const & resource,
+                                        DepthStencilViewDescription const & description) const -> DepthStencilView;
+
+            auto CreateInputLayout(InputElementDescription const * elements,
+                                   unsigned numElements,
+                                   void const * bytecode,
+                                   size_t bytecodeLength) const -> InputLayout;
+
+            auto CreatePixelShader(void const * bytecode,
+                                   size_t bytecodeLength) const -> PixelShader;
+
+            auto CreateRenderTargetView(Resource const & resource) const -> RenderTargetView;
+            auto CreateRenderTargetView(Dxgi::SwapChain const & swapChain) const -> RenderTargetView;
+
             auto CreateTexture2D(TextureDescription2D const & description) const -> Texture2D;
+
+            auto CreateVertexShader(void const * bytecode,
+                                    size_t bytecodeLength) const -> VertexShader;
+
             auto GetImmediateContext() const -> DeviceContext;
             auto OpenSharedResource(HANDLE resource) const -> Dxgi::Surface;
             auto OpenSharedResource(Dxgi::Resource const & resource) const -> Dxgi::Surface;
@@ -5448,6 +5958,13 @@ namespace KennyKerr
 
     namespace Dxgi
     {
+        inline auto Surface::AsDirect3DTexture2D() const -> Direct3D::Texture2D
+        {
+            Direct3D::Texture2D result;
+            HR(m_ptr.CopyTo(result.GetAddressOf()));
+            return result;
+        }
+
         inline auto SwapChain::Present(unsigned const sync,
                                        Dxgi::Present const flags) const -> HRESULT
         {
@@ -5620,6 +6137,30 @@ namespace KennyKerr
             return 0 != (*this)->GetMultithreadProtected();
         }
 
+        inline auto DeviceChild::GetDevice() const -> Device
+        {
+            Device result;
+            (*this)->GetDevice(result.GetAddressOf());
+            return result;
+        }
+
+        inline auto Resource::GetEvictionPriority() const -> Dxgi::ResourcePriority
+        {
+            return static_cast<Dxgi::ResourcePriority>((*this)->GetEvictionPriority());
+        }
+
+        inline auto Resource::GetType() const -> ResourceDimension
+        {
+            ResourceDimension result;
+            (*this)->GetType(reinterpret_cast<D3D11_RESOURCE_DIMENSION *>(&result));
+            return result;
+        }
+
+        inline void Resource::SetEvictionPriority(Dxgi::ResourcePriority priority) const
+        {
+            (*this)->SetEvictionPriority(static_cast<UINT>(priority));
+        }
+
         inline auto Texture2D::AsDxgiResource() const -> Dxgi::Resource
         {
             Dxgi::Resource result;
@@ -5627,9 +6168,119 @@ namespace KennyKerr
             return result;
         }
 
+        inline void DeviceContext::ClearDepthStencilView(DepthStencilView const & depthStencilView,
+                                                         ClearFlag clearFlags,
+                                                         float depth,
+                                                         unsigned char stencil) const
+        {
+            (*this)->ClearDepthStencilView(depthStencilView.Get(), static_cast<D3D11_CLEAR_FLAG>(clearFlags), depth, stencil);
+        }
+
+        inline void DeviceContext::ClearRenderTargetView(RenderTargetView const & renderTargetView,
+                                                         Color const & color) const
+        {
+            (*this)->ClearRenderTargetView(renderTargetView.Get(), reinterpret_cast<FLOAT const *>(&color));
+        }
+
         inline void DeviceContext::Flush() const
         {
             (*this)->Flush();
+        }
+
+        inline void DeviceContext::DrawIndexed(unsigned indexCount,
+                                               unsigned startIndexLocation,
+                                               int baseVertexLocation) const
+        {
+            (*this)->DrawIndexed(indexCount,
+                                 startIndexLocation,
+                                 baseVertexLocation);
+        }
+
+        inline void DeviceContext::IASetPrimitiveTopology(PrimitiveTopology topology) const
+        {
+            (*this)->IASetPrimitiveTopology(static_cast<D3D11_PRIMITIVE_TOPOLOGY>(topology));
+        }
+
+        inline void DeviceContext::IASetIndexBuffer(Buffer const & indexBuffer,
+                                                    Dxgi::Format format,
+                                                    unsigned offset) const
+        {
+            (*this)->IASetIndexBuffer(indexBuffer.Get(),
+                                      static_cast<DXGI_FORMAT>(format),
+                                      offset);
+        }
+
+        inline void DeviceContext::IASetInputLayout(InputLayout const & inputLayout) const
+        {
+            (*this)->IASetInputLayout(inputLayout.Get());
+        }
+
+        inline void DeviceContext::IASetVertexBuffers(unsigned startSlot,
+                                                      unsigned numBuffers,
+                                                      Buffer const * vertexBuffers,
+                                                      unsigned const * strides,
+                                                      unsigned const * offsets) const
+        {
+            (*this)->IASetVertexBuffers(startSlot,
+                                        numBuffers,
+                                        reinterpret_cast<ID3D11Buffer *const *>(vertexBuffers),
+                                        strides,
+                                        offsets);
+        }
+
+        inline void DeviceContext::OMSetRenderTargets() const
+        {
+            (*this)->OMSetRenderTargets(0, nullptr, nullptr);
+        }
+
+        inline void DeviceContext::OMSetRenderTargets(unsigned numViews,
+                                                      RenderTargetView const * renderTargetViews,
+                                                      DepthStencilView depthStencilView) const
+        {
+            (*this)->OMSetRenderTargets(numViews,
+                                        reinterpret_cast<ID3D11RenderTargetView *const *>(renderTargetViews),
+                                        depthStencilView.Get());
+        }
+
+        inline void DeviceContext::PSSetShader(PixelShader const & pixelShader) const
+        {
+            (*this)->PSSetShader(pixelShader.Get(),
+                                 nullptr,
+                                 0);
+        }
+
+        inline void DeviceContext::RSSetViewports(unsigned numViewports,
+                                                  ViewPort const * viewports) const
+        {
+            (*this)->RSSetViewports(numViewports, reinterpret_cast<D3D11_VIEWPORT const *>(viewports));
+        }
+
+
+        inline void DeviceContext::UpdateSubresource(Resource & dstResource,
+                                                     void const * srcData) const
+        {
+            (*this)->UpdateSubresource(dstResource.Get(),
+                                       0,
+                                       nullptr,
+                                       srcData,
+                                       0,
+                                       0);
+        }
+
+        inline void DeviceContext::VSSetConstantBuffers(unsigned startSlot,
+                                                        unsigned numBuffers,
+                                                        Buffer const * constantBuffers) const
+        {
+            (*this)->VSSetConstantBuffers(startSlot,
+                                          numBuffers,
+                                          reinterpret_cast<ID3D11Buffer *const *>(constantBuffers));
+        }
+
+        inline void DeviceContext::VSSetShader(VertexShader const & vertexShader) const
+        {
+            (*this)->VSSetShader(vertexShader.Get(),
+                                 nullptr,
+                                 0);
         }
 
         inline auto Device::AsDxgi() const -> Dxgi::Device2
@@ -5651,6 +6302,84 @@ namespace KennyKerr
             return AsDxgi().GetAdapter().GetParent();
         }
 
+        inline auto Device::CreateBuffer(BufferDescription const & description) const -> Buffer
+        {
+            Buffer result;
+
+            HR((*this)->CreateBuffer(reinterpret_cast<D3D11_BUFFER_DESC const *>(&description),
+                                     nullptr,
+                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Device::CreateBuffer(BufferDescription const & description,
+                                         SubresourceData const & initalData) const -> Buffer
+        {
+            Buffer result;
+
+            HR((*this)->CreateBuffer(reinterpret_cast<D3D11_BUFFER_DESC const *>(&description),
+                                     reinterpret_cast<D3D11_SUBRESOURCE_DATA const *>(&initalData),
+                                     result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Device::CreateDepthStencilView(Resource const & resource,
+                                                   DepthStencilViewDescription const & description) const -> DepthStencilView
+        {
+            DepthStencilView result;
+
+            HR((*this)->CreateDepthStencilView(resource.Get(), reinterpret_cast<D3D11_DEPTH_STENCIL_VIEW_DESC const *>(&description), result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Device::CreateInputLayout(InputElementDescription const * elements,
+                                              unsigned numElements,
+                                              void const * bytecode,
+                                              size_t bytecodeLength) const -> InputLayout
+        {
+            InputLayout result;
+
+            HR((*this)->CreateInputLayout(reinterpret_cast<D3D11_INPUT_ELEMENT_DESC const *>(elements),
+                numElements,
+                bytecode,
+                bytecodeLength,
+                result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Device::CreatePixelShader(void const * bytecode,
+                                              size_t bytecodeLength) const -> PixelShader
+        {
+            PixelShader result;
+
+            HR((*this)->CreatePixelShader(bytecode,
+                bytecodeLength,
+                nullptr,
+                result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Device::CreateRenderTargetView(Resource const & resource) const -> RenderTargetView
+        {
+            RenderTargetView result;
+
+            HR((*this)->CreateRenderTargetView(resource.Get(),
+                nullptr,
+                result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Device::CreateRenderTargetView(Dxgi::SwapChain const & swapChain) const -> RenderTargetView
+        {
+            return CreateRenderTargetView(swapChain.GetBuffer().AsDirect3DTexture2D());
+        }
+
         inline auto Device::CreateTexture2D(TextureDescription2D const & description) const -> Texture2D
         {
             Texture2D result;
@@ -5658,6 +6387,19 @@ namespace KennyKerr
             HR((*this)->CreateTexture2D(description.Get(),
                                         nullptr,
                                         result.GetAddressOf()));
+
+            return result;
+        }
+
+        inline auto Device::CreateVertexShader(void const * bytecode,
+                                               size_t bytecodeLength) const -> VertexShader
+        {
+            VertexShader result;
+
+            HR((*this)->CreateVertexShader(bytecode,
+                                           bytecodeLength,
+                                           nullptr,
+                                           result.GetAddressOf()));
 
             return result;
         }
