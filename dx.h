@@ -6236,12 +6236,12 @@ namespace KennyKerr
             return 0 != (*this)->GetMultithreadProtected();
         }
 
-        void *Blob::GetBufferPointer() const
+        inline void *Blob::GetBufferPointer() const
         {
             return (*this)->GetBufferPointer();
         }
 
-        auto Blob::GetBufferSize() const -> size_t
+        inline auto Blob::GetBufferSize() const -> size_t
         {
             return (*this)->GetBufferSize();
         }
