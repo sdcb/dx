@@ -7,6 +7,7 @@
 #include <d2d1_2.h>
 #include <d3d11_2.h>
 #include <dwrite_2.h>
+#include <D3Dcompiler.h>
 #include <wincodec.h>
 #include <uianimation.h>
 #include <DcompAnimation.h>
@@ -17,6 +18,7 @@
 #pragma comment(lib, "dwrite")
 #pragma comment(lib, "d3d11")
 #pragma comment(lib, "dxgi")
+#pragma comment(lib, "D3DCompiler")
 
 #ifndef ASSERT
 #define ASSERT(cond) _ASSERTE(cond)
@@ -513,6 +515,43 @@ namespace KennyKerr
             Stencil = D3D11_CLEAR_STENCIL,
         };
         DEFINE_ENUM_FLAG_OPERATORS(ClearFlag)
+
+        enum class CompileFlag
+        {
+            None                         = 0,
+            Debug                        = D3DCOMPILE_DEBUG,
+            SkipValidation               = D3DCOMPILE_SKIP_VALIDATION,
+            SkipOptimization             = D3DCOMPILE_SKIP_OPTIMIZATION,
+            PackMatrixRowMajor           = D3DCOMPILE_PACK_MATRIX_ROW_MAJOR,
+            PackMatrixColumnMajor        = D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR,
+            PartialPrecision             = D3DCOMPILE_PARTIAL_PRECISION,
+            ForceVSSoftwareNoOpt         = D3DCOMPILE_FORCE_VS_SOFTWARE_NO_OPT,
+            ForcePSSoftwareNoOpt         = D3DCOMPILE_FORCE_PS_SOFTWARE_NO_OPT,
+            NoPreshader                  = D3DCOMPILE_NO_PRESHADER,
+            AvoidFlowControl             = D3DCOMPILE_AVOID_FLOW_CONTROL,
+            PreferFlowControl            = D3DCOMPILE_PREFER_FLOW_CONTROL,
+            EnableStrictness             = D3DCOMPILE_ENABLE_STRICTNESS,
+            EnableBackwardsCompatibility = D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY,
+            IEEEStrictness               = D3DCOMPILE_IEEE_STRICTNESS,
+            OptimizationLevel0           = D3DCOMPILE_OPTIMIZATION_LEVEL0,
+            OptimizationLevel1           = D3DCOMPILE_OPTIMIZATION_LEVEL1,
+            OptimizationLevel2           = D3DCOMPILE_OPTIMIZATION_LEVEL2,
+            OptimizationLevel3           = D3DCOMPILE_OPTIMIZATION_LEVEL3,
+            WarningsAreErrors            = D3DCOMPILE_WARNINGS_ARE_ERRORS,
+            ResourcesMayAlias            = D3DCOMPILE_RESOURCES_MAY_ALIAS,
+        };
+        DEFINE_ENUM_FLAG_OPERATORS(CompileFlag)
+
+        enum class FeatureLevel
+        {
+            _9_1    = D3D_FEATURE_LEVEL_9_1,
+            _9_2    = D3D_FEATURE_LEVEL_9_2,
+            _9_3    = D3D_FEATURE_LEVEL_9_3,
+            _10_0   = D3D_FEATURE_LEVEL_10_0,
+            _10_1   = D3D_FEATURE_LEVEL_10_1,
+            _11_0   = D3D_FEATURE_LEVEL_11_0,
+            _11_1   = D3D_FEATURE_LEVEL_11_1,
+        };
 
     } // Direct3D
     
@@ -1740,13 +1779,13 @@ namespace KennyKerr
                               float width,
                               float height,
                               float minDepth = D3D11_MIN_DEPTH,
-                              float maxDepth = D3D11_MAX_DEPTH)
-                              : TopLeftX(topLeftX),
-                              TopLeftY(topLeftY),
-                              Width(width),
-                              Height(height),
-                              MinDepth(minDepth),
-                              MaxDepth(maxDepth)
+                              float maxDepth = D3D11_MAX_DEPTH) :
+                TopLeftX(topLeftX),
+                TopLeftY(topLeftY),
+                Width(width),
+                Height(height),
+                MinDepth(minDepth),
+                MaxDepth(maxDepth)
             {}
 
             float TopLeftX;
@@ -1755,6 +1794,20 @@ namespace KennyKerr
             float Height;
             float MinDepth;
             float MaxDepth;
+        };
+
+        struct ShaderMacro
+        {
+            KENNYKERR_DEFINE_STRUCT(ShaderMacro, D3D_SHADER_MACRO)
+
+            explicit ShaderMacro( char const * name,
+                                  char const * definition) :
+                Name(name),
+                Definition(definition)
+            {}
+
+            char const * Name;
+            char const * Definition;
         };
 
     } // Direct3D
@@ -2906,6 +2959,8 @@ namespace KennyKerr
         {
             KENNYKERR_DEFINE_CLASS(SwapChain1, SwapChain, IDXGISwapChain1)
 
+            auto GetDescription1() const -> SwapChainDescription1;
+
             void SetRotation(ModeRotation mode) const;
             auto GetRotation() const -> ModeRotation;
         };
@@ -2983,6 +3038,14 @@ namespace KennyKerr
             void Leave() const;
             auto SetMultithreadProtected(bool protect = true) const -> bool;
             auto GetMultithreadProtected() const -> bool;
+        };
+
+        struct Blob : Details::Object
+        {
+            KENNYKERR_DEFINE_CLASS(Blob, Details::Object, ID3DBlob)
+
+            void *GetBufferPointer() const;
+            auto GetBufferSize() const -> size_t;
         };
 
         struct DeviceChild : Details::Object
@@ -3108,6 +3171,7 @@ namespace KennyKerr
             auto AsDxgi() const -> Dxgi::Device2;
             auto AsMultiThread() const -> MultiThread;
             auto GetDxgiFactory() const -> Dxgi::Factory2;
+            auto GetFeatureLevel() const -> FeatureLevel;
 
             auto CreateBuffer(BufferDescription const & description) const -> Buffer;
 
@@ -5846,6 +5910,32 @@ namespace KennyKerr
             HR(device->QueryInterface(result.GetAddressOf()));
             return result;
         }
+
+        inline auto Compile(char const * target,
+                            void const * srcData,
+                            size_t srcDataSize,
+                            char const * sourceName = nullptr,
+                            ShaderMacro const * macros = nullptr,
+                            ID3DInclude * include = nullptr,
+                            char const * entrypoint = "main",
+                            CompileFlag flags1 = CompileFlag::None) -> Blob
+        {
+            Blob result;
+
+            HR(D3DCompile(srcData,
+                          srcDataSize,
+                          sourceName,
+                          reinterpret_cast<D3D_SHADER_MACRO const *>(macros),
+                          include,
+                          entrypoint,
+                          target,
+                          static_cast<UINT>(flags1),
+                          0,
+                          result.GetAddressOf(),
+                          nullptr));
+
+            return result;
+        }
     }
 
     namespace Wic
@@ -5993,6 +6083,15 @@ namespace KennyKerr
                                           0); // flags
         }
 
+        inline auto SwapChain1::GetDescription1() const -> SwapChainDescription1
+        {
+            SwapChainDescription1 result;
+
+            (*this)->GetDesc1(reinterpret_cast<DXGI_SWAP_CHAIN_DESC1*>(&result));
+
+            return result;
+        }
+
         inline void SwapChain1::SetRotation(ModeRotation mode) const
         {
             HR((*this)->SetRotation(static_cast<DXGI_MODE_ROTATION>(mode)));
@@ -6135,6 +6234,16 @@ namespace KennyKerr
         inline auto MultiThread::GetMultithreadProtected() const -> bool
         {
             return 0 != (*this)->GetMultithreadProtected();
+        }
+
+        void *Blob::GetBufferPointer() const
+        {
+            return (*this)->GetBufferPointer();
+        }
+
+        auto Blob::GetBufferSize() const -> size_t
+        {
+            return (*this)->GetBufferSize();
         }
 
         inline auto DeviceChild::GetDevice() const -> Device
@@ -6300,6 +6409,11 @@ namespace KennyKerr
         inline auto Device::GetDxgiFactory() const -> Dxgi::Factory2
         {
             return AsDxgi().GetAdapter().GetParent();
+        }
+
+        inline auto Device::GetFeatureLevel() const -> FeatureLevel
+        {
+            return static_cast<FeatureLevel>((*this)->GetFeatureLevel());
         }
 
         inline auto Device::CreateBuffer(BufferDescription const & description) const -> Buffer
