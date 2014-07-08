@@ -153,12 +153,9 @@ static string GetCompileTargetSuffix()
 
     case FeatureLevel::_11_0:
         return "_5_0";
-
-    case FeatureLevel::_11_1:
-        return "_5_1";
     }
 
-    throw exception("Not supported");
+    return "_5_1";
 }
 
 static void CreateDeviceResources()
@@ -266,7 +263,7 @@ static void Draw()
 }
 
 static void CreateDeviceSwapChainBitmap(Dxgi::SwapChain1 const & swapChain,
-                                        DeviceContext const & target)
+                                        DeviceContext const & context)
 {
     auto desc = swapChain.GetDescription1();
     auto width = static_cast<float>(desc.Width);
@@ -279,7 +276,8 @@ static void CreateDeviceSwapChainBitmap(Dxgi::SwapChain1 const & swapChain,
 
     context.OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 
-    context.RSSetViewports(1, &ViewPort{ 0, 0, width, height });
+    ViewPort viewPorts( 0, 0, width, height );
+    context.RSSetViewports(1, &viewPorts);
 
     auto aspectRatio = width / height;
     auto fovAngleY = 70.0f * XM_PI / 180.0f;
