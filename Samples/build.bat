@@ -12,6 +12,6 @@ cl /nologo /W4 HwndRenderTarget.cpp
 cl /nologo /W4 LinearGradient.cpp
 cl /nologo /W4 RadialGradient.cpp
 cl /nologo /W4 WicBitmapRenderTarget.cpp
-cl /nologo /W4 3DCube.cpp
+cl /nologo /W4 /EHsc 3DCube.cpp
 
 del *.obj
